@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package toolsclient;
+option go_package = "./toolsclient";
+
+message DailySentenceReq {
+    string lang = 1;
+    string use = 2;
+}
+
+message DailySentenceRes {
+    string sentence = 1;
+}
+
+service ToolsService {
+  rpc DailySentence(DailySentenceReq) returns (DailySentenceRes);
+}
