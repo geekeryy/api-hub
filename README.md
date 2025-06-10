@@ -6,8 +6,19 @@
 
 - 接口具有扩展性
 - 提供http和rpc服务
+- https://github.com/suyuan32/simple-admin-core
+
+## 痛点
+
+- api文档频繁变更：通过goctl-swagger插件自动生成api文档
+- 参数校验时相同类型校验重复编码：框架集成Validator库通过api定义自动校验参数，解决大部分通用类型的参数校验问题
 
 ## 功能列表
+
+- 国际化
+  - 框架错误消息国际化
+  - 业务错误消息国际化
+  - 业务国际化
 
 ## TODO
 
