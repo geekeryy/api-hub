@@ -1,9 +1,9 @@
 # Generate api go files
 # Example: make gen-api s=oms
 gen-api:
-	goctl api go --home tpl -dir api/${s} -api api/${s}/doc/${s}.api
+	goctl api go --home tpl-1.8.4 -dir api/${s} -api api/${s}/doc/${s}.api
 	goctl api format --dir=api/${s} --declare
-	goctl api plugin -plugin goctl-swagger="swagger -filename ${s}.json" -api api/${s}/doc/${s}.api -dir doc/swagger
+	goctl api swagger --api api/${s}/doc/${s}.api --dir doc/swagger
 
 # Generate rpc go files
 # Example: make gen-rpc s=backendrpc

@@ -4,13 +4,12 @@
 package validate
 
 import (
+	"context"
 	"errors"
-	"fmt"
 	"reflect"
-	"strings"
 	"sync"
 
-	"github.com/gin-gonic/gin/binding"
+	"github.com/geekeryy/api-hub/core/language"
 	"github.com/go-playground/locales"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/ja"
@@ -19,122 +18,22 @@ import (
 	"github.com/go-playground/locales/zh_Hant"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type defaultValidator struct {
-	once     sync.Once
+type Validate struct {
 	validate *validator.Validate
-}
-
-type SliceValidationError []error
-
-// Error concatenates all error elements in SliceValidationError into a single string separated by \n.
-func (err SliceValidationError) Error() string {
-	n := len(err)
-	switch n {
-	case 0:
-		return ""
-	default:
-		var b strings.Builder
-		if err[0] != nil {
-			fmt.Fprintf(&b, "[%d]: %s", 0, err[0].Error())
-		}
-		// TODO 改为warp不用\n
-		if n > 1 {
-			for i := 1; i < n; i++ {
-				if err[i] != nil {
-					b.WriteString("\n")
-					fmt.Fprintf(&b, "[%d]: %s", i, err[i].Error())
-				}
-			}
-		}
-		return b.String()
-	}
-}
-
-var _ binding.StructValidator = (*defaultValidator)(nil)
-
-// ValidateStruct receives any kind of type, but only performed struct or pointer to struct type.
-func (v *defaultValidator) ValidateStruct(obj any) error {
-	if obj == nil {
-		return nil
-	}
-
-	value := reflect.ValueOf(obj)
-	switch value.Kind() {
-	case reflect.Ptr:
-		if value.Elem().Kind() != reflect.Struct {
-			return v.ValidateStruct(value.Elem().Interface())
-		}
-		return v.validateStruct(obj)
-	case reflect.Struct:
-		return v.validateStruct(obj)
-	case reflect.Slice, reflect.Array:
-		count := value.Len()
-		validateRet := make(SliceValidationError, 0)
-		for i := 0; i < count; i++ {
-			if err := v.ValidateStruct(value.Index(i).Interface()); err != nil {
-				validateRet = append(validateRet, err)
-			}
-		}
-		if len(validateRet) == 0 {
-			return nil
-		}
-		return validateRet
-	default:
-		return nil
-	}
-}
-
-// validateStruct receives struct type
-func (v *defaultValidator) validateStruct(obj any) error {
-	v.lazyinit()
-	err := v.validate.Struct(obj)
-
-	if verrs, okV := err.(validator.ValidationErrors); _uni != nil && okV && len(verrs) > 0 {
-		errStr := make([]string, 0, len(verrs))
-		if t, found := _uni.GetTranslator("zh"); found {
-			for _, verr := range verrs {
-				errStr = append(errStr, verr.Translate(t))
-			}
-		}
-		// TODO 改为warp不用\n
-		return errors.New(strings.Join(errStr, "\n"))
-	}
-
-	return err
-
-}
-
-// Engine returns the underlying validator engine which powers the default
-// Validator instance. This is useful if you want to register custom validations
-// or struct level validations. See validator GoDoc for more info -
-// https://pkg.go.dev/github.com/go-playground/validator/v10
-func (v *defaultValidator) Engine() any {
-	v.lazyinit()
-	return v.validate
-}
-
-func (v *defaultValidator) lazyinit() {
-	v.once.Do(func() {
-		if _validator == nil {
-			v.validate = validator.New()
-		} else {
-			v.validate = _validator
-		}
-		v.validate.SetTagName("binding")
-	})
 }
 
 type ValidatorFn func(v *validator.Validate, trans ut.Translator) error
 
-var _validator *validator.Validate
+var _validate *Validate
 var _once sync.Once
 var _uni *ut.UniversalTranslator
 
-func Register(fns []ValidatorFn, langs []string) {
+func New(fns []ValidatorFn, langs []string) *Validate {
 	_once.Do(func() {
-		v := validator.New()
+		v := validator.New(validator.WithRequiredStructEnabled())
 		v.RegisterTagNameFunc(func(fld reflect.StructField) string {
 			return fld.Tag.Get("comment")
 		})
@@ -159,15 +58,63 @@ func Register(fns []ValidatorFn, langs []string) {
 				continue
 			}
 			for _, fn := range fns {
-				fn(v, trans)
+				if err := fn(v, trans); err != nil {
+					logx.Error(err)
+				}
 			}
 		}
 
-		_validator = v
-
-		// 替换gin默认验证器
-		binding.Validator = &defaultValidator{}
+		_validate = &Validate{
+			validate: v,
+		}
 
 	})
+	return _validate
 
+}
+
+// ValidateStruct receives any kind of type, but only performed struct or pointer to struct type.
+func (v *Validate) ValidateStruct(ctx context.Context, obj any) error {
+	if obj == nil {
+		return nil
+	}
+
+	value := reflect.ValueOf(obj)
+	switch value.Kind() {
+	case reflect.Ptr:
+		if value.Elem().Kind() != reflect.Struct {
+			return v.ValidateStruct(ctx, value.Elem().Interface())
+		}
+		return v.validateStruct(ctx, obj)
+	case reflect.Struct:
+		return v.validateStruct(ctx, obj)
+	case reflect.Slice, reflect.Array:
+		count := value.Len()
+		// 如果验证失败，返回第一个错误
+		for i := 0; i < count; i++ {
+			if err := v.ValidateStruct(ctx, value.Index(i).Interface()); err != nil {
+				return err
+			}
+		}
+		return nil
+	default:
+		return nil
+	}
+}
+
+// validateStruct receives struct type
+func (v *Validate) validateStruct(ctx context.Context, obj any) error {
+	err := v.validate.Struct(obj)
+
+	// 如果验证失败，返回第一个错误
+	if verrs, okV := err.(validator.ValidationErrors); _uni != nil && okV && len(verrs) > 0 {
+		lang := language.Lang(ctx)
+		if t, found := _uni.GetTranslator(lang); found {
+			for _, verr := range verrs {
+				return errors.New(verr.Translate(t))
+			}
+		}
+	}
+
+	return err
 }

@@ -1,7 +1,9 @@
-package localization
+package language
 
 import (
 	"context"
+
+	"github.com/geekeryy/api-hub/core/consts"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc/metadata"
@@ -25,19 +27,18 @@ const (
 const ACCEPT_LANGUAGE = "accept-language"
 
 func Default() string {
-	return JA
+	return ZH
 }
-
 
 func Lang(ctx context.Context) string {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		if value := ctx.Value(ACCEPT_LANGUAGE); value != nil {
+		if value := ctx.Value(consts.AcceptLanguage); value != nil {
 			return value.(string)
 		}
 		return Default()
 	}
-	lang, ok := md[ACCEPT_LANGUAGE]
+	lang, ok := md[consts.AcceptLanguage.String()]
 	if !ok || len(lang) == 0 || len(lang[0]) == 0 {
 		return Default()
 	}

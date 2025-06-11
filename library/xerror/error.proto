@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package xerror;
+option go_package = "./xerror";
+
+message Error {
+  int64 code = 1;
+  string messageId = 2;
+  map<string, string> TemplateDate = 3;
+  int64 plural = 4;
+  repeated string slacks = 5;
+  int64 status = 6;
+}
