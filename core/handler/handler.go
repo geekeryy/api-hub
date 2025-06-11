@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
+	coreError "github.com/geekeryy/api-hub/core/error"
 	"github.com/geekeryy/api-hub/core/language"
-	"github.com/geekeryy/api-hub/library/localization"
 	"github.com/geekeryy/api-hub/library/xerror"
 	"github.com/go-playground/validator/v10"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type baseResponse struct {
+type BaseResponse struct {
 	Code int64  `json:"code"`
 	Msg  string `json:"msg"`
 	Data any    `json:"data"`
@@ -33,7 +33,7 @@ func ErrorHandler(ctx context.Context, err error) (statusCode int, errResponse a
 	if err == nil {
 		return http.StatusOK, nil
 	}
-	target := &xerror.Error{}
+	target := &coreError.Error{}
 	if errors.As(err, &target) {
 		logx.Errorw(target.MessageId, logx.Field("callers", target.Slacks), logx.Field("code", target.Code))
 		return transform(ctx, target)
@@ -63,7 +63,7 @@ func ErrorHandler(ctx context.Context, err error) (statusCode int, errResponse a
 		return transform(ctx, xerror.InvalidParameterErr.WithStatus(http.StatusBadRequest))
 	}
 
-	return http.StatusInternalServerError, baseResponse{
+	return http.StatusInternalServerError, BaseResponse{
 		Code: 500,
 		Msg:  "unknown error",
 	}
@@ -77,19 +77,19 @@ func getCaller(slacks []string) string {
 }
 
 // transform 将内置错误转换为http返回
-func transform(ctx context.Context, target *xerror.Error) (int, any) {
+func transform(ctx context.Context, target *coreError.Error) (int, any) {
 	statusCode := http.StatusOK
 	if target.Status > 0 {
 		statusCode = int(target.Status)
 	} else if target.Code > 0 && target.Code <= 600 {
 		statusCode = int(target.Code)
 	}
-	messageId := localization.Localize(language.Lang(ctx), &i18n.LocalizeConfig{
+	messageId := language.Localize(language.Lang(ctx), &i18n.LocalizeConfig{
 		MessageID:    target.MessageId,
 		TemplateData: target.TemplateDate,
 		PluralCount:  target.Plural,
 	})
-	return statusCode, baseResponse{
+	return statusCode, BaseResponse{
 		Code: target.Code,
 		Msg:  messageId,
 	}
@@ -138,7 +138,7 @@ func grpcCodeToHTTPStatus(code codes.Code) int {
 }
 
 func OkHandler(ctx context.Context, v interface{}) any {
-	return baseResponse{
+	return BaseResponse{
 		Code: 0,
 		Msg:  "success",
 		Data: v,

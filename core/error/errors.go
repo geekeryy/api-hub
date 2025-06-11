@@ -1,4 +1,4 @@
-package xerror
+package error
 
 import (
 	"fmt"
@@ -10,15 +10,6 @@ import (
 )
 
 //go:generate protoc  --go_out=../ error.proto
-
-func newerr(c int64, msg string) *Error {
-	return &Error{
-		Code:         c,
-		MessageId:    msg,
-		Plural:       0,
-		TemplateDate: make(map[string]string),
-	}
-}
 
 func (e *Error) Error() string {
 	return e.MessageId

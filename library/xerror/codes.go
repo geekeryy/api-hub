@@ -1,5 +1,10 @@
 package xerror
 
+import (
+	coreError "github.com/geekeryy/api-hub/core/error"
+	"google.golang.org/protobuf/protoadapt"
+)
+
 // 内置系统错误 (100~599)
 var (
 	// 400 Bad Request
@@ -173,3 +178,16 @@ var (
 	// 邮箱格式错误
 	EmailFormatError = newerr(10047, "EMAIL_FORMAT_ERROR")
 )
+
+func newerr(c int64, msg string) *coreError.Error {
+	return &coreError.Error{
+		Code:         c,
+		MessageId:    msg,
+		Plural:       0,
+		TemplateDate: make(map[string]string),
+	}
+}
+
+func New(err error, e ...protoadapt.MessageV1) error {
+	return coreError.New(err, e...)
+}

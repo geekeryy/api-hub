@@ -1,7 +1,4 @@
-// Package xerror @Description  TODO
-// @Author  	 jiangyang
-// @Created  	 2024/7/19 下午5:03
-package handler
+package xerror_test
 
 import (
 	"context"
@@ -9,6 +6,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/geekeryy/api-hub/core/consts"
+	"github.com/geekeryy/api-hub/core/handler"
+	"github.com/geekeryy/api-hub/core/language"
+	_ "github.com/geekeryy/api-hub/library/localization" // 初始化翻译模块
 	"github.com/geekeryy/api-hub/library/xerror"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,7 +24,7 @@ func TestErrorHandler(t *testing.T) {
 		{
 			"normal error",
 			errors.New("normal error"),
-			baseResponse{
+			handler.BaseResponse{
 				Code: 500,
 				Msg:  "unknown error",
 			},
@@ -31,7 +32,7 @@ func TestErrorHandler(t *testing.T) {
 		{
 			"standard grpc error",
 			status.Error(codes.Unauthenticated, "unauthenticated"),
-			baseResponse{
+			handler.BaseResponse{
 				Code: 500,
 				Msg:  "unknown error",
 			},
@@ -39,7 +40,7 @@ func TestErrorHandler(t *testing.T) {
 		{
 			"grpc error",
 			xerror.InternalServerErr.Rpc(),
-			baseResponse{
+			handler.BaseResponse{
 				Code: 500,
 				Msg:  "系统错误",
 			},
@@ -47,7 +48,7 @@ func TestErrorHandler(t *testing.T) {
 		{
 			"warp normal error to grpc error",
 			xerror.New(errors.New("normal error")),
-			baseResponse{
+			handler.BaseResponse{
 				Code: int64(codes.Unknown),
 				Msg:  "normal error",
 			},
@@ -55,7 +56,7 @@ func TestErrorHandler(t *testing.T) {
 		{
 			"append details",
 			xerror.New(errors.New("normal error"), xerror.InternalServerErr),
-			baseResponse{
+			handler.BaseResponse{
 				Code: 500,
 				Msg:  "系统错误",
 			},
@@ -63,7 +64,9 @@ func TestErrorHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if _, got := ErrorHandler(context.Background(), tt.err); !reflect.DeepEqual(got, tt.want) {
+			ctx := context.Background()
+			ctx = context.WithValue(ctx, consts.AcceptLanguage, language.ZH)
+			if _, got := handler.ErrorHandler(ctx, tt.err); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ErrorHandler(err) got %v, want %v", got, tt.want)
 			}
 		})

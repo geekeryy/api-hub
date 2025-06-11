@@ -1,0 +1,8 @@
+INVALID_PARAMETER = "Invalid parameters"
+UNAUTHORIZED = "Unauthorized"
+FORBIDDEN = "Forbidden"
+NOT_FOUND = "Not found"
+CONFLICT = "Conflict"
+TOO_MANY_REQUESTS = "Too many requests"
+INTERNAL_SERVER_ERROR = "System error"
+GATEWAY_TIMEOUT = "Gateway timeout"

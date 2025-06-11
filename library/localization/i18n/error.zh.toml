@@ -1,12 +1,3 @@
-INVALID_PARAMETER = "参数错误"
-UNAUTHORIZED = "未授权"
-FORBIDDEN = "禁止访问"
-NOT_FOUND = "资源不存在"
-CONFLICT = "冲突"
-TOO_MANY_REQUESTS = "请求过多"
-INTERNAL_SERVER_ERROR = "系统错误"
-GATEWAY_TIMEOUT = "请求超时"
-
 CHINESE_NAME_ERR_MSG = "{0}不符合中文名称规范，可包含中文、大小写字母、数字、_、-、()，且长度介于1到64个字符之间"
 
 FIELD_USERNAME = "用户名称"

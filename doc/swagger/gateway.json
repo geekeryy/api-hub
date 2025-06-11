@@ -1,0 +1,100 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "网关服务",
+    "title": "gateway",
+    "contact": {
+      "name": "jiangyang",
+      "email": "jiangyang.me@gmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://github.com/geekeryy/api-hub/blob/main/LICENSE"
+    },
+    "version": "1.0"
+  },
+  "host": "localhost:8888",
+  "basePath": "/",
+  "paths": {
+    "/api/v1/gateway/ai/daily-sentence": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "AI"
+        ],
+        "summary": "每日一句",
+        "operationId": "aiDailySentenceHandler",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "语言",
+            "name": "lang",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "用途 将会传递给Prompt模板，为空时模板不包含用途",
+            "name": "use",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sentence": {
+                  "description": "句子",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/ping": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "健康检查"
+        ],
+        "summary": "健康检查",
+        "operationId": "healthzPingHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    }
+  },
+  "x-date": "2025-06-11 23:01:19",
+  "x-description": "This is a goctl generated swagger file.",
+  "x-github": "https://github.com/zeromicro/go-zero",
+  "x-go-zero-doc": "https://go-zero.dev/",
+  "x-goctl-version": "1.8.4"
+}

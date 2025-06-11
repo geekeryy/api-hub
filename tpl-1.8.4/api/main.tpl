@@ -5,6 +5,10 @@ import (
 	"fmt"
 
 	{{.importPackages}}
+
+	coreHandler "{{.projectPkg}}/core/handler"
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 var configFile = flag.String("f", "etc/{{.serviceName}}.yaml", "the config file")
@@ -20,6 +24,11 @@ func main() {
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
+
+	httpx.SetErrorHandlerCtx(coreHandler.ErrorHandler)
+	httpx.SetOkHandler(coreHandler.OkHandler)
+
+	logx.DisableStat()
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()

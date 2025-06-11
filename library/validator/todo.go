@@ -1527,3 +1527,5 @@
 // 	return t
 // }
 package validator
+
+// TODO 将validator的tag翻译注册到i18n中

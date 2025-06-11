@@ -1,41 +1,48 @@
-info(
-	desc: "gateway"
-	author: "jiangyang"
-	email: "jiangyang.me@gmail.com"
+info (
+	title:        "gateway"
+	description:  "网关服务"
+	contactName:  "jiangyang"
+	contactEmail: "jiangyang.me@gmail.com"
+	licenseName:  "MIT"
+	licenseUrl:   "https://github.com/geekeryy/api-hub/blob/main/LICENSE"
+	host:         "localhost:8888"
+	basePath:     "/"
 )
 
-type (
-    DailySentenceReq {
-        Lang string `form:"lang,omitempty"` // 语言
-        Use string `form:"use,omitempty"` // 用途 将会传递给Prompt模板，为空时模板不包含用途
-    }
-
-    DailySentenceResp {
-        Sentence string `json:"sentence"`
-    }
-)
-
-@server(
-	prefix : /api/v1/gateway
-    group: healthz
-    tags: "健康检查"
+@server (
+	prefix: /api/v1/gateway
+	group:  healthz
+	tags:   "健康检查"
 )
 service gateway-api {
+	@doc (
+		summary: "健康检查"
+	)
 	@handler PingHandler
-    @doc(
-        summary: "健康检查"
-    )
 	get /ping
 }
 
-@server(
-	group: ai
-	prefix : /api/v1/gateway/ai
+@server (
+	group:  ai
+	prefix: /api/v1/gateway/ai
+	tags:   "AI"
+	jwt:    Auth
 )
 service gateway-api {
+	@doc (
+		summary: "每日一句"
+	)
 	@handler DailySentenceHandler
-    @doc(
-        summary: "每日一句"
-    )
-	get /daily-sentence(DailySentenceReq) returns (DailySentenceResp)
+	get /daily-sentence (DailySentenceReq) returns (DailySentenceResp)
 }
+
+type (
+	DailySentenceReq {
+		Lang string `form:"lang,omitempty"` // 语言
+		Use  string `form:"use,omitempty"` // 用途 将会传递给Prompt模板，为空时模板不包含用途
+	}
+	DailySentenceResp {
+		Sentence string `json:"sentence"` // 句子
+	}
+)
+

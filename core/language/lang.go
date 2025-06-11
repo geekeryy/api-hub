@@ -2,12 +2,50 @@ package language
 
 import (
 	"context"
+	"embed"
 
+	"github.com/BurntSushi/toml"
 	"github.com/geekeryy/api-hub/core/consts"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/zeromicro/go-zero/core/logx"
+	"golang.org/x/text/language"
 	"google.golang.org/grpc/metadata"
 )
+
+var DefaultLanguageTag = language.Chinese
+
+var Bundle = i18n.NewBundle(DefaultLanguageTag)
+
+//go:embed i18n/error.*.toml
+var LocaleFS embed.FS
+
+func init() {
+	Bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
+	if _, err := Bundle.LoadMessageFileFS(LocaleFS, "i18n/error.zh.toml"); err != nil {
+		logx.Error(err)
+	}
+	if _, err := Bundle.LoadMessageFileFS(LocaleFS, "i18n/error.en.toml"); err != nil {
+		logx.Error(err)
+	}
+	if _, err := Bundle.LoadMessageFileFS(LocaleFS, "i18n/error.ja.toml"); err != nil {
+		logx.Error(err)
+	}
+	if _, err := Bundle.LoadMessageFileFS(LocaleFS, "i18n/error.ko.toml"); err != nil {
+		logx.Error(err)
+	}
+	if _, err := Bundle.LoadMessageFileFS(LocaleFS, "i18n/error.zh-Hant.toml"); err != nil {
+		logx.Error(err)
+	}
+}
+
+func Localize(lang string, localizeConfig *i18n.LocalizeConfig) string {
+	res, err := i18n.NewLocalizer(Bundle, lang).Localize(localizeConfig)
+	if err != nil {
+		return localizeConfig.MessageID
+	}
+	return res
+}
 
 type Language struct {
 	ZH     string `json:"zh,omitempty"`

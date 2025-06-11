@@ -57,8 +57,8 @@ func server() {
 		}
 
 		ctx := c.Request.Context()
-		if len(c.Request.Header.Get("accept-language"))>0{
-			ctx=context.WithValue(ctx, consts.AcceptLanguage, c.Request.Header.Get("accept-language"))
+		if len(c.Request.Header.Get("accept-language")) > 0 {
+			ctx = context.WithValue(ctx, consts.AcceptLanguage, c.Request.Header.Get("accept-language"))
 		}
 		if err := validator.ValidateStruct(ctx, &req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
