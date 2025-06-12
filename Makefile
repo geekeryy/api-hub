@@ -15,5 +15,18 @@ gen-rpc:
 model:
 	goctl model pg datasource --table="${table}" -dir ./rpc/model/${dir} --url="postgres://$(PG)" --schema="public" -home=tpl
 
+
+
+# Import api to apifox
+# ENV: export APIFOX_TOKEN=APS-xxxxxxxxxxxxxxxxxxx
+# Example: make apifox s=gateway PROJECT_ID=6567759
 apifox:
-	go run doc/swagger/main.go
+	@if [ -z "$(PROJECT_ID)" ]; then echo "PROJECT_ID is not set"; exit 1; fi
+	@if [ -z "$(APIFOX_TOKEN)" ]; then echo "APIFOX_TOKEN is not set"; exit 1; fi
+	@swaggerfile=./doc/swagger/$(s).json; \
+	jsondata=$$(cat $$swaggerfile | tr -d '\n' | sed 's/\\/\\\\/g; s/"/\\"/g'); \
+	curl --location --request POST "https://api.apifox.cn/api/v1/projects/$(PROJECT_ID)/import-data" \
+		--header "X-Apifox-Version: 2022-11-16" \
+		--header "Authorization: Bearer $(APIFOX_TOKEN)" \
+		--header "Content-Type: application/json" \
+		--data-raw "$$(printf '{"importFormat": "openapi","data":"%s"}' "$$jsondata")"
