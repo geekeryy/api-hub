@@ -108,11 +108,11 @@ var EmailFormatError = newerr(10047, "EMAIL_FORMAT_ERROR")
 
 ```toml
 # 定义错误消息
-# library/localization/zh.yaml
-EMAIL_FORMAT_ERROR: 邮箱格式错误
+# library/localization/error.zh.toml
+EMAIL_FORMAT_ERROR =  邮箱格式错误
 
-# library/localization/en.yaml
-EMAIL_FORMAT_ERROR: Email format error
+# library/localization/error.en.toml
+EMAIL_FORMAT_ERRO = Email format error
 ```
 
 ## 🤔 QA
