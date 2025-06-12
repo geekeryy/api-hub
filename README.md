@@ -7,7 +7,7 @@
 
 ## 🏗️ 项目架构概览
 
-![excalidraw.com](architecture.excalidraw.svg)
+![excalidraw.com](architecture.svg)
 
 ### 外部依赖层
 
