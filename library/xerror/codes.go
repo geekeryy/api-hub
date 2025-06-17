@@ -5,6 +5,7 @@ import (
 	"google.golang.org/protobuf/protoadapt"
 )
 
+// 错误码参考：https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Reference/Status
 // 内置系统错误 (100~599)
 var (
 	// 400 Bad Request

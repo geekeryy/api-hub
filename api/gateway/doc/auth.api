@@ -1,0 +1,143 @@
+@server (
+	group:      auth/member
+	middleware: ContextMiddleware
+	prefix:     /api/v1/gateway/auth/member
+	tags:       "Auth - C端用户授权"
+)
+service gateway-api {
+	@doc (
+		summary:     "登录"
+		description: "手机号+验证码登录、邮箱+验证码登录、用户名/手机号/邮箱+密码登录、第三方登录"
+	)
+	@handler MemberLoginHandler
+	post /login (MemberLoginReq) returns (MemberLoginResp)
+
+	@doc (
+		summary:     "注册"
+		description: "账号密码注册、手机号验证码注册、手机号验证码+密码注册、邮箱验证码注册、邮箱验证码+密码注册、邮箱激活+密码注册"
+	)
+	@handler MemberRegisterHandler
+	post /register (MemberRegisterReq)
+
+	@doc (
+		summary:     "刷新Token"
+		description: "资源请求返回401时，自动调用刷新Token接口，并重放资源请求；如果刷新Token返回401，则需要重新登录"
+	)
+	@handler MemberRefreshTokenHandler
+	post /refresh (MemberRefreshTokenReq) returns (MemberRefreshTokenResp)
+
+	@doc (
+		summary:     "激活邮箱"
+		description: "用户点击邮箱激活链接，前端页面调用激活邮箱接口，激活邮箱"
+	)
+	@handler MemberActivateEmailHandler
+	post /activate-email (MemberActivateEmailReq)
+
+	@doc (
+		summary:     "发送邮箱验证码"
+		description: "发送邮箱验证码"
+	)
+	@handler MemberSendEmailCodeHandler
+	post /send-email-code (MemberSendEmailCodeReq)
+
+	@doc (
+		summary:     "发送手机验证码"
+		description: "发送手机验证码"
+	)
+	@handler MemberSendPhoneCodeHandler
+	post /send-phone-code (MemberSendPhoneCodeReq)
+
+	@doc (
+		summary:     "忘记密码"
+		description: "忘记密码"
+	)
+	@handler MemberForgetPasswordHandler
+	post /forget-password (MemberForgetPasswordReq)
+}
+
+@server (
+	group:      auth/admin
+	middleware: ContextMiddleware
+	prefix:     /api/v1/gateway/auth/admin
+	tags:       "Auth - B端用户授权"
+)
+service gateway-api {
+	@doc (
+		summary:     "登录"
+		description: "登录"
+	)
+	@handler AdminLoginHandler
+	post /login (AdminLoginReq) returns (AdminLoginResp)
+
+	@doc (
+		summary:     "注册"
+		description: "注册"
+	)
+	@handler AdminRegisterHandler
+	post /register (AdminRegisterReq) returns (AdminRegisterResp)
+}
+
+@server (
+	group:  auth/jwks
+	prefix: /api/v1/gateway/auth/jwks
+	tags:   "Auth - jwks"
+)
+service gateway-api {
+	@doc (
+		summary:     "获取公钥"
+		description: "获取公钥"
+	)
+	@handler JWKSHandler
+	get /get
+}
+
+type (
+	MemberLoginReq {
+		IdentityType int64  `json:"identity_type,options=1|2|3|4|5|6|7"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
+		Identifier   string `json:"identifier,optional"` // 标识符 账号/手机号/邮箱
+		Credential   string `json:"credential"` // 凭证 密码/验证码/access_token
+	}
+	MemberLoginResp {
+		Token        string `json:"token"` // 新token
+		RefreshToken string `json:"refresh_token"` // 刷新token
+	}
+	MemberRefreshTokenReq {
+		RefreshToken string `json:"refresh_token"` // 刷新token
+	}
+	MemberRefreshTokenResp {
+		Token string `json:"token"` // 新token
+	}
+	MemberRegisterReq {
+		IdentityType int64  `json:"identity_type,options=1|2|3"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名
+		Identifier   string `json:"identifier"` // 标识符 账号/手机号/邮箱
+		Password     string `json:"password,optional"` // 密码
+		Code         string `json:"code,optional"` // 验证码
+		Nickname     string `json:"nickname,optional"` // 昵称
+		Avatar       string `json:"avatar,optional"` // 头像
+		Gender       int64  `json:"gender,options=1|2|3,optional"` // 性别 1: 男 2: 女 3: 未知
+		Birthday     string `json:"birthday,optional"` // 生日
+		Phone        string `json:"phone,optional"` // 手机号
+		Email        string `json:"email,optional"` // 邮箱
+	}
+	MemberActivateEmailReq {
+		Token string `json:"token"` // 激活token
+	}
+	MemberSendEmailCodeReq {
+		Email string `json:"email"` // 邮箱
+	}
+	MemberSendPhoneCodeReq {
+		Phone string `json:"phone"` // 手机号
+	}
+	MemberForgetPasswordReq {
+		IdentityType int64  `json:"identity_type,options=1|2"` // 身份类型 1: 手机号 2: 邮箱
+		Identifier   string `json:"identifier"` // 标识符 手机号/邮箱
+		Code         string `json:"code"` // 验证码
+		Password     string `json:"password"` // 新密码
+	}
+	AdminLoginReq  {}
+	AdminLoginResp  {}
+	AdminLogoutReq  {}
+	AdminRegisterReq  {}
+	AdminRegisterResp  {}
+)
+

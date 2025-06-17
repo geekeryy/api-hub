@@ -1,9 +1,9 @@
 package consts
 
-type contextKey string
+const (
+	ACCEPT_LANGUAGE = "accept-language"
 
-const AcceptLanguage contextKey = "accept-language"
+	TOKEN = "Authorization"
 
-func (c contextKey) String() string {
-	return string(c)
-}
+	CONTEXT_CLIENT_IP = "clientip"
+)

@@ -2,21 +2,75 @@ package test
 
 import (
 	"context"
+	"crypto/ed25519"
+	"crypto/rand"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"sync"
 	"testing"
 	"time"
 
 	_ "net/http/pprof"
 
-	"github.com/geekeryy/api-hub/core/consts"
+	"github.com/MicahParks/jwkset"
 	"github.com/geekeryy/api-hub/core/validate"
+	"github.com/geekeryy/api-hub/core/xcontext"
 	"github.com/geekeryy/api-hub/library/validator"
 	"github.com/gin-gonic/gin"
 )
 
-func Test_test(t *testing.T) {
+func TestSendEmail(t *testing.T) {
+	loador := sync.Map{}
+	l,ok:=loador.LoadOrStore("test", "v")
+	fmt.Println(l,ok)
+	fmt.Println(loador.Load("test"))
+}
+
+func Test_jwks(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	// Create a cryptographic key.
+	pub, _, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		log.Fatalf("Failed to generate given key.\nError: %s", err)
+	}
+
+	// Turn the key into a JWK.
+	marshalOptions := jwkset.JWKMarshalOptions{
+		Private: true,
+	}
+
+	metadata := jwkset.JWKMetadataOptions{
+		KID: time.Now().Format(time.RFC3339),
+	}
+	options := jwkset.JWKOptions{
+		Marshal:  marshalOptions,
+		Metadata: metadata,
+	}
+	jwk, err := jwkset.NewJWKFromKey(pub, options)
+	if err != nil {
+		log.Fatalf("Failed to create a JWK from the given key.\nError: %s", err)
+	}
+
+	// Write the JWK to the server's storage.
+	serverStore := jwkset.NewMemoryStorage()
+	err = serverStore.KeyWrite(ctx, jwk)
+	if err != nil {
+		log.Fatalf("Failed to write the JWK to the server's storage.\nError: %s", err)
+	}
+
+	rawJWKS, err := serverStore.JSONPublic(ctx)
+	if err != nil {
+		log.Fatalf("Failed to get the server's JWKS.\nError: %s", err)
+	}
+	fmt.Println(string(rawJWKS))
+
+}
+
+func TestValidate(t *testing.T) {
 	go server()
 	time.Sleep(1 * time.Second)
 	params := url.Values{}
@@ -27,7 +81,7 @@ func Test_test(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	// req.Header.Set("accept-language", "")
+	req.Header.Set("accept-language", "en")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatal(err)
@@ -58,7 +112,7 @@ func server() {
 
 		ctx := c.Request.Context()
 		if len(c.Request.Header.Get("accept-language")) > 0 {
-			ctx = context.WithValue(ctx, consts.AcceptLanguage, c.Request.Header.Get("accept-language"))
+			ctx = xcontext.WithLang(ctx, c.Request.Header.Get("accept-language"))
 		}
 		if err := validator.ValidateStruct(ctx, &req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

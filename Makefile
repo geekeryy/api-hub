@@ -1,7 +1,8 @@
+
 # Generate api go files
 # Example: make gen-api s=oms
 gen-api:
-	goctl api go --home tpl-1.8.4 -dir api/${s} -api api/${s}/doc/${s}.api
+	goctl api go --home tpl -dir api/${s} -api api/${s}/doc/${s}.api
 	goctl api format --dir=api/${s} --declare
 	goctl api swagger --api api/${s}/doc/${s}.api --dir doc/swagger
 
@@ -11,9 +12,13 @@ gen-rpc:
 	goctl rpc --home tpl protoc rpc/${s}/${s}.proto --go_out=rpc/${s} --go-grpc_out=rpc/${s} --zrpc_out=rpc/${s} -m
 
 # Generate model
+# ENV: export PG=user:pwd@localhost:5432/db
 # Example: make model table=stock dir=testmodel
 model:
-	goctl model pg datasource --table="${table}" -dir ./rpc/model/${dir} --url="postgres://$(PG)" --schema="public" -home=tpl
+	@if [ -z "$(table)" ]; then echo "table is not set"; exit 1; fi
+	@if [ -z "$(dir)" ]; then echo "dir is not set"; exit 1; fi
+	@if [ -z "$(PG)" ]; then echo "url is not set"; exit 1; fi
+	goctl model pg datasource --table="${table}" -dir ./rpc/model/${dir} --url="postgres://$(PG)" --schema="public" --home=tpl
 
 
 

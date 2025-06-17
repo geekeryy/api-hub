@@ -1,0 +1,22 @@
+package jwks
+
+import (
+	"net/http"
+
+	"github.com/geekeryy/api-hub/api/gateway/internal/logic/oms/jwks"
+	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
+	"github.com/zeromicro/go-zero/rest/httpx"
+)
+
+// 轮换公钥
+func RotateKeyHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		l := jwks.NewRotateKeyLogic(r.Context(), svcCtx)
+		err := l.RotateKey()
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+		} else {
+			httpx.Ok(w)
+		}
+	}
+}

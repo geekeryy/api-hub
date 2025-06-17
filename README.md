@@ -109,10 +109,10 @@ var EmailFormatError = newerr(10047, "EMAIL_FORMAT_ERROR")
 ```toml
 # 定义错误消息
 # library/localization/error.zh.toml
-EMAIL_FORMAT_ERROR =  邮箱格式错误
+EMAIL_FORMAT_ERROR =  "邮箱格式错误"
 
 # library/localization/error.en.toml
-EMAIL_FORMAT_ERRO = Email format error
+EMAIL_FORMAT_ERRO = "Email format error"
 ```
 
 ## 🤔 QA
@@ -127,12 +127,21 @@ EMAIL_FORMAT_ERRO = Email format error
       go install
       ```
 
+## 登录类型
+
+* 账号+密码
+* 邮箱+密码
+* 手机号+密码
+* 邮箱+验证码
+* 手机号+验证码
+* 第三方登录：wechat、google、facebook
+
+
 ## 📝 TODO
 
-* 搭建基础框架
 * 框架：熔断、限流、降级、排队
 * 框架：不用鉴权的api利用签名机制防止盗刷
 * 框架：CICD
-* 测试：单元测试、集成测试、性能测试
+* 测试：单元测试、集成测试、性能测试、暴力测试
 * 功能：可扩展的登录注册功能
 * 功能：AI单轮聊天

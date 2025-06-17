@@ -6,8 +6,12 @@ info (
 	licenseName:  "MIT"
 	licenseUrl:   "https://github.com/geekeryy/api-hub/blob/main/LICENSE"
 	host:         "localhost:8888"
-	basePath:     "/"
+	basePath:     ""
 )
+
+import "oms.api"
+import "auth.api"
+import "user.api"
 
 @server (
 	prefix: /api/v1/gateway
@@ -23,10 +27,10 @@ service gateway-api {
 }
 
 @server (
-	group:  ai
-	prefix: /api/v1/gateway/ai
-	tags:   "AI"
-	jwt:    Auth
+	group:      ai
+	prefix:     /api/v1/gateway/ai
+	tags:       "AI"
+	middleware: JwtMiddleware,ContextMiddleware
 )
 service gateway-api {
 	@doc (
@@ -38,8 +42,8 @@ service gateway-api {
 
 type (
 	DailySentenceReq {
-		Lang string `form:"lang,omitempty"` // 语言
-		Use  string `form:"use,omitempty"` // 用途 将会传递给Prompt模板，为空时模板不包含用途
+		Lang string `form:"lang" validate:"omitempty,oneof=zh en ja ko" comment:"LANGUAGE"` // 语言
+		Use  string `form:"use,optional"` // 用途 将会传递给Prompt模板，为空时模板不包含用途
 	}
 	DailySentenceResp {
 		Sentence string `json:"sentence"` // 句子

@@ -1,3 +1,5 @@
 CHINESE_NAME_ERR_MSG = "{0} is not a valid Chinese name"
 
 FIELD_USERNAME = "user name"
+
+LANGUAGE = "language name"
