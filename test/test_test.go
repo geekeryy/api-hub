@@ -2,7 +2,11 @@ package test
 
 import (
 	"context"
+	"crypto/ed25519"
+	"crypto/rand"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"testing"
@@ -10,11 +14,54 @@ import (
 
 	_ "net/http/pprof"
 
+	"github.com/MicahParks/jwkset"
 	"github.com/geekeryy/api-hub/core/consts"
 	"github.com/geekeryy/api-hub/core/validate"
 	"github.com/geekeryy/api-hub/library/validator"
 	"github.com/gin-gonic/gin"
 )
+
+func Test_jwks(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	// Create a cryptographic key.
+	pub, _, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		log.Fatalf("Failed to generate given key.\nError: %s", err)
+	}
+
+	// Turn the key into a JWK.
+	marshalOptions := jwkset.JWKMarshalOptions{
+		Private: true,
+	}
+
+	metadata := jwkset.JWKMetadataOptions{
+		KID: time.Now().Format(time.RFC3339),
+	}
+	options := jwkset.JWKOptions{
+		Marshal:  marshalOptions,
+		Metadata: metadata,
+	}
+	jwk, err := jwkset.NewJWKFromKey(pub, options)
+	if err != nil {
+		log.Fatalf("Failed to create a JWK from the given key.\nError: %s", err)
+	}
+
+	// Write the JWK to the server's storage.
+	serverStore := jwkset.NewMemoryStorage()
+	err = serverStore.KeyWrite(ctx, jwk)
+	if err != nil {
+		log.Fatalf("Failed to write the JWK to the server's storage.\nError: %s", err)
+	}
+
+
+	rawJWKS, err := serverStore.JSONPublic(ctx)
+	if err != nil {
+		log.Fatalf("Failed to get the server's JWKS.\nError: %s", err)
+	}
+	fmt.Println(string(rawJWKS))
+
+}
 
 func Test_test(t *testing.T) {
 	go server()

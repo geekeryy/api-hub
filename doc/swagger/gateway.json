@@ -70,6 +70,120 @@
         }
       }
     },
+    "/api/v1/gateway/jwks/delete": {
+      "delete": {
+        "description": "删除公钥",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "JWKS"
+        ],
+        "summary": "删除公钥",
+        "operationId": "jwksDeleteKeyHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "kid"
+              ],
+              "properties": {
+                "kid": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/jwks/get": {
+      "get": {
+        "description": "获取公钥",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "JWKS"
+        ],
+        "summary": "获取公钥",
+        "operationId": "jwksJWKSHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/jwks/rotate": {
+      "post": {
+        "description": "轮换公钥",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "JWKS"
+        ],
+        "summary": "轮换公钥",
+        "operationId": "jwksRotateKeyHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/jwks/usage": {
+      "get": {
+        "description": "公钥使用记录",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "JWKS"
+        ],
+        "summary": "公钥使用记录",
+        "operationId": "jwksKeyUsageHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
     "/api/v1/gateway/ping": {
       "get": {
         "produces": [
@@ -92,7 +206,7 @@
       }
     }
   },
-  "x-date": "2025-06-12 16:25:43",
+  "x-date": "2025-06-17 23:49:57",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

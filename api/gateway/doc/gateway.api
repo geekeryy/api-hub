@@ -9,6 +9,8 @@ info (
 	basePath:     "/"
 )
 
+import "jwks.api"
+
 @server (
 	prefix: /api/v1/gateway
 	group:  healthz

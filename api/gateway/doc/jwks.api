@@ -1,0 +1,63 @@
+@server (
+	group:  jwks
+	prefix: /api/v1/gateway/jwks
+	tags:   "JWKS"
+)
+service gateway-api {
+	@doc (
+		summary:     "获取公钥"
+		description: "获取公钥"
+	)
+	@handler JWKSHandler
+	get /get
+}
+
+@server (
+	group:      jwks
+	prefix:     /api/v1/gateway/jwks
+	middleware: ContextMiddleware
+	tags:       "JWKS"
+)
+service gateway-api {
+	@doc (
+		summary:     "公钥使用记录"
+		description: "公钥使用记录"
+	)
+	@handler KeyUsageHandler
+	get /usage (KeyUsageReq) returns (KeyUsageResp)
+
+	@doc (
+		summary:     "删除公钥"
+		description: "删除公钥"
+	)
+	@handler DeleteKeyHandler
+	delete /delete (DeleteKeyReq)
+
+	@doc (
+		summary:     "轮换公钥"
+		description: "轮换公钥"
+	)
+	@handler RotateKeyHandler
+	post /rotate (RotateKeyReq)
+}
+
+type (
+	// {"keys":[{"kty":"OKP","alg":"EdDSA","kid":"2025-06-15T19:18:28+08:00","crv":"Ed25519","x":"YdXwXYoQf5RxXUNYrRlQK1_F5dcJkOkqTwuu7PTCIVo"},{"kty":"OKP","alg":"EdDSA","kid":"2025-06-15T19:18:28+08:00","crv":"Ed25519","x":"fNsnefgas513PSaIdOX8FAGThwNaY15AflgIKMi6QwQ"}]}
+	JWKSResp {
+		Keys []JWK `json:"keys"`
+	}
+	JWK {
+		Kty string `json:"kty"`
+		Alg string `json:"alg"`
+		Kid string `json:"kid"`
+		Crv string `json:"crv"`
+		X   string `json:"x"`
+	}
+	KeyUsageReq  {}
+	KeyUsageResp  {}
+	DeleteKeyReq {
+		Kid string `json:"kid"`
+	}
+	RotateKeyReq  {}
+)
+

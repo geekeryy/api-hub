@@ -1,0 +1,29 @@
+@server (
+	group:      admin
+	middleware: ContextMiddleware,JwtMiddleware
+	prefix:     /api/v1/gateway/admin
+	tags:       "B端用户管理"
+)
+service gateway-api {
+	@doc (
+		summary:     "登录"
+		description: "登录"
+	)
+	@handler AdminLoginHandler
+	post /login (AdminLoginReq) returns (AdminLoginResp)
+
+	@doc (
+		summary:     "登出"
+		description: "登出"
+	)
+	@handler AdminLogoutHandler
+	post /logout (AdminLogoutReq) returns (AdminLogoutResp)
+
+	@doc (
+		summary:     "注册"
+		description: "注册"
+	)
+	@handler AdminRegisterHandler
+	post /register (AdminRegisterReq) returns (AdminRegisterResp)
+}
+
