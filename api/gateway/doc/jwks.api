@@ -38,26 +38,14 @@ service gateway-api {
 		description: "轮换公钥"
 	)
 	@handler RotateKeyHandler
-	post /rotate (RotateKeyReq)
+	post /rotate
 }
 
 type (
-	// {"keys":[{"kty":"OKP","alg":"EdDSA","kid":"2025-06-15T19:18:28+08:00","crv":"Ed25519","x":"YdXwXYoQf5RxXUNYrRlQK1_F5dcJkOkqTwuu7PTCIVo"},{"kty":"OKP","alg":"EdDSA","kid":"2025-06-15T19:18:28+08:00","crv":"Ed25519","x":"fNsnefgas513PSaIdOX8FAGThwNaY15AflgIKMi6QwQ"}]}
-	JWKSResp {
-		Keys []JWK `json:"keys"`
-	}
-	JWK {
-		Kty string `json:"kty"`
-		Alg string `json:"alg"`
-		Kid string `json:"kid"`
-		Crv string `json:"crv"`
-		X   string `json:"x"`
-	}
 	KeyUsageReq  {}
 	KeyUsageResp  {}
 	DeleteKeyReq {
-		Kid string `json:"kid"`
+		PublicKey string `json:"public_key"`
 	}
-	RotateKeyReq  {}
 )
 

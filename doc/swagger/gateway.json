@@ -95,10 +95,10 @@
             "schema": {
               "type": "object",
               "required": [
-                "kid"
+                "public_key"
               ],
               "properties": {
-                "kid": {
+                "public_key": {
                   "type": "string"
                 }
               }
@@ -138,9 +138,6 @@
     "/api/v1/gateway/jwks/rotate": {
       "post": {
         "description": "轮换公钥",
-        "consumes": [
-          "application/x-www-form-urlencoded"
-        ],
         "produces": [
           "application/json"
         ],
@@ -206,7 +203,7 @@
       }
     }
   },
-  "x-date": "2025-06-17 23:49:57",
+  "x-date": "2025-06-18 14:26:25",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

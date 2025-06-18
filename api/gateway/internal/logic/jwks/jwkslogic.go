@@ -29,8 +29,6 @@ func (l *JWKSLogic) JWKS(w http.ResponseWriter) error {
 		l.Errorf("Failed to get the server's JWKS.\nError: %s", err)
 		return err
 	}
-	l.Logger.Infof("JWKS: %s", string(rawJWKS))
-
 	w.Write(rawJWKS)
 	return nil
 }

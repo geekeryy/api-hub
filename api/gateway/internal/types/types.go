@@ -13,26 +13,11 @@ type DailySentenceResp struct {
 }
 
 type DeleteKeyReq struct {
-	Kid string `json:"kid"`
-}
-
-type JWK struct {
-	Kty string `json:"kty"`
-	Alg string `json:"alg"`
-	Kid string `json:"kid"`
-	Crv string `json:"crv"`
-	X   string `json:"x"`
-}
-
-type JWKSResp struct {
-	Keys []JWK `json:"keys"`
+	PublicKey string `json:"public_key"`
 }
 
 type KeyUsageReq struct {
 }
 
 type KeyUsageResp struct {
-}
-
-type RotateKeyReq struct {
 }

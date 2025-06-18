@@ -25,12 +25,14 @@ func NewDeleteKeyLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DeleteK
 }
 
 func (l *DeleteKeyLogic) DeleteKey(req *types.DeleteKeyReq) error {
-	ok, err := l.svcCtx.Jwkset.KeyDelete(l.ctx, req.Kid)
+	ok, err := l.svcCtx.Jwkset.KeyDelete(l.ctx, req.PublicKey)
 	if err != nil {
-		l.Logger.Errorf("Failed to delete the key.\nError: %s", err)
+		l.Errorf("Failed to delete the key.\nError: %s", err)
+		return err
 	}
 	if !ok {
-		l.Logger.Errorf("Key not found.\nError: %s", err)
+		l.Errorf("Key not found.\nError: %s", err)
+		return err
 	}
 	return nil
 }

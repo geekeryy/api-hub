@@ -6,11 +6,11 @@ import (
 	"sync"
 
 	"github.com/MicahParks/jwkset"
-	"github.com/SpectatorNan/gorm-zero/gormc/config/pg"
 	"github.com/geekeryy/api-hub/api/gateway/internal/config"
 	"github.com/geekeryy/api-hub/api/gateway/internal/middleware"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/validate"
+	"github.com/geekeryy/api-hub/core/xgorm"
 	"github.com/geekeryy/api-hub/core/xstrings"
 	"github.com/geekeryy/api-hub/rpc/model/jwksmodel"
 	"github.com/zeromicro/go-zero/rest"
@@ -28,12 +28,27 @@ type ServiceContext struct {
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	pg, err := pg.Connect(c.PgSql)
+	pg, err := xgorm.ConnectPg(c.PgSql)
 	if err != nil {
 		log.Fatalf("Failed to connect to database.\nError: %s", err)
 	}
 	jwksPublicModel := jwksmodel.NewJwksPublicModel(pg)
 
+	jwksets, pub, priv := getJwkset(jwksPublicModel)
+
+	svc := &ServiceContext{
+		Config:            c,
+		ContextMiddleware: middleware.NewContextMiddleware().Handle,
+		Validator:         validate.New(nil, []string{"zh", "en"}),
+		Jwkset:            jwksets,
+		PrivateKey:        priv,
+		PublicKey:         pub,
+		JwksPublicModel:   jwksPublicModel,
+	}
+	return svc
+}
+
+func getJwkset(jwksPublicModel jwksmodel.JwksPublicModel) (*jwkset.MemoryJWKSet, []byte, []byte) {
 	var pub, priv []byte
 	jwksets := jwkset.NewMemoryStorage()
 	jwksPublics, err := jwksPublicModel.FindAll()
@@ -78,15 +93,5 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			log.Fatalf("Failed to insert jwks public.\nError: %s", err)
 		}
 	}
-
-	svc := &ServiceContext{
-		Config:            c,
-		ContextMiddleware: middleware.NewContextMiddleware().Handle,
-		Validator:         validate.New(nil, []string{"zh", "en"}),
-		Jwkset:            jwksets,
-		PrivateKey:        priv,
-		PublicKey:         pub,
-		JwksPublicModel:   jwksPublicModel,
-	}
-	return svc
+	return jwksets, pub, priv
 }
