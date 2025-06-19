@@ -5,12 +5,11 @@ import (
 	"embed"
 
 	"github.com/BurntSushi/toml"
-	"github.com/geekeryy/api-hub/core/consts"
+	"github.com/geekeryy/api-hub/core/xcontext"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/text/language"
-	"google.golang.org/grpc/metadata"
 )
 
 var DefaultLanguageTag = language.Chinese
@@ -62,25 +61,17 @@ const (
 	KO     = "ko"
 	ZHHant = "zh-Hant"
 )
-const ACCEPT_LANGUAGE = "accept-language"
 
 func Default() string {
 	return ZH
 }
 
 func Lang(ctx context.Context) string {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		if value := ctx.Value(consts.AcceptLanguage); value != nil {
-			return value.(string)
-		}
+	language := xcontext.GetLang(ctx)
+	if language == "" {
 		return Default()
 	}
-	lang, ok := md[consts.AcceptLanguage.String()]
-	if !ok || len(lang) == 0 || len(lang[0]) == 0 {
-		return Default()
-	}
-	return lang[0]
+	return language
 }
 
 func GetTargetLanguages(sourceLanguage string) []string {

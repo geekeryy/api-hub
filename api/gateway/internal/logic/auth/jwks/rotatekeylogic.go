@@ -6,7 +6,8 @@ import (
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xstrings"
-	"github.com/geekeryy/api-hub/rpc/model/jwksmodel"
+	"github.com/geekeryy/api-hub/rpc/model/authmodel"
+	"github.com/google/uuid"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,33 +28,28 @@ func NewRotateKeyLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RotateK
 }
 
 func (l *RotateKeyLogic) RotateKey() error {
-	pub, priv, err := jwks.RotateKey(l.ctx, l.svcCtx.Jwkset)
+	pub, priv, err := jwks.RotateKey(l.ctx, uuid.New().String(), l.svcCtx.Jwkset)
 	if err != nil {
-		l.Errorf("Failed to rotate key.\nError: %s", err)
+		l.Errorf("Failed to rotate key. Error: %s", err)
 		return err
 	}
-	l.svcCtx.RWMKey.Lock()
-	defer l.svcCtx.RWMKey.Unlock()
-	l.svcCtx.PrivateKey = priv
-	l.svcCtx.PublicKey = pub
 
 	encryptPub, err := xstrings.AesCbcEncryptBase64(string(pub), "public_key_secre", nil)
 	if err != nil {
-		l.Errorf("Failed to encrypt public key.\nError: %s", err)
+		l.Errorf("Failed to encrypt public key. Error: %s", err)
 		return err
 	}
 	encryptPriv, err := xstrings.AesCbcEncryptBase64(string(priv), "private_key_secr", nil)
 	if err != nil {
-		l.Errorf("Failed to encrypt private key.\nError: %s", err)
+		l.Errorf("Failed to encrypt private key. Error: %s", err)
 		return err
 	}
-	if err := l.svcCtx.JwksPublicModel.Insert(l.ctx, nil, &jwksmodel.JwksPublic{
+	if err := l.svcCtx.JwksModel.Insert(l.ctx, nil, &authmodel.Jwks{
 		PublicKey:  encryptPub,
 		PrivateKey: encryptPriv,
 	}); err != nil {
-		l.Errorf("Failed to insert jwks public.\nError: %s", err)
+		l.Errorf("Failed to insert jwks public. Error: %s", err)
 		return err
 	}
-
 	return nil
 }

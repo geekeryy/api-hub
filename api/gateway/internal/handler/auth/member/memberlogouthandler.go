@@ -1,18 +1,18 @@
-package jwks
+package member
 
 import (
 	"net/http"
 
-	"github.com/geekeryy/api-hub/api/gateway/internal/logic/jwks"
+	"github.com/geekeryy/api-hub/api/gateway/internal/logic/auth/member"
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 公钥使用记录
-func KeyUsageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 登出
+func MemberLogoutHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.KeyUsageReq
+		var req types.MemberLogoutReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
@@ -22,12 +22,12 @@ func KeyUsageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := jwks.NewKeyUsageLogic(r.Context(), svcCtx)
-		resp, err := l.KeyUsage(&req)
+		l := member.NewMemberLogoutLogic(r.Context(), svcCtx)
+		err := l.MemberLogout(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			httpx.Ok(w)
 		}
 	}
 }

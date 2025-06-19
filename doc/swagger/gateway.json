@@ -70,7 +70,86 @@
         }
       }
     },
-    "/api/v1/gateway/jwks/delete": {
+    "/api/v1/gateway/auth/admin/login": {
+      "post": {
+        "description": "登录",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "B端用户管理"
+        ],
+        "summary": "登录",
+        "operationId": "auth/AdminAdminLoginHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/admin/logout": {
+      "post": {
+        "description": "登出",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "B端用户管理"
+        ],
+        "summary": "登出",
+        "operationId": "auth/AdminAdminLogoutHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/admin/register": {
+      "post": {
+        "description": "注册",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "B端用户管理"
+        ],
+        "summary": "注册",
+        "operationId": "auth/AdminAdminRegisterHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/jwks/delete": {
       "delete": {
         "description": "删除公钥",
         "consumes": [
@@ -86,7 +165,7 @@
           "JWKS"
         ],
         "summary": "删除公钥",
-        "operationId": "jwksDeleteKeyHandler",
+        "operationId": "auth/JwksDeleteKeyHandler",
         "parameters": [
           {
             "name": "body",
@@ -95,10 +174,10 @@
             "schema": {
               "type": "object",
               "required": [
-                "public_key"
+                "kid"
               ],
               "properties": {
-                "public_key": {
+                "kid": {
                   "type": "string"
                 }
               }
@@ -113,7 +192,7 @@
         }
       }
     },
-    "/api/v1/gateway/jwks/get": {
+    "/api/v1/gateway/auth/jwks/get": {
       "get": {
         "description": "获取公钥",
         "produces": [
@@ -126,7 +205,7 @@
           "JWKS"
         ],
         "summary": "获取公钥",
-        "operationId": "jwksJWKSHandler",
+        "operationId": "auth/JwksJWKSHandler",
         "responses": {
           "200": {
             "description": "",
@@ -135,8 +214,8 @@
         }
       }
     },
-    "/api/v1/gateway/jwks/rotate": {
-      "post": {
+    "/api/v1/gateway/auth/jwks/rotate": {
+      "put": {
         "description": "轮换公钥",
         "produces": [
           "application/json"
@@ -148,7 +227,7 @@
           "JWKS"
         ],
         "summary": "轮换公钥",
-        "operationId": "jwksRotateKeyHandler",
+        "operationId": "auth/JwksRotateKeyHandler",
         "responses": {
           "200": {
             "description": "",
@@ -157,7 +236,7 @@
         }
       }
     },
-    "/api/v1/gateway/jwks/usage": {
+    "/api/v1/gateway/auth/jwks/usage": {
       "get": {
         "description": "公钥使用记录",
         "produces": [
@@ -170,7 +249,147 @@
           "JWKS"
         ],
         "summary": "公钥使用记录",
-        "operationId": "jwksKeyUsageHandler",
+        "operationId": "auth/JwksKeyUsageHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/member/login": {
+      "post": {
+        "description": "登录",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "C端用户管理"
+        ],
+        "summary": "登录",
+        "operationId": "auth/MemberMemberLoginHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refresh_token": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/member/logout": {
+      "post": {
+        "description": "登出",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "C端用户管理"
+        ],
+        "summary": "登出",
+        "operationId": "auth/MemberMemberLogoutHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/member/refresh": {
+      "post": {
+        "description": "刷新Token",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "C端用户管理"
+        ],
+        "summary": "刷新Token",
+        "operationId": "auth/MemberMemberRefreshTokenHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "refresh_token"
+              ],
+              "properties": {
+                "refresh_token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refresh_token": {
+                  "type": "string"
+                },
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/member/register": {
+      "post": {
+        "description": "注册",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "C端用户管理"
+        ],
+        "summary": "注册",
+        "operationId": "auth/MemberMemberRegisterHandler",
         "responses": {
           "200": {
             "description": "",
@@ -203,7 +422,7 @@
       }
     }
   },
-  "x-date": "2025-06-18 14:26:25",
+  "x-date": "2025-06-19 17:59:15",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

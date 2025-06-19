@@ -12,7 +12,7 @@ gen-rpc:
 	goctl rpc --home tpl protoc rpc/${s}/${s}.proto --go_out=rpc/${s} --go-grpc_out=rpc/${s} --zrpc_out=rpc/${s} -m
 
 # Generate model
-# ENV: export PG=postgres://user:name@localhost:5432/db
+# ENV: export PG=user:pwd@localhost:5432/db
 # Example: make model table=stock dir=testmodel
 model:
 	@if [ -z "$(table)" ]; then echo "table is not set"; exit 1; fi

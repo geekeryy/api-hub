@@ -1,5 +1,51 @@
 package jwks
 
-func GenerateToken() {
-	// https://github.com/MicahParks/keyfunc/blob/main/examples/json/main.go
+import (
+	"context"
+	"crypto/ed25519"
+	"errors"
+	"log"
+	"time"
+
+	"github.com/MicahParks/jwkset"
+	"github.com/MicahParks/keyfunc/v3"
+	jwt "github.com/golang-jwt/jwt/v5"
+)
+
+func InitKeyfunc(ctx context.Context, serverURL string, override keyfunc.Override) (keyfunc.Keyfunc, error) {
+	k, err := keyfunc.NewDefaultOverrideCtx(ctx, []string{serverURL}, override)
+	if err != nil {
+		log.Fatalf("Failed to create a keyfunc.Keyfunc from the server's URL.\nError: %s", err)
+	}
+	return k, nil
+}
+
+func GenerateToken(kid string, memberId string, accessSecret string, accessExpire int64) (string, error) {
+	now := time.Now()
+	tokenOption := jwt.NewWithClaims(jwt.SigningMethodEdDSA, &jwt.MapClaims{
+		"exp": now.Add(time.Duration(accessExpire) * time.Second).Unix(),
+		"sub": memberId,
+		"iat": now.Unix(),
+		"nbf": now.Unix(),
+		"iss": "api-hub",
+		"aud": "member",
+	})
+	tokenOption.Header[jwkset.HeaderKID] = kid
+	token, err := tokenOption.SignedString(ed25519.PrivateKey(accessSecret))
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func ValidateToken(tokenStr string, k keyfunc.Keyfunc) (jwt.MapClaims, error) {
+	claims := jwt.MapClaims{}
+	token, err := jwt.ParseWithClaims(tokenStr, claims, k.Keyfunc)
+	if err != nil {
+		return nil, err
+	}
+	if !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+	return claims, nil
 }

@@ -2,16 +2,58 @@ package jwks_test
 
 import (
 	"context"
+	"crypto/ed25519"
+	"crypto/rand"
 	"testing"
 
 	"github.com/MicahParks/jwkset"
+	"github.com/MicahParks/keyfunc/v3"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xstrings"
 )
 
+func TestJwt(t *testing.T) {
+	pub2, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("Failed to generate given key.\nError: %s", err)
+	}
+	pub, _, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatalf("Failed to generate given key.\nError: %s", err)
+	}
+	kid := "2"
+	token, err := jwks.GenerateToken(kid, "1234567890", string(priv), 60)
+	if err != nil {
+		t.Fatalf("Failed to generate token.\nError: %s", err)
+	}
+	t.Logf("token: %s", token)
+
+	jwksets := jwkset.NewMemoryStorage()
+	jwks.AddKey(context.Background(), "1", pub, jwksets)
+	jwks.AddKey(context.Background(), "2", pub2, jwksets)
+	rawJWKS, err := jwksets.JSONPublic(context.Background())
+	if err != nil {
+		t.Fatalf("Failed to get JWKS.\nError: %s", err)
+	}
+	t.Logf("rawJWKS: %s", string(rawJWKS))
+
+	k, err := keyfunc.New(keyfunc.Options{
+		Ctx:     context.Background(),
+		Storage: jwksets,
+	})
+	if err != nil {
+		t.Fatalf("Failed to init keyfunc.\nError: %s", err)
+	}
+	claims, err := jwks.ValidateToken(token, k)
+	if err != nil {
+		t.Fatalf("Failed to validate token.\nError: %s", err)
+	}
+	t.Logf("claims: %+v", claims)
+}
+
 func TestRotateKey(t *testing.T) {
 	jwksets := jwkset.NewMemoryStorage()
-	pub, priv, err := jwks.RotateKey(context.Background(), jwksets)
+	pub, priv, err := jwks.RotateKey(context.Background(), "api-hub", jwksets)
 	if err != nil {
 		t.Fatalf("Failed to rotate key.\nError: %s", err)
 	}
@@ -46,7 +88,7 @@ func TestRotateKey(t *testing.T) {
 	t.Logf("decryptPub: %s", decryptPub)
 	t.Logf("decryptPriv: %s", decryptPriv)
 
-	if err := jwks.AddKey(context.Background(), pub, jwksets); err != nil {
+	if err := jwks.AddKey(context.Background(), "api-hub", pub, jwksets); err != nil {
 		t.Fatalf("Failed to add key.\nError: %s", err)
 	}
 

@@ -26,7 +26,7 @@ func NewJWKSLogic(ctx context.Context, svcCtx *svc.ServiceContext) *JWKSLogic {
 func (l *JWKSLogic) JWKS(w http.ResponseWriter) error {
 	rawJWKS, err := l.svcCtx.Jwkset.JSONPublic(l.ctx)
 	if err != nil {
-		l.Errorf("Failed to get the server's JWKS.\nError: %s", err)
+		l.Errorf("Failed to get the server's JWKS. Error: %s", err)
 		return err
 	}
 	w.Write(rawJWKS)

@@ -12,4 +12,10 @@ type Config struct {
 		AccessExpire int64
 	}
 	PgSql pg.PgSql
+	Jwks    Jwks
+}
+
+type Jwks struct {
+	ServerURL string
+	RefreshInterval int64
 }

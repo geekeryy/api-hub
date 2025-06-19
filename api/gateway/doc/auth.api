@@ -1,0 +1,136 @@
+@server (
+	group:      auth/member
+	middleware: ContextMiddleware
+	prefix:     /api/v1/gateway/auth/member
+	tags:       "C端用户管理"
+)
+service gateway-api {
+	@doc (
+		summary:     "登录"
+		description: "登录"
+	)
+	@handler MemberLoginHandler
+	post /login (MemberLoginReq) returns (MemberLoginResp)
+
+	@doc (
+		summary:     "登出"
+		description: "登出"
+	)
+	@handler MemberLogoutHandler
+	post /logout (MemberLogoutReq)
+
+	@doc (
+		summary:     "注册"
+		description: "注册"
+	)
+	@handler MemberRegisterHandler
+	post /register (MemberRegisterReq) returns (MemberRegisterResp)
+
+	@doc (
+		summary:     "刷新Token"
+		description: "刷新Token"
+	)
+	@handler MemberRefreshTokenHandler
+	post /refresh (MemberRefreshTokenReq) returns (MemberRefreshTokenResp)
+}
+
+@server (
+	group:      auth/admin
+	middleware: ContextMiddleware
+	prefix:     /api/v1/gateway/auth/admin
+	tags:       "B端用户管理"
+)
+service gateway-api {
+	@doc (
+		summary:     "登录"
+		description: "登录"
+	)
+	@handler AdminLoginHandler
+	post /login (AdminLoginReq) returns (AdminLoginResp)
+
+	@doc (
+		summary:     "登出"
+		description: "登出"
+	)
+	@handler AdminLogoutHandler
+	post /logout (AdminLogoutReq)
+
+	@doc (
+		summary:     "注册"
+		description: "注册"
+	)
+	@handler AdminRegisterHandler
+	post /register (AdminRegisterReq) returns (AdminRegisterResp)
+}
+
+@server (
+	group:  auth/jwks
+	prefix: /api/v1/gateway/auth/jwks
+	tags:   "JWKS"
+)
+service gateway-api {
+	@doc (
+		summary:     "获取公钥"
+		description: "获取公钥"
+	)
+	@handler JWKSHandler
+	get /get
+}
+
+@server (
+	group:      auth/jwks
+	prefix:     /api/v1/gateway/auth/jwks
+	middleware: ContextMiddleware
+	tags:       "JWKS"
+)
+service gateway-api {
+	@doc (
+		summary:     "公钥使用记录"
+		description: "公钥使用记录"
+	)
+	@handler KeyUsageHandler
+	get /usage (KeyUsageReq) returns (KeyUsageResp)
+
+	@doc (
+		summary:     "删除公钥"
+		description: "删除公钥"
+	)
+	@handler DeleteKeyHandler
+	delete /delete (DeleteKeyReq)
+
+	@doc (
+		summary:     "轮换公钥"
+		description: "轮换公钥"
+	)
+	@handler RotateKeyHandler
+	put /rotate
+}
+
+type (
+	MemberLoginReq  {}
+	MemberLoginResp {
+		Token        string `json:"token"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	MemberRefreshTokenReq {
+		RefreshToken string `json:"refresh_token"`
+	}
+	MemberRefreshTokenResp {
+		Token        string `json:"token"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	MemberLogoutReq  {}
+	MemberRegisterReq  {}
+	MemberRegisterResp  {}
+	AdminLoginReq  {}
+	AdminLoginResp  {}
+	AdminLogoutReq  {}
+	AdminRegisterReq  {}
+	AdminRegisterResp  {}
+	KeyUsageReq  {}
+	KeyUsageResp  {}
+	DeleteKeyReq {
+		Kid string `json:"kid"`
+	}
+)
+

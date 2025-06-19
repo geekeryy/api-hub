@@ -9,7 +9,7 @@ info (
 	basePath:     "/"
 )
 
-import "jwks.api"
+import "auth.api"
 
 @server (
 	prefix: /api/v1/gateway
@@ -25,10 +25,10 @@ service gateway-api {
 }
 
 @server (
-	group:  ai
-	prefix: /api/v1/gateway/ai
-	tags:   "AI"
-	jwt:    Auth
+	group:      ai
+	prefix:     /api/v1/gateway/ai
+	tags:       "AI"
+	middleware: JwtMiddleware,ContextMiddleware
 )
 service gateway-api {
 	@doc (

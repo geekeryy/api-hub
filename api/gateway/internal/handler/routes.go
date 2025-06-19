@@ -7,8 +7,10 @@ import (
 	"net/http"
 
 	ai "github.com/geekeryy/api-hub/api/gateway/internal/handler/ai"
+	authadmin "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/admin"
+	authjwks "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/jwks"
+	authmember "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/member"
 	healthz "github.com/geekeryy/api-hub/api/gateway/internal/handler/healthz"
-	jwks "github.com/geekeryy/api-hub/api/gateway/internal/handler/jwks"
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -16,16 +18,117 @@ import (
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.JwtMiddleware, serverCtx.ContextMiddleware},
+			[]rest.Route{
+				{
+					// 每日一句
+					Method:  http.MethodGet,
+					Path:    "/daily-sentence",
+					Handler: ai.DailySentenceHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/gateway/ai"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware},
+			[]rest.Route{
+				{
+					// 登录
+					Method:  http.MethodPost,
+					Path:    "/login",
+					Handler: authadmin.AdminLoginHandler(serverCtx),
+				},
+				{
+					// 登出
+					Method:  http.MethodPost,
+					Path:    "/logout",
+					Handler: authadmin.AdminLogoutHandler(serverCtx),
+				},
+				{
+					// 注册
+					Method:  http.MethodPost,
+					Path:    "/register",
+					Handler: authadmin.AdminRegisterHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/gateway/auth/admin"),
+	)
+
+	server.AddRoutes(
 		[]rest.Route{
 			{
-				// 每日一句
+				// 获取公钥
 				Method:  http.MethodGet,
-				Path:    "/daily-sentence",
-				Handler: ai.DailySentenceHandler(serverCtx),
+				Path:    "/get",
+				Handler: authjwks.JWKSHandler(serverCtx),
 			},
 		},
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/api/v1/gateway/ai"),
+		rest.WithPrefix("/api/v1/gateway/auth/jwks"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware},
+			[]rest.Route{
+				{
+					// 删除公钥
+					Method:  http.MethodDelete,
+					Path:    "/delete",
+					Handler: authjwks.DeleteKeyHandler(serverCtx),
+				},
+				{
+					// 轮换公钥
+					Method:  http.MethodPut,
+					Path:    "/rotate",
+					Handler: authjwks.RotateKeyHandler(serverCtx),
+				},
+				{
+					// 公钥使用记录
+					Method:  http.MethodGet,
+					Path:    "/usage",
+					Handler: authjwks.KeyUsageHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/gateway/auth/jwks"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware},
+			[]rest.Route{
+				{
+					// 登录
+					Method:  http.MethodPost,
+					Path:    "/login",
+					Handler: authmember.MemberLoginHandler(serverCtx),
+				},
+				{
+					// 登出
+					Method:  http.MethodPost,
+					Path:    "/logout",
+					Handler: authmember.MemberLogoutHandler(serverCtx),
+				},
+				{
+					// 刷新Token
+					Method:  http.MethodPost,
+					Path:    "/refresh",
+					Handler: authmember.MemberRefreshTokenHandler(serverCtx),
+				},
+				{
+					// 注册
+					Method:  http.MethodPost,
+					Path:    "/register",
+					Handler: authmember.MemberRegisterHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/gateway/auth/member"),
 	)
 
 	server.AddRoutes(
@@ -38,44 +141,5 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 		rest.WithPrefix("/api/v1/gateway"),
-	)
-
-	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 获取公钥
-				Method:  http.MethodGet,
-				Path:    "/get",
-				Handler: jwks.JWKSHandler(serverCtx),
-			},
-		},
-		rest.WithPrefix("/api/v1/gateway/jwks"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.ContextMiddleware},
-			[]rest.Route{
-				{
-					// 删除公钥
-					Method:  http.MethodDelete,
-					Path:    "/delete",
-					Handler: jwks.DeleteKeyHandler(serverCtx),
-				},
-				{
-					// 轮换公钥
-					Method:  http.MethodPost,
-					Path:    "/rotate",
-					Handler: jwks.RotateKeyHandler(serverCtx),
-				},
-				{
-					// 公钥使用记录
-					Method:  http.MethodGet,
-					Path:    "/usage",
-					Handler: jwks.KeyUsageHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithPrefix("/api/v1/gateway/jwks"),
 	)
 }

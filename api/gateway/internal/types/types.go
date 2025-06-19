@@ -3,6 +3,21 @@
 
 package types
 
+type AdminLoginReq struct {
+}
+
+type AdminLoginResp struct {
+}
+
+type AdminLogoutReq struct {
+}
+
+type AdminRegisterReq struct {
+}
+
+type AdminRegisterResp struct {
+}
+
 type DailySentenceReq struct {
 	Lang string `form:"lang,omitempty"` // 语言
 	Use  string `form:"use,omitempty"`  // 用途 将会传递给Prompt模板，为空时模板不包含用途
@@ -13,11 +28,37 @@ type DailySentenceResp struct {
 }
 
 type DeleteKeyReq struct {
-	PublicKey string `json:"public_key"`
+	Kid string `json:"kid"`
 }
 
 type KeyUsageReq struct {
 }
 
 type KeyUsageResp struct {
+}
+
+type MemberLoginReq struct {
+}
+
+type MemberLoginResp struct {
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
+type MemberLogoutReq struct {
+}
+
+type MemberRefreshTokenReq struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
+type MemberRefreshTokenResp struct {
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
+type MemberRegisterReq struct {
+}
+
+type MemberRegisterResp struct {
 }

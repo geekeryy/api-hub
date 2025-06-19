@@ -1,6 +1,7 @@
-create table public.jwks_public
+create table public.jwks
 (
     id         serial primary key,
+    kid        text not null,
     public_key text not null,
     private_key text not null,
     created_at timestamp(6) with time zone,

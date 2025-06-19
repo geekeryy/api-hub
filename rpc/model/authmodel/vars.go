@@ -1,4 +1,4 @@
-package jwksmodel
+package authmodel
 
 import "gorm.io/gorm"
 
