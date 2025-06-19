@@ -18,6 +18,11 @@ import (
 	"github.com/go-playground/locales/zh_Hant"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	en_translations "github.com/geekeryy/api-hub/core/validate/en"
+	ja_translations "github.com/geekeryy/api-hub/core/validate/ja"
+	ko_translations "github.com/geekeryy/api-hub/core/validate/ko"
+	zh_translations "github.com/geekeryy/api-hub/core/validate/zh"
+	zh_Hant_translations "github.com/geekeryy/api-hub/core/validate/zh_hant"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -56,6 +61,18 @@ func New(fns []ValidatorFn, langs []string) *Validate {
 			trans, ok := _uni.GetTranslator(t.Locale())
 			if !ok {
 				continue
+			}
+			switch lang {
+			case "zh":
+				zh_translations.RegisterDefaultTranslations(v, trans)
+			case "en":
+				en_translations.RegisterDefaultTranslations(v, trans)
+			case "ja":
+				ja_translations.RegisterDefaultTranslations(v, trans)
+			case "ko":
+				ko_translations.RegisterDefaultTranslations(v, trans)
+			case "zh_Hant":
+				zh_Hant_translations.RegisterDefaultTranslations(v, trans)
 			}
 			for _, fn := range fns {
 				if err := fn(v, trans); err != nil {

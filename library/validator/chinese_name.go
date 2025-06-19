@@ -13,19 +13,19 @@ func ChineseNameValidator(v *validator.Validate, trans ut.Translator) error {
 		return err
 	}
 	if err := v.RegisterTranslation("chinese_name", trans, func(ut ut.Translator) error {
-		message := localization.Localize(trans.Locale(), &i18n.LocalizeConfig{
+		message := localization.Localize(ut.Locale(), &i18n.LocalizeConfig{
 			MessageID:    "CHINESE_NAME_ERR_MSG",
 			TemplateData: nil,
 			PluralCount:  nil,
 		})
 		return ut.Add("chinese_name", message, true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
-		fieldName := localization.Localize(trans.Locale(), &i18n.LocalizeConfig{
+		fieldName := localization.Localize(ut.Locale(), &i18n.LocalizeConfig{
 			MessageID:    fe.Field(),
 			TemplateData: nil,
 			PluralCount:  nil,
 		})
-		t, _ := ut.T("chinese_name", fieldName)
+		t, _ := ut.T(fe.Tag(), fieldName)
 		return t
 	}); err != nil {
 		return err

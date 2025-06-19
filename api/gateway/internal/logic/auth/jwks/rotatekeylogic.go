@@ -3,6 +3,7 @@ package jwks
 import (
 	"context"
 
+	"github.com/MicahParks/jwkset"
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xstrings"
@@ -28,12 +29,13 @@ func NewRotateKeyLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RotateK
 }
 
 func (l *RotateKeyLogic) RotateKey() error {
-	pub, priv, err := jwks.RotateKey(l.ctx, uuid.New().String(), l.svcCtx.Jwkset)
+	jwksets := jwkset.NewMemoryStorage()
+	kid := uuid.New().String()
+	pub, priv, err := jwks.RotateKey(l.ctx, kid, jwksets)
 	if err != nil {
 		l.Errorf("Failed to rotate key. Error: %s", err)
 		return err
 	}
-
 	encryptPub, err := xstrings.AesCbcEncryptBase64(string(pub), "public_key_secre", nil)
 	if err != nil {
 		l.Errorf("Failed to encrypt public key. Error: %s", err)
@@ -45,6 +47,7 @@ func (l *RotateKeyLogic) RotateKey() error {
 		return err
 	}
 	if err := l.svcCtx.JwksModel.Insert(l.ctx, nil, &authmodel.Jwks{
+		Kid:        kid,
 		PublicKey:  encryptPub,
 		PrivateKey: encryptPriv,
 	}); err != nil {

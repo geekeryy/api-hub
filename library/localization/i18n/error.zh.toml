@@ -1,3 +1,5 @@
 CHINESE_NAME_ERR_MSG = "{0}不符合中文名称规范，可包含中文、大小写字母、数字、_、-、()，且长度介于1到64个字符之间"
 
 FIELD_USERNAME = "用户名称"
+
+LANGUAGE = "语言"

@@ -27,12 +27,12 @@ func NewMemberLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Membe
 }
 
 func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.MemberLoginResp, err error) {
-	jwksRecord, err := l.svcCtx.JwksModel.FindLatest()
+	jwksRecord, err := l.svcCtx.JwksModel.FindLatest(l.ctx)
 	if err != nil {
 		l.Errorf("Failed to find latest jwks public. Error: %s", err)
 		return nil, err
 	}
-	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, "private_key_secre", nil)
+	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, "private_key_secr", nil)
 	if err != nil {
 		l.Errorf("Failed to decrypt private key. Error: %s", err)
 		return nil, err
@@ -42,8 +42,10 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 		l.Errorf("Failed to generate token. Error: %s", err)
 		return nil, err
 	}
-	resp.Token = token
-	resp.RefreshToken = token
+	resp = &types.MemberLoginResp{
+		Token:        token,
+		RefreshToken: token,
+	}
 
 	return
 }

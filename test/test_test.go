@@ -15,8 +15,8 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/MicahParks/jwkset"
-	"github.com/geekeryy/api-hub/core/consts"
 	"github.com/geekeryy/api-hub/core/validate"
+	"github.com/geekeryy/api-hub/core/xcontext"
 	"github.com/geekeryy/api-hub/library/validator"
 	"github.com/gin-gonic/gin"
 )
@@ -54,7 +54,6 @@ func Test_jwks(t *testing.T) {
 		log.Fatalf("Failed to write the JWK to the server's storage.\nError: %s", err)
 	}
 
-
 	rawJWKS, err := serverStore.JSONPublic(ctx)
 	if err != nil {
 		log.Fatalf("Failed to get the server's JWKS.\nError: %s", err)
@@ -63,7 +62,7 @@ func Test_jwks(t *testing.T) {
 
 }
 
-func Test_test(t *testing.T) {
+func TestValidate(t *testing.T) {
 	go server()
 	time.Sleep(1 * time.Second)
 	params := url.Values{}
@@ -74,7 +73,7 @@ func Test_test(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	// req.Header.Set("accept-language", "")
+	req.Header.Set("accept-language", "en")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatal(err)
@@ -94,7 +93,7 @@ type TestRequest struct {
 }
 
 func server() {
-	validator := validate.New([]validate.ValidatorFn{validator.ChineseNameValidator}, []string{"zh", "en"})
+	validator := validate.New([]validate.ValidatorFn{validate.RegisterDefaultTranslations, validator.ChineseNameValidator}, []string{"zh", "en"})
 	g := gin.Default()
 	g.GET("/test", func(c *gin.Context) {
 		var req TestRequest
@@ -105,7 +104,7 @@ func server() {
 
 		ctx := c.Request.Context()
 		if len(c.Request.Header.Get("accept-language")) > 0 {
-			ctx = context.WithValue(ctx, consts.AcceptLanguage, c.Request.Header.Get("accept-language"))
+			ctx = xcontext.WithLang(ctx, c.Request.Header.Get("accept-language"))
 		}
 		if err := validator.ValidateStruct(ctx, &req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

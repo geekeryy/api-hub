@@ -19,8 +19,8 @@ type AdminRegisterResp struct {
 }
 
 type DailySentenceReq struct {
-	Lang string `form:"lang,omitempty"` // 语言
-	Use  string `form:"use,omitempty"`  // 用途 将会传递给Prompt模板，为空时模板不包含用途
+	Lang string `form:"lang" validate:"omitempty,oneof=zh en ja ko" comment:"LANGUAGE"` // 语言
+	Use  string `form:"use,optional"`                                                   // 用途 将会传递给Prompt模板，为空时模板不包含用途
 }
 
 type DailySentenceResp struct {

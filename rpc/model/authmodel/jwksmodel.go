@@ -1,6 +1,8 @@
 package authmodel
 
 import (
+	"context"
+
 	"gorm.io/gorm"
 )
 
@@ -19,8 +21,9 @@ type (
 	}
 
 	customJwksLogicModel interface {
-		FindAll() ([]*Jwks, error)
-		FindLatest() (*Jwks, error)
+		FindAll(ctx context.Context) ([]*Jwks, error)
+		FindLatest(ctx context.Context) (*Jwks, error)
+		DeleteByKid(ctx context.Context, kid string) error
 	}
 )
 
@@ -31,11 +34,10 @@ func NewJwksModel(conn *gorm.DB) JwksModel {
 	}
 }
 
-
 // FindAll
-func (c *customJwksModel) FindAll() ([]*Jwks, error) {
+func (c *customJwksModel) FindAll(ctx context.Context) ([]*Jwks, error) {
 	var jwkss []*Jwks
-	err := c.conn.Model(&Jwks{}).Order("id desc").Find(&jwkss).Error
+	err := c.conn.WithContext(ctx).Model(&Jwks{}).Order("id desc").Find(&jwkss).Error
 	if err != nil {
 		return nil, err
 	}
@@ -43,11 +45,16 @@ func (c *customJwksModel) FindAll() ([]*Jwks, error) {
 }
 
 // FindLatest
-func (c *customJwksModel) FindLatest() (*Jwks, error) {
+func (c *customJwksModel) FindLatest(ctx context.Context) (*Jwks, error) {
 	var jwks Jwks
-	err := c.conn.Model(&Jwks{}).Order("id desc").First(&jwks).Error
+	err := c.conn.WithContext(ctx).Model(&Jwks{}).Order("id desc").First(&jwks).Error
 	if err != nil {
 		return nil, err
 	}
 	return &jwks, nil
+}
+
+// DeleteByKid
+func (c *customJwksModel) DeleteByKid(ctx context.Context, kid string) error {
+	return c.conn.WithContext(ctx).Model(&Jwks{}).Where("kid = ?", kid).Delete(&Jwks{}).Error
 }

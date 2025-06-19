@@ -51,7 +51,7 @@
             "description": "用途 将会传递给Prompt模板，为空时模板不包含用途",
             "name": "use",
             "in": "query",
-            "required": true
+            "allowEmptyValue": true
           }
         ],
         "responses": {
@@ -422,7 +422,7 @@
       }
     }
   },
-  "x-date": "2025-06-19 17:59:15",
+  "x-date": "2025-06-19 23:57:16",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",
