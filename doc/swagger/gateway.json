@@ -83,7 +83,7 @@
           "https"
         ],
         "tags": [
-          "B端用户管理"
+          "Auth - B端用户登录注册"
         ],
         "summary": "登录",
         "operationId": "auth/AdminAdminLoginHandler",
@@ -110,7 +110,7 @@
           "https"
         ],
         "tags": [
-          "B端用户管理"
+          "Auth - B端用户登录注册"
         ],
         "summary": "登出",
         "operationId": "auth/AdminAdminLogoutHandler",
@@ -135,7 +135,7 @@
           "https"
         ],
         "tags": [
-          "B端用户管理"
+          "Auth - B端用户登录注册"
         ],
         "summary": "注册",
         "operationId": "auth/AdminAdminRegisterHandler",
@@ -145,49 +145,6 @@
             "schema": {
               "type": "object"
             }
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/jwks/delete": {
-      "delete": {
-        "description": "删除公钥",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "JWKS"
-        ],
-        "summary": "删除公钥",
-        "operationId": "auth/JwksDeleteKeyHandler",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "kid"
-              ],
-              "properties": {
-                "kid": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {}
           }
         }
       }
@@ -202,7 +159,7 @@
           "https"
         ],
         "tags": [
-          "JWKS"
+          "Auth - jwks"
         ],
         "summary": "获取公钥",
         "operationId": "auth/JwksJWKSHandler",
@@ -214,57 +171,11 @@
         }
       }
     },
-    "/api/v1/gateway/auth/jwks/rotate": {
-      "put": {
-        "description": "轮换公钥",
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "JWKS"
-        ],
-        "summary": "轮换公钥",
-        "operationId": "auth/JwksRotateKeyHandler",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {}
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/jwks/usage": {
-      "get": {
-        "description": "公钥使用记录",
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "JWKS"
-        ],
-        "summary": "公钥使用记录",
-        "operationId": "auth/JwksKeyUsageHandler",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      }
-    },
     "/api/v1/gateway/auth/member/login": {
       "post": {
         "description": "登录",
         "consumes": [
-          "application/x-www-form-urlencoded"
+          "application/json"
         ],
         "produces": [
           "application/json"
@@ -273,10 +184,39 @@
           "https"
         ],
         "tags": [
-          "C端用户管理"
+          "Auth - C端用户登录注册"
         ],
         "summary": "登录",
         "operationId": "auth/MemberMemberLoginHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "identity_type",
+                "identifier",
+                "credential"
+              ],
+              "properties": {
+                "credential": {
+                  "description": "凭证 密码/验证码/access_token",
+                  "type": "string"
+                },
+                "identifier": {
+                  "description": "标识符 账号/手机号/邮箱",
+                  "type": "string"
+                },
+                "identity_type": {
+                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -308,7 +248,7 @@
           "https"
         ],
         "tags": [
-          "C端用户管理"
+          "Auth - C端用户登录注册"
         ],
         "summary": "登出",
         "operationId": "auth/MemberMemberLogoutHandler",
@@ -333,7 +273,7 @@
           "https"
         ],
         "tags": [
-          "C端用户管理"
+          "Auth - C端用户登录注册"
         ],
         "summary": "刷新Token",
         "operationId": "auth/MemberMemberRefreshTokenHandler",
@@ -361,9 +301,6 @@
             "schema": {
               "type": "object",
               "properties": {
-                "refresh_token": {
-                  "type": "string"
-                },
                 "token": {
                   "type": "string"
                 }
@@ -386,7 +323,7 @@
           "https"
         ],
         "tags": [
-          "C端用户管理"
+          "Auth - C端用户登录注册"
         ],
         "summary": "注册",
         "operationId": "auth/MemberMemberRegisterHandler",
@@ -395,6 +332,133 @@
             "description": "",
             "schema": {
               "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/oms/jwks/delete": {
+      "delete": {
+        "description": "删除公钥",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Oms - jwks"
+        ],
+        "summary": "删除公钥",
+        "operationId": "oms/JwksDeleteKeyHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "kid"
+              ],
+              "properties": {
+                "kid": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/oms/jwks/rotate": {
+      "put": {
+        "description": "轮换公钥",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Oms - jwks"
+        ],
+        "summary": "轮换公钥",
+        "operationId": "oms/JwksRotateKeyHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/oms/jwks/usage": {
+      "get": {
+        "description": "公钥使用记录",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Oms - jwks"
+        ],
+        "summary": "公钥使用记录",
+        "operationId": "oms/JwksKeyUsageHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "kid"
+              ],
+              "properties": {
+                "kid": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "records": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "time",
+                      "count"
+                    ],
+                    "properties": {
+                      "count": {
+                        "type": "integer"
+                      },
+                      "time": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -420,9 +484,100 @@
           }
         }
       }
+    },
+    "/api/v1/gateway/user/admin/info": {
+      "get": {
+        "description": "获取用户信息",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - B端用户管理"
+        ],
+        "summary": "获取用户信息",
+        "operationId": "user/AdminAdminInfoHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "avatar": {
+                  "type": "string"
+                },
+                "birthday": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "gender": {
+                  "type": "integer"
+                },
+                "nickname": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/info": {
+      "get": {
+        "description": "获取用户信息",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户管理"
+        ],
+        "summary": "获取用户信息",
+        "operationId": "user/MemberMemberInfoHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "avatar": {
+                  "type": "string"
+                },
+                "birthday": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "gender": {
+                  "type": "integer"
+                },
+                "nickname": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
-  "x-date": "2025-06-19 23:57:16",
+  "x-date": "2025-06-20 17:52:23",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

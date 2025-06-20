@@ -11,6 +11,9 @@ import (
 	authjwks "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/jwks"
 	authmember "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/member"
 	healthz "github.com/geekeryy/api-hub/api/gateway/internal/handler/healthz"
+	omsjwks "github.com/geekeryy/api-hub/api/gateway/internal/handler/oms/jwks"
+	useradmin "github.com/geekeryy/api-hub/api/gateway/internal/handler/user/admin"
+	usermember "github.com/geekeryy/api-hub/api/gateway/internal/handler/user/member"
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -76,33 +79,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.ContextMiddleware},
 			[]rest.Route{
 				{
-					// 删除公钥
-					Method:  http.MethodDelete,
-					Path:    "/delete",
-					Handler: authjwks.DeleteKeyHandler(serverCtx),
-				},
-				{
-					// 轮换公钥
-					Method:  http.MethodPut,
-					Path:    "/rotate",
-					Handler: authjwks.RotateKeyHandler(serverCtx),
-				},
-				{
-					// 公钥使用记录
-					Method:  http.MethodGet,
-					Path:    "/usage",
-					Handler: authjwks.KeyUsageHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithPrefix("/api/v1/gateway/auth/jwks"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.ContextMiddleware},
-			[]rest.Route{
-				{
 					// 登录
 					Method:  http.MethodPost,
 					Path:    "/login",
@@ -141,5 +117,62 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 		rest.WithPrefix("/api/v1/gateway"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.OmsJwtMiddleware},
+			[]rest.Route{
+				{
+					// 删除公钥
+					Method:  http.MethodDelete,
+					Path:    "/delete",
+					Handler: omsjwks.DeleteKeyHandler(serverCtx),
+				},
+				{
+					// 轮换公钥
+					Method:  http.MethodPut,
+					Path:    "/rotate",
+					Handler: omsjwks.RotateKeyHandler(serverCtx),
+				},
+				{
+					// 公钥使用记录
+					Method:  http.MethodGet,
+					Path:    "/usage",
+					Handler: omsjwks.KeyUsageHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/gateway/oms/jwks"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.AdminJwtMiddleware},
+			[]rest.Route{
+				{
+					// 获取用户信息
+					Method:  http.MethodGet,
+					Path:    "/info",
+					Handler: useradmin.AdminInfoHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/gateway/user/admin"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.JwtMiddleware},
+			[]rest.Route{
+				{
+					// 获取用户信息
+					Method:  http.MethodGet,
+					Path:    "/info",
+					Handler: usermember.MemberInfoHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/gateway/user/member"),
 	)
 }

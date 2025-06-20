@@ -13,15 +13,20 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.20.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
+	github.com/google/uuid v1.6.0
+	github.com/huandu/facebook/v2 v2.9.1
 	github.com/json-iterator/go v1.1.12
+	github.com/lib/pq v1.10.9
 	github.com/nicksnyder/go-i18n/v2 v2.6.0
 	github.com/zeromicro/go-zero v1.8.4
 	go.opentelemetry.io/otel v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0
+	golang.org/x/crypto v0.39.0
 	golang.org/x/text v0.26.0
 	golang.org/x/time v0.10.0
 	google.golang.org/grpc v1.73.0
 	google.golang.org/protobuf v1.36.6
+	googlemaps.github.io/maps v1.7.0
 	gorm.io/gorm v1.30.0
 	gorm.io/plugin/opentelemetry v0.1.15
 )
@@ -49,7 +54,6 @@ require (
 	github.com/go-sql-driver/mysql v1.9.0 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/grafana/pyroscope-go v1.2.2 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.8 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 // indirect
@@ -83,6 +87,7 @@ require (
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
+	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.24.0 // indirect
@@ -95,7 +100,6 @@ require (
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.39.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect

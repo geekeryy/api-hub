@@ -24,7 +24,6 @@ func NewJwtMiddleware(kfunc keyfunc.Keyfunc) *JwtMiddleware {
 	}
 }
 
-
 func (m *JwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger := logx.WithContext(r.Context())

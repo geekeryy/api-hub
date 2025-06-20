@@ -2,7 +2,7 @@
 	group:      auth/member
 	middleware: ContextMiddleware
 	prefix:     /api/v1/gateway/auth/member
-	tags:       "C端用户管理"
+	tags:       "Auth - C端用户登录注册"
 )
 service gateway-api {
 	@doc (
@@ -38,7 +38,7 @@ service gateway-api {
 	group:      auth/admin
 	middleware: ContextMiddleware
 	prefix:     /api/v1/gateway/auth/admin
-	tags:       "B端用户管理"
+	tags:       "Auth - B端用户登录注册"
 )
 service gateway-api {
 	@doc (
@@ -66,7 +66,7 @@ service gateway-api {
 @server (
 	group:  auth/jwks
 	prefix: /api/v1/gateway/auth/jwks
-	tags:   "JWKS"
+	tags:   "Auth - jwks"
 )
 service gateway-api {
 	@doc (
@@ -77,37 +77,12 @@ service gateway-api {
 	get /get
 }
 
-@server (
-	group:      auth/jwks
-	prefix:     /api/v1/gateway/auth/jwks
-	middleware: ContextMiddleware
-	tags:       "JWKS"
-)
-service gateway-api {
-	@doc (
-		summary:     "公钥使用记录"
-		description: "公钥使用记录"
-	)
-	@handler KeyUsageHandler
-	get /usage (KeyUsageReq) returns (KeyUsageResp)
-
-	@doc (
-		summary:     "删除公钥"
-		description: "删除公钥"
-	)
-	@handler DeleteKeyHandler
-	delete /delete (DeleteKeyReq)
-
-	@doc (
-		summary:     "轮换公钥"
-		description: "轮换公钥"
-	)
-	@handler RotateKeyHandler
-	put /rotate
-}
-
 type (
-	MemberLoginReq  {}
+	MemberLoginReq {
+		IdentityType int64  `json:"identity_type"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
+		Identifier   string `json:"identifier"` // 标识符 账号/手机号/邮箱
+		Credential   string `json:"credential"` // 凭证 密码/验证码/access_token
+	}
 	MemberLoginResp {
 		Token        string `json:"token"`
 		RefreshToken string `json:"refresh_token"`
@@ -116,8 +91,7 @@ type (
 		RefreshToken string `json:"refresh_token"`
 	}
 	MemberRefreshTokenResp {
-		Token        string `json:"token"`
-		RefreshToken string `json:"refresh_token"`
+		Token string `json:"token"`
 	}
 	MemberLogoutReq  {}
 	MemberRegisterReq  {}
@@ -127,10 +101,5 @@ type (
 	AdminLogoutReq  {}
 	AdminRegisterReq  {}
 	AdminRegisterResp  {}
-	KeyUsageReq  {}
-	KeyUsageResp  {}
-	DeleteKeyReq {
-		Kid string `json:"kid"`
-	}
 )
 

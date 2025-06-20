@@ -1,0 +1,45 @@
+@server (
+	group:      oms/jwks
+	middleware: ContextMiddleware,OmsJwtMiddleware
+	prefix:     /api/v1/gateway/oms/jwks
+	tags:       "Oms - jwks"
+)
+service gateway-api {
+	@doc (
+		summary:     "公钥使用记录"
+		description: "公钥使用记录"
+	)
+	@handler KeyUsageHandler
+	get /usage (KeyUsageReq) returns (KeyUsageResp)
+
+	@doc (
+		summary:     "删除公钥"
+		description: "删除公钥"
+	)
+	@handler DeleteKeyHandler
+	delete /delete (DeleteKeyReq)
+
+	@doc (
+		summary:     "轮换公钥"
+		description: "轮换公钥"
+	)
+	@handler RotateKeyHandler
+	put /rotate
+}
+
+type (
+	KeyUsageReq {
+		Kid string `json:"kid"`
+	}
+	KeyUsageResp {
+		Records []TokenRefreshRecord `json:"records"`
+	}
+	TokenRefreshRecord {
+		Time  string `json:"time"`
+		Count int    `json:"count"`
+	}
+	DeleteKeyReq {
+		Kid string `json:"kid"`
+	}
+)
+

@@ -9,6 +9,7 @@ import (
 	"github.com/geekeryy/api-hub/api/gateway/internal/config"
 	"github.com/geekeryy/api-hub/api/gateway/internal/middleware"
 	"github.com/geekeryy/api-hub/core/jwks"
+	"github.com/geekeryy/api-hub/core/pgcache"
 	"github.com/geekeryy/api-hub/core/validate"
 	"github.com/geekeryy/api-hub/core/xgorm"
 	"github.com/geekeryy/api-hub/library/validator"
@@ -18,17 +19,26 @@ import (
 )
 
 type ServiceContext struct {
-	Config            config.Config
-	ContextMiddleware rest.Middleware
-	JwtMiddleware     rest.Middleware
-	Validator         *validate.Validate
-	JwksModel         authmodel.JwksModel
+	Config                  config.Config
+	ContextMiddleware       rest.Middleware
+	JwtMiddleware           rest.Middleware
+	Validator               *validate.Validate
+	JwksModel               authmodel.JwksModel
+	TokenRefreshRecordModel authmodel.TokenRefreshRecordModel
+	MemberIdentityModel     authmodel.MemberIdentityModel
+	RefreshTokenModel       authmodel.RefreshTokenModel
+	Cache                   *pgcache.Cache
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	pg, err := xgorm.ConnectPg(c.PgSql)
 	if err != nil {
 		log.Fatalf("Failed to connect to database. Error: %s", err)
+	}
+
+	cache, err := pgcache.NewCache(c.PgSql)
+	if err != nil {
+		log.Fatalf("Failed to init cache. Error: %s", err)
 	}
 
 	kfunc, err := jwks.InitKeyfunc(context.Background(), c.Jwks.ServerURL, keyfunc.Override{
@@ -41,13 +51,17 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 
 	svc := &ServiceContext{
-		Config:            c,
-		ContextMiddleware: middleware.NewContextMiddleware().Handle,
-		JwtMiddleware:     middleware.NewJwtMiddleware(kfunc).Handle,
-		JwksModel: authmodel.NewJwksModel(pg),
+		Config:                  c,
+		ContextMiddleware:       middleware.NewContextMiddleware().Handle,
+		JwtMiddleware:           middleware.NewJwtMiddleware(kfunc).Handle,
+		JwksModel:               authmodel.NewJwksModel(pg),
+		TokenRefreshRecordModel: authmodel.NewTokenRefreshRecordModel(pg),
+		MemberIdentityModel:     authmodel.NewMemberIdentityModel(pg),
+		RefreshTokenModel:       authmodel.NewRefreshTokenModel(pg),
 		Validator: validate.New([]validate.ValidatorFn{
 			validator.ChineseNameValidator,
 		}, []string{"zh", "en"}),
+		Cache: cache,
 	}
 	return svc
 }

@@ -127,6 +127,16 @@ EMAIL_FORMAT_ERRO = Email format error
       go install
       ```
 
+## 登录类型
+
+* 账号+密码
+* 邮箱+密码
+* 手机号+密码
+* 邮箱+验证码
+* 手机号+验证码
+* 第三方登录：wechat、google、facebook
+
+
 ## 📝 TODO
 
 * 搭建基础框架

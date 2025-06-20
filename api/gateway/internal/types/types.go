@@ -3,6 +3,16 @@
 
 package types
 
+type AdminInfoResp struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Avatar   string `json:"avatar"`
+	Nickname string `json:"nickname"`
+	Gender   int    `json:"gender"`
+	Birthday string `json:"birthday"`
+}
+
 type AdminLoginReq struct {
 }
 
@@ -32,12 +42,26 @@ type DeleteKeyReq struct {
 }
 
 type KeyUsageReq struct {
+	Kid string `json:"kid"`
 }
 
 type KeyUsageResp struct {
+	Records []TokenRefreshRecord `json:"records"`
+}
+
+type MemberInfoResp struct {
+	Nickname string `json:"nickname"`
+	Avatar   string `json:"avatar"`
+	Gender   int    `json:"gender"`
+	Birthday string `json:"birthday"`
+	Phone    string `json:"phone"`
+	Email    string `json:"email"`
 }
 
 type MemberLoginReq struct {
+	IdentityType int64  `json:"identity_type"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
+	Identifier   string `json:"identifier"`    // 标识符 账号/手机号/邮箱
+	Credential   string `json:"credential"`    // 凭证 密码/验证码/access_token
 }
 
 type MemberLoginResp struct {
@@ -53,12 +77,16 @@ type MemberRefreshTokenReq struct {
 }
 
 type MemberRefreshTokenResp struct {
-	Token        string `json:"token"`
-	RefreshToken string `json:"refresh_token"`
+	Token string `json:"token"`
 }
 
 type MemberRegisterReq struct {
 }
 
 type MemberRegisterResp struct {
+}
+
+type TokenRefreshRecord struct {
+	Time  string `json:"time"`
+	Count int    `json:"count"`
 }

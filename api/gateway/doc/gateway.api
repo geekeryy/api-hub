@@ -9,7 +9,9 @@ info (
 	basePath:     ""
 )
 
+import "oms.api"
 import "auth.api"
+import "user.api"
 
 @server (
 	prefix: /api/v1/gateway

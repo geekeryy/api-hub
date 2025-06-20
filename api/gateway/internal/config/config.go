@@ -12,9 +12,15 @@ type Config struct {
 	}
 	PgSql pg.PgSql
 	Jwks    Jwks
+	Facebook Facebook
 }
 
 type Jwks struct {
 	ServerURL string
 	RefreshInterval int64
+}
+
+type Facebook struct {
+	AppID     string
+	AppSecret string
 }

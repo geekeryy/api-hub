@@ -1,4 +1,4 @@
-package jwks
+package admin
 
 import (
 	"context"
@@ -9,22 +9,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type KeyUsageLogic struct {
+type AdminInfoLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-// 公钥使用记录
-func NewKeyUsageLogic(ctx context.Context, svcCtx *svc.ServiceContext) *KeyUsageLogic {
-	return &KeyUsageLogic{
+// 获取用户信息
+func NewAdminInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AdminInfoLogic {
+	return &AdminInfoLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *KeyUsageLogic) KeyUsage(req *types.KeyUsageReq) (resp *types.KeyUsageResp, err error) {
+func (l *AdminInfoLogic) AdminInfo() (resp *types.AdminInfoResp, err error) {
 	// todo: add your logic here and delete this line
 
 	return
