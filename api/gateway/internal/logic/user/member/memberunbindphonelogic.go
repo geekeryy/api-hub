@@ -9,22 +9,23 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type MemberRegisterLogic struct {
+type MemberUnbindPhoneLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-// 注册
-func NewMemberRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MemberRegisterLogic {
-	return &MemberRegisterLogic{
+// 解绑手机号
+func NewMemberUnbindPhoneLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MemberUnbindPhoneLogic {
+	return &MemberUnbindPhoneLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *MemberRegisterLogic) MemberRegister(req *types.MemberRegisterReq) error {
+func (l *MemberUnbindPhoneLogic) MemberUnbindPhone(req *types.MemberUnbindPhoneReq) error {
+	// todo: add your logic here and delete this line
 
 	return nil
 }

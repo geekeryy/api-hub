@@ -10,3 +10,15 @@ const (
 	IdentityTypeFacebook = 6
 	IdentityTypeGithub   = 7
 )
+
+// 刷新令牌状态
+const (
+	RefreshTokenStatusEnabled  = 1
+	RefreshTokenStatusDisabled = 2
+)
+
+// 用户状态
+const (
+	MemberStatusEnabled  = 1
+	MemberStatusDisabled = 2
+)

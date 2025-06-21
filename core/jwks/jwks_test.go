@@ -22,7 +22,7 @@ func TestJwt(t *testing.T) {
 		t.Fatalf("Failed to generate given key.\nError: %s", err)
 	}
 	kid := "2"
-	token, err := jwks.GenerateToken(kid, "1234567890", string(priv), 60)
+	token, _, err := jwks.GenerateToken(kid, "1234567890", string(priv), 60)
 	if err != nil {
 		t.Fatalf("Failed to generate token.\nError: %s", err)
 	}

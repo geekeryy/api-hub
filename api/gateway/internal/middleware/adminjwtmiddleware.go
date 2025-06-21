@@ -1,12 +1,19 @@
 package middleware
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/MicahParks/keyfunc/v3"
+)
 
 type AdminJwtMiddleware struct {
+	kfunc keyfunc.Keyfunc
 }
 
-func NewAdminJwtMiddleware() *AdminJwtMiddleware {
-	return &AdminJwtMiddleware{}
+func NewAdminJwtMiddleware(kfunc keyfunc.Keyfunc) *AdminJwtMiddleware {
+	return &AdminJwtMiddleware{
+		kfunc: kfunc,
+	}
 }
 
 func (m *AdminJwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {

@@ -83,7 +83,7 @@
           "https"
         ],
         "tags": [
-          "Auth - B端用户登录注册"
+          "Auth - B端用户授权"
         ],
         "summary": "登录",
         "operationId": "auth/AdminAdminLoginHandler",
@@ -93,31 +93,6 @@
             "schema": {
               "type": "object"
             }
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/admin/logout": {
-      "post": {
-        "description": "登出",
-        "consumes": [
-          "application/x-www-form-urlencoded"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - B端用户登录注册"
-        ],
-        "summary": "登出",
-        "operationId": "auth/AdminAdminLogoutHandler",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {}
           }
         }
       }
@@ -135,7 +110,7 @@
           "https"
         ],
         "tags": [
-          "Auth - B端用户登录注册"
+          "Auth - B端用户授权"
         ],
         "summary": "注册",
         "operationId": "auth/AdminAdminRegisterHandler",
@@ -171,9 +146,9 @@
         }
       }
     },
-    "/api/v1/gateway/auth/member/login": {
+    "/api/v1/gateway/auth/member/activate-email": {
       "post": {
-        "description": "登录",
+        "description": "用户点击邮箱激活链接，前端页面调用激活邮箱接口，激活邮箱",
         "consumes": [
           "application/json"
         ],
@@ -184,7 +159,114 @@
           "https"
         ],
         "tags": [
-          "Auth - C端用户登录注册"
+          "Auth - C端用户授权"
+        ],
+        "summary": "激活邮箱",
+        "operationId": "auth/MemberMemberActivateEmailHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "token"
+              ],
+              "properties": {
+                "token": {
+                  "description": "激活token",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/member/forget-password": {
+      "post": {
+        "description": "忘记密码",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Auth - C端用户授权"
+        ],
+        "summary": "忘记密码",
+        "operationId": "auth/MemberMemberForgetPasswordHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "identity_type",
+                "identifier",
+                "code",
+                "new_password"
+              ],
+              "properties": {
+                "code": {
+                  "description": "验证码",
+                  "type": "string"
+                },
+                "identifier": {
+                  "description": "标识符 手机号/邮箱",
+                  "type": "string"
+                },
+                "identity_type": {
+                  "description": "身份类型 1: 手机号 2: 邮箱",
+                  "type": "integer",
+                  "enum": [
+                    "1",
+                    "2"
+                  ]
+                },
+                "new_password": {
+                  "description": "新密码",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/member/login": {
+      "post": {
+        "description": "手机号+验证码登录、邮箱+验证码登录、用户名/手机号/邮箱+密码登录、第三方登录",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Auth - C端用户授权"
         ],
         "summary": "登录",
         "operationId": "auth/MemberMemberLoginHandler",
@@ -197,7 +279,6 @@
               "type": "object",
               "required": [
                 "identity_type",
-                "identifier",
                 "credential"
               ],
               "properties": {
@@ -211,7 +292,16 @@
                 },
                 "identity_type": {
                   "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
-                  "type": "integer"
+                  "type": "integer",
+                  "enum": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7"
+                  ]
                 }
               }
             }
@@ -224,9 +314,11 @@
               "type": "object",
               "properties": {
                 "refresh_token": {
+                  "description": "刷新token",
                   "type": "string"
                 },
                 "token": {
+                  "description": "新token",
                   "type": "string"
                 }
               }
@@ -235,34 +327,9 @@
         }
       }
     },
-    "/api/v1/gateway/auth/member/logout": {
-      "post": {
-        "description": "登出",
-        "consumes": [
-          "application/x-www-form-urlencoded"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - C端用户登录注册"
-        ],
-        "summary": "登出",
-        "operationId": "auth/MemberMemberLogoutHandler",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {}
-          }
-        }
-      }
-    },
     "/api/v1/gateway/auth/member/refresh": {
       "post": {
-        "description": "刷新Token",
+        "description": "资源请求返回401时，自动调用刷新Token接口，并重放资源请求；如果刷新Token返回401，则需要重新登录",
         "consumes": [
           "application/json"
         ],
@@ -273,7 +340,7 @@
           "https"
         ],
         "tags": [
-          "Auth - C端用户登录注册"
+          "Auth - C端用户授权"
         ],
         "summary": "刷新Token",
         "operationId": "auth/MemberMemberRefreshTokenHandler",
@@ -289,6 +356,7 @@
               ],
               "properties": {
                 "refresh_token": {
+                  "description": "刷新token",
                   "type": "string"
                 }
               }
@@ -302,6 +370,7 @@
               "type": "object",
               "properties": {
                 "token": {
+                  "description": "新token",
                   "type": "string"
                 }
               }
@@ -312,9 +381,9 @@
     },
     "/api/v1/gateway/auth/member/register": {
       "post": {
-        "description": "注册",
+        "description": "账号密码注册、手机号验证码注册、手机号验证码+密码注册、邮箱验证码注册、邮箱验证码+密码注册、邮箱激活+密码注册",
         "consumes": [
-          "application/x-www-form-urlencoded"
+          "application/json"
         ],
         "produces": [
           "application/json"
@@ -323,16 +392,168 @@
           "https"
         ],
         "tags": [
-          "Auth - C端用户登录注册"
+          "Auth - C端用户授权"
         ],
         "summary": "注册",
         "operationId": "auth/MemberMemberRegisterHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "identity_type",
+                "identifier"
+              ],
+              "properties": {
+                "avatar": {
+                  "description": "头像",
+                  "type": "string"
+                },
+                "birthday": {
+                  "description": "生日",
+                  "type": "string"
+                },
+                "code": {
+                  "description": "验证码",
+                  "type": "string"
+                },
+                "email": {
+                  "description": "邮箱",
+                  "type": "string"
+                },
+                "gender": {
+                  "description": "性别 1: 男 2: 女 3: 未知",
+                  "type": "integer",
+                  "enum": [
+                    "1",
+                    "2",
+                    "3"
+                  ]
+                },
+                "identifier": {
+                  "description": "标识符 账号/手机号/邮箱",
+                  "type": "string"
+                },
+                "identity_type": {
+                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名",
+                  "type": "integer",
+                  "enum": [
+                    "1",
+                    "2",
+                    "3"
+                  ]
+                },
+                "nickname": {
+                  "description": "昵称",
+                  "type": "string"
+                },
+                "password": {
+                  "description": "密码",
+                  "type": "string"
+                },
+                "phone": {
+                  "description": "手机号",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/member/send-email-code": {
+      "post": {
+        "description": "发送邮箱验证码",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Auth - C端用户授权"
+        ],
+        "summary": "发送邮箱验证码",
+        "operationId": "auth/MemberMemberSendEmailCodeHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
             "schema": {
-              "type": "object"
+              "type": "object",
+              "required": [
+                "email"
+              ],
+              "properties": {
+                "email": {
+                  "description": "邮箱",
+                  "type": "string"
+                }
+              }
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/auth/member/send-phone-code": {
+      "post": {
+        "description": "发送手机验证码",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Auth - C端用户授权"
+        ],
+        "summary": "发送手机验证码",
+        "operationId": "auth/MemberMemberSendPhoneCodeHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "phone"
+              ],
+              "properties": {
+                "phone": {
+                  "description": "手机号",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
           }
         }
       }
@@ -506,28 +727,182 @@
               "type": "object",
               "properties": {
                 "avatar": {
+                  "description": "头像",
                   "type": "string"
                 },
                 "birthday": {
+                  "description": "生日",
                   "type": "string"
                 },
                 "email": {
+                  "description": "邮箱",
                   "type": "string"
                 },
                 "gender": {
+                  "description": "性别",
                   "type": "integer"
                 },
                 "nickname": {
+                  "description": "昵称",
                   "type": "string"
                 },
                 "phone": {
+                  "description": "手机号",
                   "type": "string"
                 },
                 "username": {
+                  "description": "用户名",
                   "type": "string"
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/bind-email": {
+      "post": {
+        "description": "绑定邮箱",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户管理"
+        ],
+        "summary": "绑定邮箱",
+        "operationId": "user/MemberMemberBindEmailHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "email",
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "description": "验证码",
+                  "type": "string"
+                },
+                "email": {
+                  "description": "邮箱",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/bind-phone": {
+      "post": {
+        "description": "绑定手机号",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户管理"
+        ],
+        "summary": "绑定手机号",
+        "operationId": "user/MemberMemberBindPhoneHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "phone",
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "description": "验证码",
+                  "type": "string"
+                },
+                "phone": {
+                  "description": "手机号",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/change-password": {
+      "put": {
+        "description": "修改密码",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户管理"
+        ],
+        "summary": "修改密码",
+        "operationId": "user/MemberMemberChangePasswordHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "old_password",
+                "new_password"
+              ],
+              "properties": {
+                "new_password": {
+                  "description": "新密码",
+                  "type": "string"
+                },
+                "old_password": {
+                  "description": "旧密码",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
           }
         }
       }
@@ -553,21 +928,27 @@
               "type": "object",
               "properties": {
                 "avatar": {
+                  "description": "头像",
                   "type": "string"
                 },
                 "birthday": {
+                  "description": "生日",
                   "type": "string"
                 },
                 "email": {
+                  "description": "邮箱",
                   "type": "string"
                 },
                 "gender": {
+                  "description": "性别",
                   "type": "integer"
                 },
                 "nickname": {
+                  "description": "昵称",
                   "type": "string"
                 },
                 "phone": {
+                  "description": "手机号",
                   "type": "string"
                 }
               }
@@ -575,9 +956,150 @@
           }
         }
       }
+    },
+    "/api/v1/gateway/user/member/unbind-email": {
+      "post": {
+        "description": "解绑邮箱",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户管理"
+        ],
+        "summary": "解绑邮箱",
+        "operationId": "user/MemberMemberUnbindEmailHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "email"
+              ],
+              "properties": {
+                "email": {
+                  "description": "邮箱",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/unbind-phone": {
+      "post": {
+        "description": "解绑手机号",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户管理"
+        ],
+        "summary": "解绑手机号",
+        "operationId": "user/MemberMemberUnbindPhoneHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "phone"
+              ],
+              "properties": {
+                "phone": {
+                  "description": "手机号",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/update-info": {
+      "put": {
+        "description": "更新用户信息",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户管理"
+        ],
+        "summary": "更新用户信息",
+        "operationId": "user/MemberMemberUpdateInfoHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "avatar": {
+                  "description": "头像",
+                  "type": "string"
+                },
+                "birthday": {
+                  "description": "生日",
+                  "type": "string"
+                },
+                "gender": {
+                  "description": "性别",
+                  "type": "integer"
+                },
+                "nickname": {
+                  "description": "昵称",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
     }
   },
-  "x-date": "2025-06-20 17:52:23",
+  "x-date": "2025-06-21 16:54:15",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

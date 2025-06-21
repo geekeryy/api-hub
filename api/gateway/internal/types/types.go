@@ -4,13 +4,13 @@
 package types
 
 type AdminInfoResp struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Avatar   string `json:"avatar"`
-	Nickname string `json:"nickname"`
-	Gender   int    `json:"gender"`
-	Birthday string `json:"birthday"`
+	Username string `json:"username"` // 用户名
+	Email    string `json:"email"`    // 邮箱
+	Phone    string `json:"phone"`    // 手机号
+	Avatar   string `json:"avatar"`   // 头像
+	Nickname string `json:"nickname"` // 昵称
+	Gender   int    `json:"gender"`   // 性别
+	Birthday string `json:"birthday"` // 生日
 }
 
 type AdminLoginReq struct {
@@ -49,41 +49,94 @@ type KeyUsageResp struct {
 	Records []TokenRefreshRecord `json:"records"`
 }
 
+type MemberActivateEmailReq struct {
+	Token string `json:"token"` // 激活token
+}
+
+type MemberBindEmailReq struct {
+	Email string `json:"email"` // 邮箱
+	Code  string `json:"code"`  // 验证码
+}
+
+type MemberBindPhoneReq struct {
+	Phone string `json:"phone"` // 手机号
+	Code  string `json:"code"`  // 验证码
+}
+
+type MemberChangePasswordReq struct {
+	OldPassword string `json:"old_password"` // 旧密码
+	NewPassword string `json:"new_password"` // 新密码
+}
+
+type MemberForgetPasswordReq struct {
+	IdentityType int64  `json:"identity_type,options=1|2"` // 身份类型 1: 手机号 2: 邮箱
+	Identifier   string `json:"identifier"`                // 标识符 手机号/邮箱
+	Code         string `json:"code"`                      // 验证码
+	NewPassword  string `json:"new_password"`              // 新密码
+}
+
 type MemberInfoResp struct {
-	Nickname string `json:"nickname"`
-	Avatar   string `json:"avatar"`
-	Gender   int    `json:"gender"`
-	Birthday string `json:"birthday"`
-	Phone    string `json:"phone"`
-	Email    string `json:"email"`
+	Nickname string `json:"nickname"` // 昵称
+	Avatar   string `json:"avatar"`   // 头像
+	Gender   int    `json:"gender"`   // 性别
+	Birthday string `json:"birthday"` // 生日
+	Phone    string `json:"phone"`    // 手机号
+	Email    string `json:"email"`    // 邮箱
 }
 
 type MemberLoginReq struct {
-	IdentityType int64  `json:"identity_type"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
-	Identifier   string `json:"identifier"`    // 标识符 账号/手机号/邮箱
-	Credential   string `json:"credential"`    // 凭证 密码/验证码/access_token
+	IdentityType int64  `json:"identity_type,options=1|2|3|4|5|6|7"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
+	Identifier   string `json:"identifier,optional"`                 // 标识符 账号/手机号/邮箱
+	Credential   string `json:"credential"`                          // 凭证 密码/验证码/access_token
 }
 
 type MemberLoginResp struct {
-	Token        string `json:"token"`
-	RefreshToken string `json:"refresh_token"`
-}
-
-type MemberLogoutReq struct {
+	Token        string `json:"token"`         // 新token
+	RefreshToken string `json:"refresh_token"` // 刷新token
 }
 
 type MemberRefreshTokenReq struct {
-	RefreshToken string `json:"refresh_token"`
+	RefreshToken string `json:"refresh_token"` // 刷新token
 }
 
 type MemberRefreshTokenResp struct {
-	Token string `json:"token"`
+	Token string `json:"token"` // 新token
 }
 
 type MemberRegisterReq struct {
+	IdentityType int64  `json:"identity_type,options=1|2|3"`   // 身份类型 1: 手机号 2: 邮箱 3: 用户名
+	Identifier   string `json:"identifier"`                    // 标识符 账号/手机号/邮箱
+	Password     string `json:"password,optional"`             // 密码
+	Code         string `json:"code,optional"`                 // 验证码
+	Nickname     string `json:"nickname,optional"`             // 昵称
+	Avatar       string `json:"avatar,optional"`               // 头像
+	Gender       int64  `json:"gender,options=1|2|3,optional"` // 性别 1: 男 2: 女 3: 未知
+	Birthday     string `json:"birthday,optional"`             // 生日
+	Phone        string `json:"phone,optional"`                // 手机号
+	Email        string `json:"email,optional"`                // 邮箱
 }
 
-type MemberRegisterResp struct {
+type MemberSendEmailCodeReq struct {
+	Email string `json:"email"` // 邮箱
+}
+
+type MemberSendPhoneCodeReq struct {
+	Phone string `json:"phone"` // 手机号
+}
+
+type MemberUnbindEmailReq struct {
+	Email string `json:"email"` // 邮箱
+}
+
+type MemberUnbindPhoneReq struct {
+	Phone string `json:"phone"` // 手机号
+}
+
+type MemberUpdateInfoReq struct {
+	Nickname string `json:"nickname,optional"` // 昵称
+	Avatar   string `json:"avatar,optional"`   // 头像
+	Gender   int    `json:"gender,optional"`   // 性别
+	Birthday string `json:"birthday,optional"` // 生日
 }
 
 type TokenRefreshRecord struct {

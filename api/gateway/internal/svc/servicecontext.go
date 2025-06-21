@@ -14,20 +14,27 @@ import (
 	"github.com/geekeryy/api-hub/core/xgorm"
 	"github.com/geekeryy/api-hub/library/validator"
 	"github.com/geekeryy/api-hub/rpc/model/authmodel"
+	"github.com/geekeryy/api-hub/rpc/model/usermodel"
 	"github.com/zeromicro/go-zero/rest"
 	"golang.org/x/time/rate"
+	"gorm.io/gorm"
 )
 
 type ServiceContext struct {
 	Config                  config.Config
 	ContextMiddleware       rest.Middleware
 	JwtMiddleware           rest.Middleware
+	AdminJwtMiddleware      rest.Middleware
+	OmsJwtMiddleware        rest.Middleware
 	Validator               *validate.Validate
 	JwksModel               authmodel.JwksModel
 	TokenRefreshRecordModel authmodel.TokenRefreshRecordModel
 	MemberIdentityModel     authmodel.MemberIdentityModel
+	MemberInfoModel         usermodel.MemberInfoModel
 	RefreshTokenModel       authmodel.RefreshTokenModel
+	DB                      *gorm.DB
 	Cache                   *pgcache.Cache
+	Kfunc                   keyfunc.Keyfunc
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -54,14 +61,19 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config:                  c,
 		ContextMiddleware:       middleware.NewContextMiddleware().Handle,
 		JwtMiddleware:           middleware.NewJwtMiddleware(kfunc).Handle,
+		AdminJwtMiddleware:      middleware.NewAdminJwtMiddleware(kfunc).Handle,
+		OmsJwtMiddleware:        middleware.NewOmsJwtMiddleware().Handle,
+		Kfunc:                   kfunc,
 		JwksModel:               authmodel.NewJwksModel(pg),
 		TokenRefreshRecordModel: authmodel.NewTokenRefreshRecordModel(pg),
 		MemberIdentityModel:     authmodel.NewMemberIdentityModel(pg),
+		MemberInfoModel:         usermodel.NewMemberInfoModel(pg),
 		RefreshTokenModel:       authmodel.NewRefreshTokenModel(pg),
 		Validator: validate.New([]validate.ValidatorFn{
 			validator.ChineseNameValidator,
 		}, []string{"zh", "en"}),
 		Cache: cache,
+		DB:    pg,
 	}
 	return svc
 }

@@ -46,12 +46,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: authadmin.AdminLoginHandler(serverCtx),
 				},
 				{
-					// 登出
-					Method:  http.MethodPost,
-					Path:    "/logout",
-					Handler: authadmin.AdminLogoutHandler(serverCtx),
-				},
-				{
 					// 注册
 					Method:  http.MethodPost,
 					Path:    "/register",
@@ -79,16 +73,22 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.ContextMiddleware},
 			[]rest.Route{
 				{
+					// 激活邮箱
+					Method:  http.MethodPost,
+					Path:    "/activate-email",
+					Handler: authmember.MemberActivateEmailHandler(serverCtx),
+				},
+				{
+					// 忘记密码
+					Method:  http.MethodPost,
+					Path:    "/forget-password",
+					Handler: authmember.MemberForgetPasswordHandler(serverCtx),
+				},
+				{
 					// 登录
 					Method:  http.MethodPost,
 					Path:    "/login",
 					Handler: authmember.MemberLoginHandler(serverCtx),
-				},
-				{
-					// 登出
-					Method:  http.MethodPost,
-					Path:    "/logout",
-					Handler: authmember.MemberLogoutHandler(serverCtx),
 				},
 				{
 					// 刷新Token
@@ -101,6 +101,18 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/register",
 					Handler: authmember.MemberRegisterHandler(serverCtx),
+				},
+				{
+					// 发送邮箱验证码
+					Method:  http.MethodPost,
+					Path:    "/send-email-code",
+					Handler: authmember.MemberSendEmailCodeHandler(serverCtx),
+				},
+				{
+					// 发送手机验证码
+					Method:  http.MethodPost,
+					Path:    "/send-phone-code",
+					Handler: authmember.MemberSendPhoneCodeHandler(serverCtx),
 				},
 			}...,
 		),
@@ -166,10 +178,46 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.JwtMiddleware},
 			[]rest.Route{
 				{
+					// 绑定邮箱
+					Method:  http.MethodPost,
+					Path:    "/bind-email",
+					Handler: usermember.MemberBindEmailHandler(serverCtx),
+				},
+				{
+					// 绑定手机号
+					Method:  http.MethodPost,
+					Path:    "/bind-phone",
+					Handler: usermember.MemberBindPhoneHandler(serverCtx),
+				},
+				{
+					// 修改密码
+					Method:  http.MethodPut,
+					Path:    "/change-password",
+					Handler: usermember.MemberChangePasswordHandler(serverCtx),
+				},
+				{
 					// 获取用户信息
 					Method:  http.MethodGet,
 					Path:    "/info",
 					Handler: usermember.MemberInfoHandler(serverCtx),
+				},
+				{
+					// 解绑邮箱
+					Method:  http.MethodPost,
+					Path:    "/unbind-email",
+					Handler: usermember.MemberUnbindEmailHandler(serverCtx),
+				},
+				{
+					// 解绑手机号
+					Method:  http.MethodPost,
+					Path:    "/unbind-phone",
+					Handler: usermember.MemberUnbindPhoneHandler(serverCtx),
+				},
+				{
+					// 更新用户信息
+					Method:  http.MethodPut,
+					Path:    "/update-info",
+					Handler: usermember.MemberUpdateInfoHandler(serverCtx),
 				},
 			}...,
 		),

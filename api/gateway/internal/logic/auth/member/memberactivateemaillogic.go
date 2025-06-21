@@ -9,22 +9,23 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type MemberRegisterLogic struct {
+type MemberActivateEmailLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-// 注册
-func NewMemberRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MemberRegisterLogic {
-	return &MemberRegisterLogic{
+// 激活邮箱
+func NewMemberActivateEmailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MemberActivateEmailLogic {
+	return &MemberActivateEmailLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *MemberRegisterLogic) MemberRegister(req *types.MemberRegisterReq) error {
+func (l *MemberActivateEmailLogic) MemberActivateEmail(req *types.MemberActivateEmailReq) error {
+	// todo: add your logic here and delete this line
 
 	return nil
 }

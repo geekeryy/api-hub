@@ -9,10 +9,10 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 注册
-func MemberRegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 发送邮箱验证码
+func MemberSendEmailCodeHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.MemberRegisterReq
+		var req types.MemberSendEmailCodeReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
@@ -22,8 +22,8 @@ func MemberRegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := member.NewMemberRegisterLogic(r.Context(), svcCtx)
-		err := l.MemberRegister(&req)
+		l := member.NewMemberSendEmailCodeLogic(r.Context(), svcCtx)
+		err := l.MemberSendEmailCode(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

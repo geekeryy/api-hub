@@ -9,6 +9,7 @@ type Config struct {
 	rest.RestConf
 	Auth struct {
 		AccessExpire int64
+		RefreshExpire int64
 	}
 	PgSql pg.PgSql
 	Jwks    Jwks

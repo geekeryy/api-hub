@@ -20,10 +20,11 @@ func InitKeyfunc(ctx context.Context, serverURL string, override keyfunc.Overrid
 	return k, nil
 }
 
-func GenerateToken(kid string, memberId string, accessSecret string, accessExpire int64) (string, error) {
+func GenerateToken(kid string, memberId string, accessSecret string, accessExpire int64) (string,time.Time, error) {
 	now := time.Now()
+	exp:=now.Add(time.Duration(accessExpire) * time.Second)
 	tokenOption := jwt.NewWithClaims(jwt.SigningMethodEdDSA, &jwt.MapClaims{
-		"exp": now.Add(time.Duration(accessExpire) * time.Second).Unix(),
+		"exp": exp.Unix(),
 		"sub": memberId,
 		"iat": now.Unix(),
 		"nbf": now.Unix(),
@@ -33,9 +34,9 @@ func GenerateToken(kid string, memberId string, accessSecret string, accessExpir
 	tokenOption.Header[jwkset.HeaderKID] = kid
 	token, err := tokenOption.SignedString(ed25519.PrivateKey(accessSecret))
 	if err != nil {
-		return "", err
+		return "", time.Time{}, err
 	}
-	return token, nil
+	return token, exp, nil
 }
 
 func ValidateToken(tokenStr string, k keyfunc.Keyfunc) (jwt.MapClaims, error) {
