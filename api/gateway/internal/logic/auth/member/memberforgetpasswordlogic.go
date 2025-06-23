@@ -9,8 +9,6 @@ import (
 	"github.com/geekeryy/api-hub/core/xstrings"
 	"github.com/geekeryy/api-hub/library/consts"
 	"github.com/geekeryy/api-hub/rpc/model/authmodel"
-	"github.com/geekeryy/api-hub/rpc/model/usermodel"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"github.com/zeromicro/go-zero/core/logx"

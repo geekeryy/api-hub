@@ -136,6 +136,11 @@ EMAIL_FORMAT_ERRO = "Email format error"
 * 手机号+验证码
 * 第三方登录：wechat、google、facebook
 
+## 资源
+
+* [百度翻译API](https://api.fanyi.baidu.com) 100w字符/月免费
+* [谷歌翻译API](https://cloud.google.com/translate?hl=zh-cn) 50w字符/月免费
+
 
 ## 📝 TODO
 
