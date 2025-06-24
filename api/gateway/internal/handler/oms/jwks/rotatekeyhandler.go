@@ -3,9 +3,10 @@ package jwks
 import (
 	"net/http"
 
+	"github.com/zeromicro/go-zero/rest/httpx"
+
 	"github.com/geekeryy/api-hub/api/gateway/internal/logic/oms/jwks"
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 // 轮换公钥

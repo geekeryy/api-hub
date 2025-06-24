@@ -10,6 +10,11 @@ import (
 	"sync"
 
 	"github.com/geekeryy/api-hub/core/language"
+	en_translations "github.com/geekeryy/api-hub/core/validate/en"
+	ja_translations "github.com/geekeryy/api-hub/core/validate/ja"
+	ko_translations "github.com/geekeryy/api-hub/core/validate/ko"
+	zh_translations "github.com/geekeryy/api-hub/core/validate/zh"
+	zh_Hant_translations "github.com/geekeryy/api-hub/core/validate/zh_hant"
 	"github.com/go-playground/locales"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/ja"
@@ -18,11 +23,6 @@ import (
 	"github.com/go-playground/locales/zh_Hant"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	en_translations "github.com/geekeryy/api-hub/core/validate/en"
-	ja_translations "github.com/geekeryy/api-hub/core/validate/ja"
-	ko_translations "github.com/geekeryy/api-hub/core/validate/ko"
-	zh_translations "github.com/geekeryy/api-hub/core/validate/zh"
-	zh_Hant_translations "github.com/geekeryy/api-hub/core/validate/zh_hant"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 

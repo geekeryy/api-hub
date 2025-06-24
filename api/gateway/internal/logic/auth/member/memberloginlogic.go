@@ -46,21 +46,21 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 		cacheValue, err := l.svcCtx.Cache.Get(fmt.Sprintf("phone_code_%s", req.Identifier))
 		if err != nil {
 			l.Errorf("Failed to get cache. Error: %s", err)
-			return nil, xerror.New(xerror.InternalServerErr)
+			return nil, xerror.InternalServerErr
 		}
 		if req.Credential != cacheValue {
 			l.Infof("Member login failed. Identity: %s, Credential: %s code not match", req.Identifier, req.Credential)
-			return nil, xerror.New(xerror.UnauthorizedErr)
+			return nil, xerror.UnauthorizedErr
 		}
 		memberIdentities, err := l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, req.IdentityType, req.Identifier)
 		if err != nil {
 			l.Errorf("Failed to find member identity. Error: %s", err)
-			return nil, xerror.New(xerror.InternalServerErr)
+			return nil, xerror.InternalServerErr
 		}
 
 		if len(memberIdentities) == 0 {
 			l.Errorf("Member identity not found. IdentityType: %d, Identity: %s", req.IdentityType, req.Identifier)
-			return nil, xerror.New(xerror.NotFoundErr)
+			return nil, xerror.NotFoundErr
 		}
 		if err := l.svcCtx.Cache.Delete(fmt.Sprintf("phone_code_%s", req.Identifier)); err != nil {
 			l.Errorf("Failed to delete cache. Error: %s", err)
@@ -70,21 +70,21 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 		cacheValue, err := l.svcCtx.Cache.Get(fmt.Sprintf("email_code_%s", req.Identifier))
 		if err != nil {
 			l.Errorf("Failed to get cache. Error: %s", err)
-			return nil, xerror.New(xerror.InternalServerErr)
+			return nil, xerror.InternalServerErr
 		}
 		if req.Credential != cacheValue {
 			l.Infof("Member login failed. Identity: %s, Credential: %s code not match", req.Identifier, req.Credential)
-			return nil, xerror.New(xerror.UnauthorizedErr)
+			return nil, xerror.UnauthorizedErr
 		}
 		memberIdentities, err := l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, req.IdentityType, req.Identifier)
 		if err != nil {
 			l.Errorf("Failed to find member identity. Error: %s", err)
-			return nil, xerror.New(xerror.InternalServerErr)
+			return nil, xerror.InternalServerErr
 		}
 
 		if len(memberIdentities) == 0 {
 			l.Errorf("Member identity not found. IdentityType: %d, Identity: %s", req.IdentityType, req.Identifier)
-			return nil, xerror.New(xerror.NotFoundErr)
+			return nil, xerror.NotFoundErr
 		}
 		if err := l.svcCtx.Cache.Delete(fmt.Sprintf("email_code_%s", req.Identifier)); err != nil {
 			l.Errorf("Failed to delete cache. Error: %s", err)
@@ -96,7 +96,7 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 		for _, v := range []int64{consts.IdentityTypePassword, consts.IdentityTypeEmail, consts.IdentityTypePhone} {
 			memberIdentities, err = l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, v, req.Identifier)
 			if err != nil {
-				return nil, xerror.New(xerror.InternalServerErr)
+				return nil, xerror.InternalServerErr
 			}
 			if len(memberIdentities) > 0 {
 				break
@@ -104,11 +104,11 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 		}
 		if len(memberIdentities) == 0 {
 			l.Errorf("Member identity not found. IdentityType: %d, Identity: %s", req.IdentityType, req.Identifier)
-			return nil, xerror.New(xerror.NotFoundErr)
+			return nil, xerror.NotFoundErr
 		}
 		if !xstrings.PasswordMatch(memberIdentities[0].Credential, req.Credential) {
 			l.Infof("Member login failed. Identity: %s, Credential: %s code not match", req.Identifier, req.Credential)
-			return nil, xerror.New(xerror.UnauthorizedErr)
+			return nil, xerror.UnauthorizedErr
 		}
 		memberID = memberIdentities[0].MemberId
 	case consts.IdentityTypeWechat:
@@ -117,7 +117,7 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 		userInfo, err := google.GetUserInfo(l.ctx, req.Credential)
 		if err != nil {
 			l.Errorf("Failed to get google user info. Error: %s", err)
-			return nil, xerror.New(xerror.InternalServerErr)
+			return nil, xerror.InternalServerErr
 		}
 		thirdPartyId = userInfo.Sub
 		memberInfo.Nickname = userInfo.Name
@@ -127,7 +127,7 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 		userInfo, err := facebook.NewFaceBookApp(l.svcCtx.Config.Facebook.AppID, l.svcCtx.Config.Facebook.AppSecret).GetUserInfo(l.ctx, req.Credential)
 		if err != nil {
 			l.Errorf("Failed to get facebook user info. Error: %s", err)
-			return nil, xerror.New(xerror.InternalServerErr)
+			return nil, xerror.InternalServerErr
 		}
 		thirdPartyId = userInfo.UserID
 		memberInfo.Email = userInfo.Email
@@ -139,7 +139,7 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 		memberIdentities, err := l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, req.IdentityType, thirdPartyId)
 		if err != nil {
 			l.Errorf("Failed to find member identity. Error: %s", err)
-			return nil, xerror.New(xerror.InternalServerErr)
+			return nil, xerror.InternalServerErr
 		}
 		if len(memberIdentities) == 0 {
 			l.Infof("Member identity not found. IdentityType: %d, Identity: %s", req.IdentityType, req.Identifier)
@@ -164,7 +164,7 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 			})
 			if err != nil {
 				l.Errorf("Failed to create member identity. Error: %s", err)
-				return nil, xerror.New(xerror.InternalServerErr)
+				return nil, xerror.InternalServerErr
 			}
 		} else {
 			memberID = memberIdentities[0].MemberId
@@ -173,14 +173,14 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 
 	if memberID == "" {
 		l.Errorf("Member identity not found. IdentityType: %d, Identity: %s", req.IdentityType, req.Identifier)
-		return nil, xerror.New(xerror.NotFoundErr)
+		return nil, xerror.NotFoundErr
 	}
 
 	// 生成token、refresh token
 	jwksRecord, err := l.svcCtx.JwksModel.FindLatest(l.ctx)
 	if err != nil {
 		l.Errorf("Failed to find latest jwks public. Error: %s", err)
-		return nil, xerror.New(xerror.InternalServerErr)
+		return nil, xerror.InternalServerErr
 	}
 	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, "private_key_secr", nil)
 	if err != nil {
@@ -228,7 +228,7 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 	})
 	if err != nil {
 		l.Errorf("Failed to insert token refresh record. Error: %s", err)
-		return nil, xerror.New(xerror.InternalServerErr)
+		return nil, xerror.InternalServerErr
 	}
 	resp = &types.MemberLoginResp{
 		Token:        token,

@@ -3,9 +3,10 @@ package admin
 import (
 	"net/http"
 
+	"github.com/zeromicro/go-zero/rest/httpx"
+
 	"github.com/geekeryy/api-hub/api/gateway/internal/logic/user/admin"
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 // 获取用户信息

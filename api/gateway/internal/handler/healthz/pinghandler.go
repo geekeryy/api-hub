@@ -3,9 +3,10 @@ package healthz
 import (
 	"net/http"
 
+	"github.com/zeromicro/go-zero/rest/httpx"
+
 	"github.com/geekeryy/api-hub/api/gateway/internal/logic/healthz"
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 // 健康检查

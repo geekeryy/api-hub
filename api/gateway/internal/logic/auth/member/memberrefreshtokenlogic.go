@@ -36,7 +36,7 @@ func (l *MemberRefreshTokenLogic) MemberRefreshToken(req *types.MemberRefreshTok
 	claims, err := jwks.ValidateToken(req.RefreshToken, l.svcCtx.Kfunc)
 	if err != nil {
 		l.Errorf("Failed to validate token. Error: %s", err)
-		return nil, xerror.New(xerror.UnauthorizedErr)
+		return nil, xerror.UnauthorizedErr
 	}
 	memberId, err := claims.GetSubject()
 	if err != nil || len(memberId) == 0 {
@@ -51,11 +51,11 @@ func (l *MemberRefreshTokenLogic) MemberRefreshToken(req *types.MemberRefreshTok
 	refreshToken, err := l.svcCtx.RefreshTokenModel.FindOneByRefreshTokenHash(l.ctx, refreshTokenHash)
 	if err != nil {
 		l.Errorf("Failed to find refresh token. Error: %s", err)
-		return nil, xerror.New(xerror.InternalServerErr)
+		return nil, xerror.InternalServerErr
 	}
 	if refreshToken.Status == consts.RefreshTokenStatusDisabled || refreshToken.ExpiredAt.Before(time.Now()) {
 		l.Errorf("Refresh token is disabled. RefreshToken: %s", req.RefreshToken)
-		return nil, xerror.New(xerror.UnauthorizedErr)
+		return nil, xerror.UnauthorizedErr
 	}
 	if refreshToken.MemberId != memberId {
 		l.Errorf("Refresh token member id not match. RefreshToken: %s", req.RefreshToken)
@@ -66,7 +66,7 @@ func (l *MemberRefreshTokenLogic) MemberRefreshToken(req *types.MemberRefreshTok
 	jwksRecord, err := l.svcCtx.JwksModel.FindLatest(l.ctx)
 	if err != nil {
 		l.Errorf("Failed to find latest jwks public. Error: %s", err)
-		return nil, xerror.New(xerror.InternalServerErr)
+		return nil, xerror.InternalServerErr
 	}
 	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, "private_key_secr", nil)
 	if err != nil {
@@ -88,7 +88,7 @@ func (l *MemberRefreshTokenLogic) MemberRefreshToken(req *types.MemberRefreshTok
 	})
 	if err != nil {
 		l.Errorf("Failed to insert token refresh record. Error: %s", err)
-		return nil, xerror.New(xerror.InternalServerErr)
+		return nil, xerror.InternalServerErr
 	}
 
 	resp = &types.MemberRefreshTokenResp{

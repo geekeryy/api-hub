@@ -2,18 +2,26 @@ package xerror_test
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
-	"github.com/geekeryy/api-hub/core/consts"
 	"github.com/geekeryy/api-hub/core/handler"
 	"github.com/geekeryy/api-hub/core/language"
+	"github.com/geekeryy/api-hub/core/xcontext"
 	_ "github.com/geekeryy/api-hub/library/localization" // 初始化翻译模块
 	"github.com/geekeryy/api-hub/library/xerror"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+func TestError(t *testing.T) {
+	err := errors.New("normal error")
+	err = errors.Wrap(err, "attempt to wrap")
+	xerror.New(err)
+	fmt.Println(err)
+}
 
 func TestErrorHandler(t *testing.T) {
 	tests := []struct {
@@ -64,8 +72,7 @@ func TestErrorHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
-			ctx = context.WithValue(ctx, consts.AcceptLanguage, language.ZH)
+			ctx := xcontext.WithLang(context.Background(), language.ZH)
 			if _, got := handler.ErrorHandler(ctx, tt.err); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ErrorHandler(err) got %v, want %v", got, tt.want)
 			}
