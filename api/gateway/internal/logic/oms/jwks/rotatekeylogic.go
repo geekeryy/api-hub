@@ -35,12 +35,12 @@ func (l *RotateKeyLogic) RotateKey() error {
 		l.Errorf("Failed to rotate key. Error: %s", err)
 		return err
 	}
-	encryptPub, err := xstrings.AesCbcEncryptBase64(string(pub), "public_key_secre", nil)
+	encryptPub, err := xstrings.AesCbcEncryptBase64(string(pub), l.svcCtx.Config.Secret.PublicKey, nil)
 	if err != nil {
 		l.Errorf("Failed to encrypt public key. Error: %s", err)
 		return err
 	}
-	encryptPriv, err := xstrings.AesCbcEncryptBase64(string(priv), "private_key_secr", nil)
+	encryptPriv, err := xstrings.AesCbcEncryptBase64(string(priv), l.svcCtx.Config.Secret.PrivateKey, nil)
 	if err != nil {
 		l.Errorf("Failed to encrypt private key. Error: %s", err)
 		return err

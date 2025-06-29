@@ -43,7 +43,7 @@ func (l *MemberRefreshTokenLogic) MemberRefreshToken(req *types.MemberRefreshTok
 		l.Errorf("validate claims err:%v %+v", err, claims)
 		return nil, xerror.UnauthorizedErr
 	}
-	refreshTokenHash, err := xstrings.AesCbcEncryptBase64(req.RefreshToken, "refresh_token_se", nil)
+	refreshTokenHash, err := xstrings.AesCbcEncryptBase64(req.RefreshToken, l.svcCtx.Config.Secret.RefreshToken, nil)
 	if err != nil {
 		l.Errorf("Failed to encrypt refresh token. Error: %s", err)
 		return nil, err

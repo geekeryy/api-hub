@@ -197,7 +197,7 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 		l.Errorf("Failed to generate token. Error: %s", err)
 		return nil, err
 	}
-	refreshTokenHash, err := xstrings.AesCbcEncryptBase64(token, "refresh_token_se", nil)
+	refreshTokenHash, err := xstrings.AesCbcEncryptBase64(token, l.svcCtx.Config.Secret.RefreshToken, nil)
 	if err != nil {
 		l.Errorf("Failed to encrypt refresh token. Error: %s", err)
 		return nil, err

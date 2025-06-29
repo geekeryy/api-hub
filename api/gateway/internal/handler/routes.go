@@ -133,7 +133,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.OmsJwtMiddleware},
+			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.OmsOtpMiddleware},
 			[]rest.Route{
 				{
 					// 删除公钥

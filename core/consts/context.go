@@ -6,4 +6,6 @@ const (
 	TOKEN = "Authorization"
 
 	CONTEXT_CLIENT_IP = "clientip"
+
+	OTP_TOKEN = "Otp-Token"
 )

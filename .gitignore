@@ -22,4 +22,5 @@ rad.json
 TestResults.xml
 
 .DS_Store
-api/gateway/etc/gateway-api.yaml
+.env
+test/data/

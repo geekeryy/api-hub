@@ -4,13 +4,29 @@ import (
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
+	"os"
 	"testing"
 
 	"github.com/MicahParks/jwkset"
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xstrings"
+	"github.com/pquerna/otp/totp"
 )
+
+func TestGenerateOTP(t *testing.T) {
+	otp, qrCode, err := jwks.GenerateOTP("api-hub", "admin")
+	if err != nil {
+		t.Fatalf("Failed to generate OTP.\nError: %s", err)
+	}
+	t.Logf("otp: %s", otp)
+	os.WriteFile("../../test/data/qrcode.png", qrCode, 0644)
+}
+
+func TestValidateOTP(t *testing.T) {
+	ok := totp.Validate("370550", "II5UPLT5LHFTKEIY2Q4NP2VWWHPEWOOV")
+	t.Logf("ok: %v", ok)
+}
 
 func TestJwt(t *testing.T) {
 	pub2, priv, err := ed25519.GenerateKey(rand.Reader)

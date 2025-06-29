@@ -1,6 +1,6 @@
 @server (
 	group:      oms/jwks
-	middleware: ContextMiddleware,OmsJwtMiddleware
+	middleware: ContextMiddleware,OmsOtpMiddleware
 	prefix:     /api/v1/gateway/oms/jwks
 	tags:       "Oms - jwks"
 )

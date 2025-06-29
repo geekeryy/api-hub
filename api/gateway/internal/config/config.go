@@ -15,6 +15,14 @@ type Config struct {
 	Jwks    Jwks
 	Facebook Facebook
 	MailGun MailGun
+	Secret Secret
+	Oms Oms
+}
+
+type Secret struct {
+	RefreshToken string
+	PrivateKey string
+	PublicKey string
 }
 
 type Jwks struct {
@@ -31,4 +39,8 @@ type MailGun struct {
 	Domain string
 	ApiKey string
 	Sender string
+}
+
+type Oms struct {
+	OtpSecret string
 }

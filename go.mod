@@ -21,6 +21,8 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mailgun/mailgun-go/v3 v3.6.4
 	github.com/nicksnyder/go-i18n/v2 v2.6.0
+	github.com/pkg/errors v0.9.1
+	github.com/pquerna/otp v1.5.0
 	github.com/zeromicro/go-zero v1.8.4
 	go.opentelemetry.io/otel v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0
@@ -40,6 +42,7 @@ require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.30.0 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
@@ -82,7 +85,6 @@ require (
 	github.com/paulmach/orb v0.11.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.21.1 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
