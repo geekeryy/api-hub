@@ -40,4 +40,4 @@ apifox:
 # VSCode: "go.lintFlags": ["--config=./.golangci.yml"] 
 lint:
 	golangci-lint fmt
-	golangci-lint run --config=./.golangci.yml
+	golangci-lint run

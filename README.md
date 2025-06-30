@@ -141,6 +141,17 @@ EMAIL_FORMAT_ERROR =  "邮箱格式错误"
 EMAIL_FORMAT_ERRO = "Email format error"
 ```
 
+## 功能列表
+
+### 登录类型
+
+* 账号+密码
+* 邮箱+密码
+* 手机号+密码
+* 邮箱+验证码
+* 手机号+验证码
+* 第三方登录：wechat、google、facebook
+
 ## 🤔 QA
 
 * 使用模板生成代码出现`<no value>`，如何解决？
@@ -153,9 +164,15 @@ EMAIL_FORMAT_ERRO = "Email format error"
       go install
       ```
 
-## 代码规范
+## 项目管理
+
+### 开发流程
+
+需求评审 -> 持续开发、测试用例评审 -> 开发自测 -> 产品走查、冒烟测试 -> 多轮测试 -> 预发布测试、开启下个迭代 -> 上线并测试、Checklist -> 项目复盘
 
 ### Commit规范
+
+> 每次push需要压缩提交，commit描述清楚，让每次提交的功能尽可能清晰和单一；分支合并使用rebase，多次少量原则
 
 * feat： 新增 featur
 * fix: 修复 bug
@@ -167,14 +184,36 @@ EMAIL_FORMAT_ERRO = "Email format error"
 * chore: 改变构建流程、或者增加依赖库、工具等
 * revert: 回滚到上一个版本
 
-## 登录类型
+### Git分支管理
 
-* 账号+密码
-* 邮箱+密码
-* 手机号+密码
-* 邮箱+验证码
-* 手机号+验证码
-* 第三方登录：wechat、google、facebook
+* master：稳定分支
+* hotfix：紧急修复分支 线上紧急bug修复，修改后需合入dev
+* release：发布分支 用于提测 格式：release/20250630（下个迭代开始后，release不再合并dev分支，而是直接在分支上修复问题，修改后需合入dev）
+* dev：开发分支
+* feature：功能分支
+
+### 版本管理
+
+[语义化版本 2.0.0](https://semver.org/lang/zh-CN/)
+
+版本格式：主版本号.次版本号.修订号，版本号递增规则如下：
+
+* 主版本号：当你做了不兼容的 API 修改
+* 次版本号：当你做了向下兼容的功能性新增
+* 修订号：当你做了向下兼容的问题修正
+
+先行版本号及版本编译信息可以加到“主版本号.次版本号.修订号”的后面，作为延伸
+
+定制版本：主版本号.次版本号.修订号-<客户> 意思是某客户基于某个版本的定制
+
+### 代码规范
+
+[Effective Go](https://go.dev/doc/effective_go)
+
+* go文件名：下划线
+* 包名：小写的单个单词
+* 变量名、函数名：驼峰
+* 单方法接口以方法名加上-er后缀或类似的修饰来构造代理名词来命名：Reader
 
 ## 资源
 

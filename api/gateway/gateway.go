@@ -9,6 +9,7 @@ import (
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/proc"
 	"github.com/zeromicro/go-zero/rest"
 
 	coreHandler "github.com/geekeryy/api-hub/core/handler"
@@ -32,6 +33,10 @@ func main() {
 
 	httpx.SetErrorHandlerCtx(coreHandler.ErrorHandler)
 	httpx.SetOkHandler(coreHandler.OkHandler)
+
+	proc.AddWrapUpListener(func() {
+		ctx.Close()
+	})
 
 	logx.DisableStat()
 

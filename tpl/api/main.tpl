@@ -28,6 +28,10 @@ func main() {
 	httpx.SetErrorHandlerCtx(coreHandler.ErrorHandler)
 	httpx.SetOkHandler(coreHandler.OkHandler)
 
+	proc.AddWrapUpListener(func() {
+		ctx.Close()
+	})
+
 	logx.DisableStat()
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)

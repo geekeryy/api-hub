@@ -86,3 +86,13 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 	return svc
 }
+
+func (s *ServiceContext) Close() {
+	if s.Cache != nil {
+		s.Cache.Close()
+	}
+	if s.DB != nil {
+		db, _ := s.DB.DB()
+		db.Close()
+	}
+}
