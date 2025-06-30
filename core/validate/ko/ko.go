@@ -474,7 +474,7 @@ func RegisterDefaultTranslations(v *validator.Validate, trans ut.Translator) (er
 
 				case reflect.Struct:
 					if fe.Type() != reflect.TypeOf(time.Time{}) {
-						err = fmt.Errorf("tag '%s'不能用于struct类型.", fe.Tag())
+						err = fmt.Errorf("tag '%s'不能用于struct类型", fe.Tag())
 					} else {
 						t, err = ut.T("lt-datetime", translateFieldName(ut, fe))
 					}

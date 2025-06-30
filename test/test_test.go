@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"context"
@@ -24,8 +24,8 @@ import (
 
 func TestSendEmail(t *testing.T) {
 	loador := sync.Map{}
-	l,ok:=loador.LoadOrStore("test", "v")
-	fmt.Println(l,ok)
+	l, ok := loador.LoadOrStore("test", "v")
+	fmt.Println(l, ok)
 	fmt.Println(loador.Load("test"))
 }
 

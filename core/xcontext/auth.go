@@ -69,5 +69,3 @@ func GetClientIp(ctx context.Context) string {
 	}
 	return ip[0]
 }
-
-

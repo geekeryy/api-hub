@@ -35,3 +35,9 @@ apifox:
 		--header "Authorization: Bearer $(APIFOX_TOKEN)" \
 		--header "Content-Type: application/json" \
 		--data-raw "$$(printf '{"importFormat": "openapi","data":"%s"}' "$$jsondata")"
+
+# 静态代码检查
+# VSCode: "go.lintFlags": ["--config=./.golangci.yml"] 
+lint:
+	golangci-lint fmt
+	golangci-lint run --config=./.golangci.yml

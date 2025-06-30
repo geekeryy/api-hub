@@ -22,7 +22,7 @@ type timeSlot struct {
 	count     int64
 }
 
-// 内存限流器
+// Limiter 内存限流器
 type Limiter struct {
 	sync.Mutex
 	windows  []*timeSlot
@@ -124,8 +124,8 @@ func (m *Limiter) Validate() bool {
 
 }
 
-// TODO 测试RedisLimiter
 // RedisLimiter 使用redis存储限流器
+// TODO 测试RedisLimiter
 type RedisLimiter struct {
 	width    time.Duration
 	maxCount int64

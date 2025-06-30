@@ -26,7 +26,7 @@ func Geocode(address, apiKey string) *GeoLocation {
 		logx.Errorf("google Geocode error: %v", err)
 		return nil
 	}
-	logx.Errorf("google Geocode, address:%v, Geocode: %+v", geocode)
+	logx.Errorf("google Geocode, address:%v, Geocode: %+v", address, geocode)
 	if len(geocode) != 1 {
 		logx.Errorf("google Geocode Expected length of response is 1, was %+v", geocode)
 		return nil

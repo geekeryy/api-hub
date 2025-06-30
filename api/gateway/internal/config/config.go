@@ -8,39 +8,39 @@ import (
 type Config struct {
 	rest.RestConf
 	Auth struct {
-		AccessExpire int64
-		RefreshExpire int64
+		AccessExpire  int64 `json:",env=AUTH_ACCESS_EXPIRE"`
+		RefreshExpire int64 `json:",env=AUTH_REFRESH_EXPIRE"`
 	}
-	PgSql pg.PgSql
-	Jwks    Jwks
+	PgSql    pg.PgSql
+	Jwks     Jwks
 	Facebook Facebook
-	MailGun MailGun
-	Secret Secret
-	Oms Oms
+	MailGun  MailGun
+	Secret   Secret
+	Oms      Oms
 }
 
 type Secret struct {
-	RefreshToken string
-	PrivateKey string
-	PublicKey string
+	RefreshToken string `json:",env=SECRET_REFRESH_TOKEN"`
+	PrivateKey   string `json:",env=SECRET_PRIVATE_KEY"`
+	PublicKey    string `json:",env=SECRET_PUBLIC_KEY"`
 }
 
 type Jwks struct {
-	ServerURL string
-	RefreshInterval int64
+	ServerURL       string `json:",env=JWKS_SERVER_URL"`
+	RefreshInterval int64  `json:",env=JWKS_REFRESH_INTERVAL"`
 }
 
 type Facebook struct {
-	AppID     string
-	AppSecret string
+	AppID     string `json:",env=FACEBOOK_APP_ID"`
+	AppSecret string `json:",env=FACEBOOK_APP_SECRET"`
 }
 
 type MailGun struct {
-	Domain string
-	ApiKey string
-	Sender string
+	Domain string `json:",env=MAILGUN_DOMAIN"`
+	ApiKey string `json:",env=MAILGUN_API_KEY"`
+	Sender string `json:",env=MAILGUN_SENDER"`
 }
 
 type Oms struct {
-	OtpSecret string
+	OtpSecret string `json:",env=OMS_OTP_SECRET"`
 }

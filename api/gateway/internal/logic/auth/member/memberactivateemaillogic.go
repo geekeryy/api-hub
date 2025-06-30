@@ -32,7 +32,7 @@ func (l *MemberActivateEmailLogic) MemberActivateEmail(req *types.MemberActivate
 	if err != nil {
 		return err
 	}
-	l.Logger.Infof("claims: %v", claims)
+	l.Infof("claims: %v", claims)
 	memberId, err := claims.GetSubject()
 	if err != nil {
 		return err

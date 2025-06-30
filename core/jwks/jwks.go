@@ -37,7 +37,7 @@ func AddKey(ctx context.Context, kid string, pub ed25519.PublicKey, jwksets *jwk
 	return nil
 }
 
-func RotateKey(ctx context.Context,kid string, jwksets *jwkset.MemoryJWKSet) (ed25519.PublicKey, ed25519.PrivateKey, error) {
+func RotateKey(ctx context.Context, kid string, jwksets *jwkset.MemoryJWKSet) (ed25519.PublicKey, ed25519.PrivateKey, error) {
 	pub, priv, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		log.Fatalf("Failed to generate given key.\nError: %s", err)

@@ -81,8 +81,8 @@ func AesCbcDecryptBase64(cipherText, secretKey string, ivAes []byte) (string, er
 		iv = []byte(Ivaes)
 	}
 	blockMode := cipher.NewCBCDecrypter(block, iv)
-	paddingText := make([]byte, len([]byte(decodedCipherText)))
-	blockMode.CryptBlocks(paddingText, []byte(decodedCipherText))
+	paddingText := make([]byte, len(decodedCipherText))
+	blockMode.CryptBlocks(paddingText, decodedCipherText)
 
 	plainText, err := PKCS5UnPadding(paddingText, block.BlockSize())
 	if err != nil {

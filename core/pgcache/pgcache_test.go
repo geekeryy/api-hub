@@ -6,8 +6,8 @@ package pgcache_test
 import (
 	"fmt"
 	"github.com/SpectatorNan/gorm-zero/gormc/config/pg"
-	"log"
 	"github.com/geekeryy/api-hub/core/pgcache"
+	"log"
 	"testing"
 	"time"
 )
