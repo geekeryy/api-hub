@@ -164,6 +164,9 @@ EMAIL_FORMAT_ERRO = "Email format error"
       go install
       ```
 
+* 为什么配置项的类型不能使用`int64`？
+  * 因为go-zero使用环境变量覆盖配置项时，使用类型为int64的配置项会被误认为time.Duration，我已经提交pr修复，等待官方合并 [#4979](https://github.com/zeromicro/go-zero/pull/4979)
+
 ## 项目管理
 
 ### 开发流程
@@ -206,7 +209,9 @@ EMAIL_FORMAT_ERRO = "Email format error"
 
 定制版本：主版本号.次版本号.修订号-<客户> 意思是某客户基于某个版本的定制
 
-### 代码规范
+## 代码规范
+
+### 命名规范
 
 [Effective Go](https://go.dev/doc/effective_go)
 
@@ -215,6 +220,11 @@ EMAIL_FORMAT_ERRO = "Email format error"
 * 变量名、函数名：驼峰
 * 单方法接口以方法名加上-er后缀或类似的修饰来构造代理名词来命名：Reader
 
+### 配置管理
+
+* 原则：配置与程序隔离，使用环境变量覆盖（防止配置泄露）
+* 开发环境：推荐使用`.env`文件，使用`dotenv`库加载
+
 ## 资源
 
 * [百度翻译API](https://api.fanyi.baidu.com) 100w字符/月免费
@@ -222,9 +232,9 @@ EMAIL_FORMAT_ERRO = "Email format error"
 
 ## 📝 TODO
 
-* 框架：熔断、限流、降级、排队
+* 框架：熔断、限流、降级、排队、监控、告警、日志、链路追踪
 * 框架：不用鉴权的api利用签名机制防止盗刷
 * 框架：CICD
 * 测试：单元测试、集成测试、性能测试、暴力测试
-* 功能：可扩展的登录注册功能
 * 功能：AI单轮聊天
+* 功能：翻译池，聚合多家翻译API，通过账号池实现无限量翻译

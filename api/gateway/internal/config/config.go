@@ -1,6 +1,8 @@
 package config
 
 import (
+	"errors"
+
 	"github.com/SpectatorNan/gorm-zero/gormc/config/pg"
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -8,8 +10,8 @@ import (
 type Config struct {
 	rest.RestConf
 	Auth struct {
-		AccessExpire  int64 `json:",env=AUTH_ACCESS_EXPIRE"`
-		RefreshExpire int64 `json:",env=AUTH_REFRESH_EXPIRE"`
+		AccessExpire  int `json:",env=AUTH_ACCESS_EXPIRE,default=600"`
+		RefreshExpire int `json:",env=AUTH_REFRESH_EXPIRE,default=2592000"`
 	}
 	PgSql    pg.PgSql
 	Jwks     Jwks
@@ -17,6 +19,13 @@ type Config struct {
 	MailGun  MailGun
 	Secret   Secret
 	Oms      Oms
+}
+
+func (c *Config) Validate() error {
+	if c.Auth.AccessExpire <= 0 {
+		return errors.New("AUTH_ACCESS_EXPIRE must be greater than 0")
+	}
+	return nil
 }
 
 type Secret struct {
@@ -27,7 +36,7 @@ type Secret struct {
 
 type Jwks struct {
 	ServerURL       string `json:",env=JWKS_SERVER_URL"`
-	RefreshInterval int64  `json:",env=JWKS_REFRESH_INTERVAL"`
+	RefreshInterval int    `json:",env=JWKS_REFRESH_INTERVAL"`
 }
 
 type Facebook struct {

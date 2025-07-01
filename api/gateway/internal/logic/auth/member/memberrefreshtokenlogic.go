@@ -73,7 +73,7 @@ func (l *MemberRefreshTokenLogic) MemberRefreshToken(req *types.MemberRefreshTok
 		l.Errorf("Failed to decrypt private key. Error: %s", err)
 		return nil, err
 	}
-	token, exp, err := jwks.GenerateToken(jwksRecord.Kid, refreshToken.MemberId, privateKey, l.svcCtx.Config.Auth.AccessExpire, nil)
+	token, exp, err := jwks.GenerateToken(jwksRecord.Kid, refreshToken.MemberId, privateKey, int64(l.svcCtx.Config.Auth.AccessExpire), nil)
 	if err != nil {
 		l.Errorf("Failed to generate token. Error: %s", err)
 		return nil, err
