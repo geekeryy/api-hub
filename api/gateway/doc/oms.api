@@ -1,6 +1,6 @@
 @server (
 	group:      oms/jwks
-	middleware: ContextMiddleware,OmsOtpMiddleware
+	middleware: ContextMiddleware,OmsJwtMiddleware
 	prefix:     /api/v1/gateway/oms/jwks
 	tags:       "Oms - jwks"
 )
@@ -25,6 +25,16 @@ service gateway-api {
 	)
 	@handler RotateKeyHandler
 	put /rotate
+}
+
+@server (
+	group:      oms/rbac
+	middleware: ContextMiddleware,OmsJwtMiddleware
+	prefix:     /api/v1/gateway/oms/rbac
+	tags:       "Oms - rbac"
+)
+service gateway-api {
+
 }
 
 type (

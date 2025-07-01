@@ -28,6 +28,7 @@ type ServiceContext struct {
 	JwtMiddleware           rest.Middleware
 	AdminJwtMiddleware      rest.Middleware
 	OmsOtpMiddleware        rest.Middleware
+	OmsJwtMiddleware        rest.Middleware
 	Validator               *validate.Validate
 	JwksModel               authmodel.JwksModel
 	TokenRefreshRecordModel authmodel.TokenRefreshRecordModel
@@ -71,6 +72,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		JwtMiddleware:           middleware.NewJwtMiddleware(kfunc).Handle,
 		AdminJwtMiddleware:      middleware.NewAdminJwtMiddleware(kfunc).Handle,
 		OmsOtpMiddleware:        middleware.NewOmsOtpMiddleware(c.Oms.OtpSecret).Handle,
+		OmsJwtMiddleware:        middleware.NewOmsJwtMiddleware(kfunc).Handle,
 		Kfunc:                   kfunc,
 		JwksModel:               authmodel.NewJwksModel(pg),
 		TokenRefreshRecordModel: authmodel.NewTokenRefreshRecordModel(pg),

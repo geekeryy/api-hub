@@ -78,6 +78,20 @@ service gateway-api {
 }
 
 @server (
+	group:  auth/oms
+	prefix: /api/v1/gateway/auth/oms
+	tags:   "Auth - oms授权"
+)
+service gateway-api {
+	@doc (
+		summary:     "Oms登录"
+		description: "Oms登录"
+	)
+	@handler OmsLoginHandler
+	post /login (OmsLoginReq) returns (OmsLoginResp)
+}
+
+@server (
 	group:  auth/jwks
 	prefix: /api/v1/gateway/auth/jwks
 	tags:   "Auth - jwks"
@@ -92,6 +106,13 @@ service gateway-api {
 }
 
 type (
+	OmsLoginReq {
+		Username string `json:"username"` // 用户名
+		Code     string `json:"code"` // 验证码
+	}
+	OmsLoginResp {
+		Token string `json:"token"` // 令牌
+	}
 	MemberLoginReq {
 		IdentityType int64  `json:"identity_type,options=1|2|3|4|5|6|7"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
 		Identifier   string `json:"identifier,optional"` // 标识符 账号/手机号/邮箱

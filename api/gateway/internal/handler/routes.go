@@ -10,6 +10,7 @@ import (
 	authadmin "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/admin"
 	authjwks "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/jwks"
 	authmember "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/member"
+	authoms "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/oms"
 	healthz "github.com/geekeryy/api-hub/api/gateway/internal/handler/healthz"
 	omsjwks "github.com/geekeryy/api-hub/api/gateway/internal/handler/oms/jwks"
 	useradmin "github.com/geekeryy/api-hub/api/gateway/internal/handler/user/admin"
@@ -122,6 +123,18 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// Oms登录
+				Method:  http.MethodPost,
+				Path:    "/login",
+				Handler: authoms.OmsLoginHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/api/v1/gateway/auth/oms"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
 				// 健康检查
 				Method:  http.MethodGet,
 				Path:    "/ping",
@@ -133,7 +146,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.OmsOtpMiddleware},
+			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.OmsJwtMiddleware},
 			[]rest.Route{
 				{
 					// 删除公钥

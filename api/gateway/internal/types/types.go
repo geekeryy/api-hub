@@ -139,6 +139,15 @@ type MemberUpdateInfoReq struct {
 	Birthday string `json:"birthday,optional"` // 生日
 }
 
+type OmsLoginReq struct {
+	Username string `json:"username"` // 用户名
+	Code     string `json:"code"`     // 验证码
+}
+
+type OmsLoginResp struct {
+	Token string `json:"token"` // 令牌
+}
+
 type TokenRefreshRecord struct {
 	Time  string `json:"time"`
 	Count int    `json:"count"`
