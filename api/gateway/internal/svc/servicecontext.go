@@ -71,7 +71,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		ContextMiddleware:       middleware.NewContextMiddleware().Handle,
 		JwtMiddleware:           middleware.NewJwtMiddleware(kfunc).Handle,
 		AdminJwtMiddleware:      middleware.NewAdminJwtMiddleware(kfunc).Handle,
-		OmsOtpMiddleware:        middleware.NewOmsOtpMiddleware(c.Oms.OtpSecret).Handle,
 		OmsJwtMiddleware:        middleware.NewOmsJwtMiddleware(kfunc).Handle,
 		Kfunc:                   kfunc,
 		JwksModel:               authmodel.NewJwksModel(pg),

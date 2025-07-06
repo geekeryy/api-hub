@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/MicahParks/keyfunc/v3"
 	"github.com/geekeryy/api-hub/core/consts"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xcontext"
 	"github.com/geekeryy/api-hub/library/xerror"
-	"github.com/golang-jwt/jwt/v5/keyfunc"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
