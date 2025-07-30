@@ -52,13 +52,18 @@ jobs:
           commit=$(git log --pretty=format:"%B" ${{ github.sha }} -1 | head -1)
           commit=${commit//"/\\\\\""}
           servicesstring=$(git log --pretty=format:"%B" ${{ github.sha }} -1 | head -1 | grep ": \[.*\]" -o || true)
+          servicelist=""
 
-          if [ ${{ inputs.user }} == true ] ; then
-            servicelist=${servicelist},user
+          if [ "${{ inputs.user }}" = "true" ] ; then
+            servicelist=${servicelist}user
           fi
 
-          if [ ${{ inputs.gateway }} == true ] ; then
-            servicelist=${servicelist},gateway
+          if [ "${{ inputs.gateway }}" = "true" ] ; then
+            if [ -n "$servicelist" ] ; then
+              servicelist=${servicelist},gateway
+            else
+              servicelist=gateway
+            fi
           fi
 
           if [ -z "$servicelist" ] ; then
@@ -84,7 +89,7 @@ jobs:
           rpclist=$(find rpc -mindepth 1 -maxdepth 1 -type d ! -name model -exec basename {} \;| paste -sd, -)
           apilist=$(find api -mindepth 1 -maxdepth 1 -type d -exec basename {} \;| paste -sd, -)
 
-          if [ "${{ steps.commit.outputs.servicesstring }}" = "*" ]; then
+          if [ "${{ steps.commit.outputs.servicesstring }}" = "*" ] ; then
             servicelist=${rpclist},${apilist}
           fi
           echo "servicelist=$servicelist"
@@ -100,7 +105,7 @@ jobs:
             fi
             if ! (CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o $element $service_type/$element/$element.go) then
               echo "build $element failed"
-              exit 0
+              exit 1
             fi
             if [ -z "${{ env.REGISTRY }}" ] ; then
               echo "REGISTRY is not set, skip build and push image"
@@ -112,7 +117,7 @@ jobs:
               echo deploy $element;
             ) then
               servicelist=$element
-              break
+              exit 1
             fi
           done
           echo "services=$servicelist" >> $GITHUB_OUTPUT
