@@ -55,15 +55,11 @@ jobs:
           servicelist=""
 
           if [ "${{ inputs.user }}" = "true" ] ; then
-            servicelist=${servicelist}user
+            servicelist=${servicelist},user
           fi
 
           if [ "${{ inputs.gateway }}" = "true" ] ; then
-            if [ -n "$servicelist" ] ; then
-              servicelist=${servicelist},gateway
-            else
-              servicelist=gateway
-            fi
+            servicelist=${servicelist},gateway
           fi
 
           if [ -z "$servicelist" ] ; then
@@ -76,24 +72,27 @@ jobs:
 
       - name: Setup Go
         uses: actions/setup-go@v5
-        if: steps.commit.outputs.servicelist != 'null'
+        if: steps.commit.outputs.servicelist != ''
         with:
           go-version-file: "go.mod"
           cache-dependency-path: "**/*.sum"
 
       - name: Build, tag, and push docker image
         id: build
-        if: steps.commit.outputs.servicelist != 'null'
+        if: steps.commit.outputs.servicelist != ''
         run: |-
           build_time=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
           rpclist=$(find rpc -mindepth 1 -maxdepth 1 -type d ! -name model -exec basename {} \;| paste -sd, -)
           apilist=$(find api -mindepth 1 -maxdepth 1 -type d -exec basename {} \;| paste -sd, -)
 
-          if [ "${{ steps.commit.outputs.servicesstring }}" = "*" ] ; then
+          if [ "${{ steps.commit.outputs.servicelist }}" = "*" ] ; then
             servicelist=${rpclist},${apilist}
+          else
+            servicelist=${{ steps.commit.outputs.servicelist }}
           fi
           echo "servicelist=$servicelist"
 
+          
           for element in $(awk -F ',' '{ for (i=1; i<=NF; i++) print $i }' <<< $servicelist );do
             if echo $rpclist | grep "$element" ; then
               service_type="rpc"
@@ -103,6 +102,7 @@ jobs:
               servicelist=$element
               break
             fi
+            buildlist=${buildlist},${element}
             if ! (CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o $element $service_type/$element/$element.go) then
               echo "build $element failed"
               exit 1
@@ -120,11 +120,11 @@ jobs:
               exit 1
             fi
           done
-          echo "services=$servicelist" >> $GITHUB_OUTPUT
+          echo "buildlist=$buildlist" >> $GITHUB_OUTPUT
 
       # https://github.com/appleboy/ssh-action
       - name: Deploy to server
-        if: steps.build.outputs.services != 'null' && ${{ inputs.deploy }} == true
+        if: steps.build.outputs.buildlist != '' && ${{ inputs.deploy }} == 'true'
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HOST }}
