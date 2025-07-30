@@ -92,7 +92,7 @@ jobs:
           fi
           echo "servicelist=$servicelist"
 
-          
+
           for element in $(awk -F ',' '{ for (i=1; i<=NF; i++) print $i }' <<< $servicelist );do
             if echo $rpclist | grep "$element" ; then
               service_type="rpc"
@@ -124,7 +124,7 @@ jobs:
 
       # https://github.com/appleboy/ssh-action
       - name: Deploy to server
-        if: steps.commit.outputs.servicelist != '' && steps.build.outputs.buildlist != '' && ${{ env.DEPLOY }} == 'true'
+        if: steps.commit.outputs.servicelist != '' && env.DEPLOY == 'true'
         uses: appleboy/ssh-action@v1
         with:
           # host: ${{ secrets.HOST }}
