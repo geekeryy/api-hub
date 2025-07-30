@@ -1,6 +1,8 @@
 name: Build and Deploy to AWS Dev
 
-on: 
+on:
+  push:
+    branches: ["dev", "feature/**", "fix/**", "main"]
   workflow_dispatch:
     inputs:
       image_tag:
@@ -11,6 +13,11 @@ on:
         description: "镜像仓库地址（不填则不构建镜像）"
         required: false
         default: ""
+      deploy:
+        description: "是否部署"
+        required: false
+        type: boolean
+        default: false
       gateway:
         description: "是否构建gateway镜像"
         required: false
@@ -25,6 +32,7 @@ on:
 env:
   IMAGE_TAG: ${{ inputs.image_tag }}
   REGISTRY: ${{ inputs.registry }}
+  DEPLOY: ${{ inputs.deploy }}
 
 jobs:
   setup-build-publish-deploy:
@@ -32,45 +40,56 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-          cache-dependency-path: "**/*.sum"
-
-      - name: Build, tag, and push docker image
-        id: build
+      - name: Get commit message
+        id: commit
         run: |-
           commit=$(git log --pretty=format:"%B" ${{ github.sha }} -1 | head -1)
           commit=${commit//"/\\\\\""}
-          build_time=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
           servicesstring=$(git log --pretty=format:"%B" ${{ github.sha }} -1 | head -1 | grep ": \[.*\]" -o || true)
-          rpclist=$(find rpc -mindepth 1 -maxdepth 1 -type d ! -name model -exec basename {} \;| paste -sd, -)
-          apilist=$(find api -mindepth 1 -maxdepth 1 -type d -exec basename {} \;| paste -sd, -)
-          
+
           if [ ${{ inputs.user }} = true ] ; then
             servicelist=${servicelist},user
           fi
+
           if [ ${{ inputs.gateway }} = true ] ; then
             servicelist=${servicelist},gateway
           fi
 
-          if [ -z "${servicelist}" ] ; then
-            if [ -z "$servicesstring" ] ; then
-              echo "no service"
-              exit 0
-            elif [ "${servicesstring:3:-1}" = "*" ]; then
-              servicelist=${rpclist},${apilist}
-            else
+          if [ -z "$servicelist" ] ; then
+            if [ ! -z "$servicesstring" ] ; then
               servicelist=${servicesstring:3:-1}
             fi
+          fi
+
+          echo "servicelist=$servicelist" >> $GITHUB_OUTPUT
+          
+          
+
+      - name: Checkout
+        if: steps.commit.outputs.servicelist != 'null'
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        if: steps.commit.outputs.servicelist != 'null'
+        with:
+          go-version-file: "go.mod"
+          cache-dependency-path: "**/*.sum"
+
+      - name: Build, tag, and push docker image
+        id: build
+        if: steps.commit.outputs.servicelist != 'null'
+        run: |-
+          build_time=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          rpclist=$(find rpc -mindepth 1 -maxdepth 1 -type d ! -name model -exec basename {} \;| paste -sd, -)
+          apilist=$(find api -mindepth 1 -maxdepth 1 -type d -exec basename {} \;| paste -sd, -)
+
+          if [ "${{ steps.commit.outputs.servicesstring }}" = "*" ]; then
+            servicelist=${rpclist},${apilist}
           fi
           echo "servicelist=$servicelist"
 
@@ -104,7 +123,7 @@ jobs:
 
       # https://github.com/appleboy/ssh-action
       - name: Deploy to server
-        if: steps.build.outputs.services != 'null'
+        if: steps.build.outputs.services != 'null' && ${{ inputs.deploy }} == true
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HOST }}
@@ -113,5 +132,3 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             # TODO
-
-        
