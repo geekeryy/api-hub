@@ -102,7 +102,6 @@ jobs:
               servicelist=$element
               break
             fi
-            buildlist=${buildlist},${element}
             if ! (CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o $element $service_type/$element/$element.go) then
               echo "build $element failed"
               exit 1
@@ -119,12 +118,13 @@ jobs:
               servicelist=$element
               exit 1
             fi
+            buildlist=${buildlist},${element}
           done
           echo "buildlist=$buildlist" >> $GITHUB_OUTPUT
 
       # https://github.com/appleboy/ssh-action
       - name: Deploy to server
-        if: steps.commit.outputs.servicelist != '' && steps.build.outputs.buildlist != '' && ${{ inputs.deploy }} == 'true'
+        if: steps.commit.outputs.servicelist != '' && steps.build.outputs.buildlist != '' && ${{ env.DEPLOY }} == 'true'
         uses: appleboy/ssh-action@v1
         with:
           # host: ${{ secrets.HOST }}
