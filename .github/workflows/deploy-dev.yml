@@ -44,6 +44,8 @@ jobs:
       id-token: "write"
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Get commit message
         id: commit
         run: |-
@@ -66,12 +68,6 @@ jobs:
           fi
 
           echo "servicelist=$servicelist" >> $GITHUB_OUTPUT
-          
-          
-
-      - name: Checkout
-        if: steps.commit.outputs.servicelist != 'null'
-        uses: actions/checkout@v4
 
       - name: Setup Go
         uses: actions/setup-go@v5
