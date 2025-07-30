@@ -124,12 +124,12 @@ jobs:
 
       # https://github.com/appleboy/ssh-action
       - name: Deploy to server
-        if: steps.build.outputs.buildlist != '' && ${{ inputs.deploy }} == 'true'
+        if: steps.commit.outputs.servicelist != '' && steps.build.outputs.buildlist != '' && ${{ inputs.deploy }} == 'true'
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.PORT }}
+          # host: ${{ secrets.HOST }}
+          # username: ${{ secrets.USERNAME }}
+          # key: ${{ secrets.KEY }}
+          # port: ${{ secrets.PORT }}
           script: |
             # TODO
