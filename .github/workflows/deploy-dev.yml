@@ -53,11 +53,11 @@ jobs:
           commit=${commit//"/\\\\\""}
           servicesstring=$(git log --pretty=format:"%B" ${{ github.sha }} -1 | head -1 | grep ": \[.*\]" -o || true)
 
-          if [ ${{ inputs.user }} = true ] ; then
+          if [ ${{ inputs.user }} == true ] ; then
             servicelist=${servicelist},user
           fi
 
-          if [ ${{ inputs.gateway }} = true ] ; then
+          if [ ${{ inputs.gateway }} == true ] ; then
             servicelist=${servicelist},gateway
           fi
 
