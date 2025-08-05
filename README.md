@@ -225,6 +225,11 @@ EMAIL_FORMAT_ERRO = "Email format error"
 * 原则：配置与程序隔离，使用环境变量覆盖（防止配置泄露）
 * 开发环境：推荐使用`.env`文件，使用`dotenv`库加载
 
+### 错误处理
+
+* 业务代码在发生错误的地方打印错误日志并上报error
+* 共享库warp详细信息并上报error，不打印日志
+
 ## 资源
 
 * [百度翻译API](https://api.fanyi.baidu.com) 100w字符/月免费

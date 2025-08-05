@@ -35,7 +35,7 @@ func (l *JWKSLogic) JWKS(w http.ResponseWriter) error {
 	}
 	if len(jwksList) > 0 {
 		for _, record := range jwksList {
-			publicKey, err := xstrings.AesCbcDecryptBase64(record.PublicKey, "public_key_secre", nil)
+			publicKey, err := xstrings.AesCbcDecryptBase64(record.PublicKey, l.svcCtx.Config.Secret.PublicKey, nil)
 			if err != nil {
 				l.Errorf("Failed to decrypt public key. Error: %s", err)
 				return err

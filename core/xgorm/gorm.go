@@ -46,9 +46,9 @@ type logger struct {
 }
 
 const (
-	TraceStr     = "%s  [%.3fms] [rows:%v] %s"
-	TraceWarnStr = "%s %s [%.3fms] [rows:%v] %s"
-	TraceErrStr  = "%s %s [%.3fms] [rows:%v] %s"
+	TraceStr     = "[%.3fms] [rows:%v] %s"
+	TraceWarnStr = "%s [%.3fms] [rows:%v] %s"
+	TraceErrStr  = "%s [%.3fms] [rows:%v] %s"
 )
 
 func ConnectMysql(m mysql.Mysql) (*gorm.DB, error) {
@@ -146,34 +146,35 @@ func (l logger) Trace(ctx context.Context, begin time.Time, fc func() (string, i
 	}
 	lines := fmt.Sprint(FileWithLineNum()...)
 	elapsed := time.Since(begin)
+	elapsedFloat := float64(elapsed.Nanoseconds()) / 1e6
 	switch {
 	case err != nil && l.LogLevel >= gormiologger.Error && (!errors.Is(err, gormiologger.ErrRecordNotFound) || !l.IgnoreRecordNotFoundError):
 		sql, rows := fc()
 		if rows == -1 {
-			l.Printf(l.traceErrStr, lines, err, float64(elapsed.Nanoseconds())/1e6, "-", sql)
-			logx.WithContext(ctx).Errorf(TraceErrStr, lines, err, float64(elapsed.Nanoseconds())/1e6, "-", sql)
+			l.Printf(l.traceErrStr, lines, err, elapsedFloat, "-", sql)
+			logx.WithContext(ctx).WithFields(logx.LogField{Key: "lines", Value: lines}).WithFields(logx.LogField{Key: "elapsed", Value: elapsedFloat}).Errorf(TraceErrStr, err, elapsedFloat, "-", sql)
 		} else {
-			l.Printf(l.traceErrStr, lines, err, float64(elapsed.Nanoseconds())/1e6, rows, sql)
-			logx.WithContext(ctx).Errorf(TraceErrStr, lines, err, float64(elapsed.Nanoseconds())/1e6, rows, sql)
+			l.Printf(l.traceErrStr, lines, err, elapsedFloat, rows, sql)
+			logx.WithContext(ctx).WithFields(logx.LogField{Key: "lines", Value: lines}).WithFields(logx.LogField{Key: "elapsed", Value: elapsedFloat}).Errorf(TraceErrStr, err, elapsedFloat, rows, sql)
 		}
 	case elapsed > l.SlowThreshold && l.SlowThreshold != 0 && l.LogLevel >= gormiologger.Warn:
 		sql, rows := fc()
 		slowLog := fmt.Sprintf("SLOW SQL >= %v", l.SlowThreshold)
 		if rows == -1 {
-			l.Printf(l.traceWarnStr, lines, slowLog, float64(elapsed.Nanoseconds())/1e6, "-", sql)
-			logx.WithContext(ctx).Infof(TraceWarnStr, lines, slowLog, float64(elapsed.Nanoseconds())/1e6, "-", sql)
+			l.Printf(l.traceWarnStr, lines, slowLog, elapsedFloat, "-", sql)
+			logx.WithContext(ctx).WithFields(logx.LogField{Key: "lines", Value: lines}).WithFields(logx.LogField{Key: "elapsed", Value: elapsedFloat}).Infof(TraceWarnStr, slowLog, elapsedFloat, "-", sql)
 		} else {
-			l.Printf(l.traceWarnStr, lines, slowLog, float64(elapsed.Nanoseconds())/1e6, rows, sql)
-			logx.WithContext(ctx).Infof(TraceWarnStr, lines, slowLog, float64(elapsed.Nanoseconds())/1e6, rows, sql)
+			l.Printf(l.traceWarnStr, lines, slowLog, elapsedFloat, rows, sql)
+			logx.WithContext(ctx).WithFields(logx.LogField{Key: "lines", Value: lines}).WithFields(logx.LogField{Key: "elapsed", Value: elapsedFloat}).Infof(TraceWarnStr, slowLog, elapsedFloat, rows, sql)
 		}
 	case l.LogLevel == gormiologger.Info:
 		sql, rows := fc()
 		if rows == -1 {
-			l.Printf(l.traceStr, lines, float64(elapsed.Nanoseconds())/1e6, "-", sql)
-			logx.WithContext(ctx).Infof(TraceStr, lines, float64(elapsed.Nanoseconds())/1e6, "-", sql)
+			l.Printf(l.traceStr, lines, elapsedFloat, "-", sql)
+			logx.WithContext(ctx).WithFields(logx.LogField{Key: "lines", Value: lines}).WithFields(logx.LogField{Key: "elapsed", Value: elapsedFloat}).Infof(TraceStr, lines, elapsedFloat, "-", sql)
 		} else {
-			l.Printf(l.traceStr, lines, float64(elapsed.Nanoseconds())/1e6, rows, sql)
-			logx.WithContext(ctx).Infof(TraceStr, lines, float64(elapsed.Nanoseconds())/1e6, rows, sql)
+			l.Printf(l.traceStr, lines, elapsedFloat, rows, sql)
+			logx.WithContext(ctx).WithFields(logx.LogField{Key: "lines", Value: lines}).WithFields(logx.LogField{Key: "elapsed", Value: elapsedFloat}).Infof(TraceStr, elapsedFloat, rows, sql)
 		}
 	}
 }

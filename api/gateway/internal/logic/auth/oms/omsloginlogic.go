@@ -29,6 +29,7 @@ func NewOmsLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *OmsLogin
 }
 
 func (l *OmsLoginLogic) OmsLogin(req *types.OmsLoginReq) (resp *types.OmsLoginResp, err error) {
+	// TODO 加上IP白名单，定时更新otp密钥
 	if req.Username != "admin" || !totp.Validate(req.Code, l.svcCtx.Config.Oms.OtpSecret) {
 		return nil, xerror.ForbiddenErr
 	}
