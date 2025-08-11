@@ -1,0 +1,15 @@
+services:
+  gateway:
+    image: alpine:latest
+    ports:
+      - 8888:8888
+      - 6470:6470
+    env_file:
+      - ../../.env
+    command: ["/app/gateway", "-f", "/app/etc/gateway-api.yaml"]
+    volumes:
+      - ../../api/gateway/etc/gateway-api.yaml:/app/etc/gateway-api.yaml
+      - ../../build/gateway:/app/gateway
+
+
+

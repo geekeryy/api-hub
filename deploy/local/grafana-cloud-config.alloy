@@ -1,0 +1,58 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+discovery.docker "docker_discovery" {
+  host = "unix:///var/run/docker.sock"
+}
+
+loki.source.docker "from_docker" {
+  host = "unix:///var/run/docker.sock"
+  targets = discovery.docker.docker_discovery.targets
+  forward_to = [loki.write.grafanacloud.receiver]
+}
+
+loki.write "grafanacloud" {
+  endpoint {
+    url = env("LOKI_URL")
+
+    basic_auth {
+      username = env("LOKI_USERNAME")
+      password = env("LOKI_PASSWORD")
+    }
+  }
+}
+
+prometheus.scrape "gozero" {
+  targets = [ 
+    {
+      __address__ = "localhost:6470",
+    },
+  ]
+  scrape_interval = "15s"
+  forward_to      = [prometheus.relabel.filter_metrics.receiver]
+}
+
+
+
+prometheus.relabel "filter_metrics" {
+  rule {
+    action        = "drop"
+    source_labels = ["env"]
+    regex         = "dev1"
+  }
+
+  forward_to = [prometheus.remote_write.grafanacloud.receiver]
+}
+
+prometheus.remote_write "grafanacloud" {
+    endpoint {
+        url = env("PROM_URL")
+
+        basic_auth {
+        username = env("PROM_USERNAME")
+        password = env("PROM_PASSWORD")
+        }
+    }
+}

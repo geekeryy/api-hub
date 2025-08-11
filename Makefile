@@ -41,3 +41,11 @@ apifox:
 lint:
 	golangci-lint fmt
 	golangci-lint run
+
+############################################ Docker本地调试 #################################################
+
+build:
+	GOOS=linux go build -o build/gateway api/gateway/gateway.go
+
+restart:
+	docker compose -f deploy/local/docker-compose.yml up -d

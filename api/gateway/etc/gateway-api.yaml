@@ -50,4 +50,23 @@ Oms:
   OtpSecret: 
 
 
-# Profile
+# docker run -it -p 4040:4040 grafana/pyroscope
+Profiling:
+  Name: gateway-api
+  ServerAddr: ${PROFILING_SERVER_ADDR}
+  AuthUser: "${PROFILING_AUTH_USER}"
+  AuthPassword: ${PROFILING_AUTH_PASSWORD}
+  CpuThreshold: 0
+  ProfileType:
+    Logger: true
+    CPU: true
+    Goroutines: true
+    Memory: true
+    Mutex: false
+    Block: false
+
+DevServer:
+  Enabled: true
+  Port: 6470
+  MetricsPath: /metrics
+  EnableMetrics: true
