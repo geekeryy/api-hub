@@ -20,6 +20,7 @@ import (
 	"github.com/geekeryy/api-hub/core/xcontext"
 	"github.com/geekeryy/api-hub/library/validator"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSendEmail(t *testing.T) {
@@ -27,6 +28,7 @@ func TestSendEmail(t *testing.T) {
 	l, ok := loador.LoadOrStore("test", "v")
 	fmt.Println(l, ok)
 	fmt.Println(loador.Load("test"))
+	assert.Equal(t, "v", l)
 }
 
 func Test_jwks(t *testing.T) {
