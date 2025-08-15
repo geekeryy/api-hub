@@ -1,3 +1,4 @@
+.PHONY: gen-api gen-rpc model lint apifox build restart
 
 # Generate api go files
 # Example: make gen-api s=oms
