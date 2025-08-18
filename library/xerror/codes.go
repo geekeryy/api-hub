@@ -2,7 +2,6 @@ package xerror
 
 import (
 	coreError "github.com/geekeryy/api-hub/core/error"
-	"google.golang.org/protobuf/protoadapt"
 )
 
 // 错误码参考：https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Reference/Status
@@ -31,6 +30,15 @@ var (
 
 	// 504 Gateway Timeout
 	GatewayTimeoutErr = newerr(504, "GATEWAY_TIMEOUT")
+)
+
+// 框架错误(1000~9999)
+var (
+	// 未知错误
+	UnknownErr = newerr(1000, "UNKNOWN_ERROR")
+
+	// 数据库错误
+	DBErr = newerr(1001, "DB_ERROR")
 )
 
 // 自定义错误（10000~99999）
@@ -187,8 +195,4 @@ func newerr(c int64, msg string) *coreError.Error {
 		Plural:       0,
 		TemplateDate: make(map[string]string),
 	}
-}
-
-func New(err error, e ...protoadapt.MessageV1) error {
-	return coreError.New(err, e...)
 }

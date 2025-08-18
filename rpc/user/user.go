@@ -4,7 +4,11 @@ import (
 	"flag"
 	"fmt"
 
-	{{.imports}}
+	"github.com/geekeryy/api-hub/rpc/user/internal/config"
+	adminserviceServer "github.com/geekeryy/api-hub/rpc/user/internal/server/adminservice"
+	memberserviceServer "github.com/geekeryy/api-hub/rpc/user/internal/server/memberservice"
+	"github.com/geekeryy/api-hub/rpc/user/internal/svc"
+	"github.com/geekeryy/api-hub/rpc/user/user"
 
 	coreerror "github.com/geekeryy/api-hub/core/error"
 	"github.com/zeromicro/go-zero/core/conf"
@@ -14,7 +18,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-var configFile = flag.String("f", "etc/{{.serviceName}}.yaml", "the config file")
+var configFile = flag.String("f", "etc/user.yaml", "the config file")
 
 func main() {
 	flag.Parse()
@@ -24,8 +28,9 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
-{{range .serviceNames}}       {{.Pkg}}.Register{{.GRPCService}}Server(grpcServer, {{.ServerPkg}}.New{{.Service}}Server(ctx))
-{{end}}
+		user.RegisterAdminServiceServer(grpcServer, adminserviceServer.NewAdminServiceServer(ctx))
+		user.RegisterMemberServiceServer(grpcServer, memberserviceServer.NewMemberServiceServer(ctx))
+
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)
 		}

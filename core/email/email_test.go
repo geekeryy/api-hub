@@ -9,6 +9,9 @@ import (
 
 func TestEmail(t *testing.T) {
 	apiKey := os.Getenv("MAILGUN_API_KEY")
+	if len(apiKey) == 0 {
+		t.Skip("MAILGUN_API_KEY is not set")
+	}
 	err := email.New("mailgun.jiangyang.online", apiKey).SendMailGun(&email.SendMsg{
 		Subject: "test",
 		Body:    "test",

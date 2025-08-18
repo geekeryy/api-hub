@@ -5,6 +5,7 @@ import (
 
 	"github.com/SpectatorNan/gorm-zero/gormc/config/pg"
 	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type Config struct {
@@ -13,12 +14,13 @@ type Config struct {
 		AccessExpire  int `json:",env=AUTH_ACCESS_EXPIRE,default=600"`
 		RefreshExpire int `json:",env=AUTH_REFRESH_EXPIRE,default=2592000"`
 	}
-	PgSql    pg.PgSql
-	Jwks     Jwks
-	Facebook Facebook
-	MailGun  MailGun
-	Secret   Secret
-	Oms      Oms
+	PgSql         pg.PgSql
+	Jwks          Jwks
+	Facebook      Facebook
+	MailGun       MailGun
+	Secret        Secret
+	Oms           Oms
+	MemberService zrpc.RpcClientConf
 }
 
 func (c *Config) Validate() error {

@@ -29,42 +29,72 @@ type BaseResponse struct {
 //			http层：直接返回内置错误，隐藏下层错误
 //			    return xerror.SystemErr                                    // 直接返回内置错误消息（错误细节需要在发生出打印）
 //		    	return xerror.InvalidParameterErr.WithMessage(err.Error()) // 返回自定义错误消息（错误细节需要在发生出打印）
-//	         return xerror.New(err,xerror.InvalidParameterErr)          // 将内置错误追加到原始错误之后，给下层兜底
+//	            return xerror.New(err,xerror.InvalidParameterErr)          // 将内置错误追加到原始错误之后，给下层兜底
 //		    	return err                                                 // 当前层不做处理，直接返回原始错误（普通错误、grpc错误）
 //			grpc层：使用下层的内置错误（从details中查找最近一个内置错误）
 //			    return xerror.SystemErr.Rpc()                     // 直接返回内置错误消息（错误细节需要在发生出打印）
-//		    	return xerror.New(err,xerror.InvalidParameterErr) // 将内置错误追加到原始错误之后，给下层兜底 TODO grpc是否会丢失细节？
-//	                                                           // 将原始错误带给上层，让上层进行逻辑处理
+//		    	return xerror.New(err,xerror.InvalidParameterErr) // 将内置错误追加到原始错误之后，给下层兜底
+//	                                                              // 将原始错误带给上层，让上层进行逻辑处理
 //		    	return err                                        // 当前层不做处理，让上层处理要返回的错误（错误细节需要在发生出打印）
 func ErrorHandler(ctx context.Context, err error) (statusCode int, errResponse any) {
 	if err == nil {
 		return http.StatusOK, nil
 	}
+
 	target := &coreError.Error{}
 	if errors.As(err, &target) {
-		logx.Errorw(target.MessageId, logx.Field("callers", target.Slacks), logx.Field("code", target.Code))
+		fields := make([]logx.LogField, 0, len(target.Slacks)+1)
+		fields = append(fields, logx.Field("code", target.Code))
+		for i, v := range target.Slacks {
+			fields = append(fields, logx.Field(fmt.Sprintf("callers[%d]", i), v))
+		}
+		for i, v := range target.Details {
+			fields = append(fields, logx.Field(fmt.Sprintf("detail[%d]", i), v))
+		}
+		logx.WithContext(ctx).Errorw(target.MessageId, fields...)
 		return transform(ctx, target)
 	}
 
-	if s, ok := status.FromError(err); ok {
-		found := false
-		fields := make([]logx.LogField, 0)
-		for i := len(s.Details()) - 1; i >= 0; i-- {
-			if errors.As(s.Details()[i].(error), &target) {
-				fields = append(fields, logx.Field(fmt.Sprintf("callers[%d]", i), fmt.Sprintf("%v err:%v", getCaller(target.Slacks), target.MessageId)))
-				if !found {
-					statusCode, errResponse = transform(ctx, target)
-					found = true
-				}
-			}
+	s, ok := status.FromError(err)
+	if !ok {
+		logx.WithContext(ctx).Error(err.Error())
+		return http.StatusInternalServerError, BaseResponse{
+			Code: 500,
+			Msg:  "unknown error",
 		}
-		logx.Errorw(s.Message(), fields...)
-		if found {
-			return statusCode, errResponse
-		}
-	} else {
-		logx.Error(err.Error())
 	}
+
+	found := false
+	for _, detail := range s.Proto().Details {
+		detail, err := detail.UnmarshalNew()
+		if err != nil {
+			logx.WithContext(ctx).Errorw("unmarshal detail", logx.Field("error", err))
+			continue
+		}
+		target, ok = detail.(*coreError.Error)
+		if !ok {
+			logx.WithContext(ctx).Errorw("unknown detail", logx.Field("error", detail))
+			continue
+		}
+		if !found {
+			fields := make([]logx.LogField, 0)
+			for i, v := range target.Slacks {
+				fields = append(fields, logx.Field(fmt.Sprintf("callers[%d]", i), v))
+			}
+			for i, v := range target.Details {
+				fields = append(fields, logx.Field(fmt.Sprintf("detail[%d]", i), v))
+			}
+			logx.WithContext(ctx).Errorw(s.Message(), fields...)
+			statusCode, errResponse = transform(ctx, target)
+			found = true
+		}
+	}
+
+	if found {
+		return statusCode, errResponse
+	}
+
+	logx.WithContext(ctx).WithFields(logx.Field("code", uint32(s.Code()))).Error(s)
 
 	return http.StatusInternalServerError, BaseResponse{
 		Code: 500,

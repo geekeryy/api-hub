@@ -10,4 +10,5 @@ message Error {
   int64 plural = 4;
   repeated string slacks = 5;
   int64 status = 6;
+  repeated string details = 7;
 }

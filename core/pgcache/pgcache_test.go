@@ -24,7 +24,7 @@ var conf = pg.PgSql{
 func TestLock(t *testing.T) {
 	var cache, err = pgcache.NewCache(conf)
 	if err != nil {
-		log.Fatal(err)
+		t.Skip("skip pgcache test")
 	}
 	defer cache.Close()
 

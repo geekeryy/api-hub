@@ -1,10 +1,16 @@
-Name: gateway-api
-Host: 0.0.0.0
-Port: 8888
+Name: user.rpc
+ListenOn: 0.0.0.0:8080
 Log:
   Mode: console
   Level: info
 
+Telemetry:
+  Batcher: otlphttp
+  OtlpHeaders:
+    Authorization: "${TELEMETRY_AUTH}"
+  Endpoint: "${TELEMETRY_ENDPOINT}"
+  OtlpHttpPath: /otlp/v1/traces
+  OtlpHttpSecure: true
 
 PgSql:
   Username: ${PG_USERNAME}
@@ -19,42 +25,6 @@ PgSql:
   SlowThreshold: 1000
   MaxIdleConns: 2
   MaxOpenConns: 10
-
-MemberService:
-  Timeout: 10000
-  Endpoints:
-    - "user:8080"
-    - "localhost:8080"
-
-Jwks:
-  ServerURL:
-  RefreshInterval: 
-
-Facebook:
-  AppID: 
-  AppSecret: 
-
-MailGun:
-  Domain: 
-  ApiKey: 
-  Sender: 
-
-Secret:
-  RefreshToken: 
-  PrivateKey: 
-  PublicKey: 
-
-Oms:
-  OtpSecret: 
-
-
-Telemetry:
-  Batcher: otlphttp
-  OtlpHeaders:
-    Authorization: "${TELEMETRY_AUTH}"
-  Endpoint: "${TELEMETRY_ENDPOINT}"
-  OtlpHttpPath: /otlp/v1/traces
-  OtlpHttpSecure: true
 
 Profiling:
   ServerAddr: ${PROFILING_SERVER_ADDR}
@@ -71,6 +41,6 @@ Profiling:
 
 DevServer:
   Enabled: true
-  Port: 6470
+  Port: 6471
   MetricsPath: /metrics
   EnableMetrics: true

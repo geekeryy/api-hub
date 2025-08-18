@@ -16,8 +16,10 @@ import (
 	"github.com/geekeryy/api-hub/library/validator"
 	"github.com/geekeryy/api-hub/rpc/model/authmodel"
 	"github.com/geekeryy/api-hub/rpc/model/usermodel"
+	"github.com/geekeryy/api-hub/rpc/user/client/memberservice"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/zrpc"
 	"golang.org/x/time/rate"
 	"gorm.io/gorm"
 )
@@ -35,6 +37,7 @@ type ServiceContext struct {
 	MemberIdentityModel     authmodel.MemberIdentityModel
 	MemberInfoModel         usermodel.MemberInfoModel
 	RefreshTokenModel       authmodel.RefreshTokenModel
+	MemberService           memberservice.MemberService
 	DB                      *gorm.DB
 	Cache                   *pgcache.Cache
 	Kfunc                   keyfunc.Keyfunc
@@ -66,6 +69,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		log.Fatalf("Failed to init code limiter. Error: %s", err)
 	}
 
+	client := zrpc.MustNewClient(c.MemberService)
+
 	svc := &ServiceContext{
 		Config:                  c,
 		ContextMiddleware:       middleware.NewContextMiddleware().Handle,
@@ -81,9 +86,10 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Validator: validate.New([]validate.ValidatorFn{
 			validator.ChineseNameValidator,
 		}, []string{"zh", "en"}),
-		Cache:       cache,
-		DB:          pg,
-		CodeLimiter: codeLimiter,
+		Cache:         cache,
+		DB:            pg,
+		CodeLimiter:   codeLimiter,
+		MemberService: memberservice.NewMemberService(client),
 	}
 	return svc
 }

@@ -2,12 +2,12 @@ package member
 
 import (
 	"context"
-	"time"
 
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/geekeryy/api-hub/core/xcontext"
-
+	"github.com/geekeryy/api-hub/library/xerror"
+	"github.com/geekeryy/api-hub/rpc/user/client/memberservice"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -27,16 +27,21 @@ func NewMemberInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Member
 }
 
 func (l *MemberInfoLogic) MemberInfo() (resp *types.MemberInfoResp, err error) {
-	memberInfo, err := l.svcCtx.MemberInfoModel.FindOneByMemberId(l.ctx, xcontext.GetMemberID(l.ctx))
+	memberID := xcontext.GetMemberID(l.ctx)
+	if memberID == "" {
+		return nil, xerror.ForbiddenErr
+	}
+	memberInfo, err := l.svcCtx.MemberService.GetMemberInfo(l.ctx, &memberservice.GetMemberInfoReq{
+		MemberId: memberID,
+	})
 	if err != nil {
-		l.Errorf("Failed to find member info. Error: %s", err)
 		return nil, err
 	}
 	resp = &types.MemberInfoResp{
 		Nickname: memberInfo.Nickname,
 		Avatar:   memberInfo.Avatar,
 		Gender:   int(memberInfo.Gender),
-		Birthday: memberInfo.Birthday.Format(time.DateTime),
+		Birthday: memberInfo.Birthday,
 		Phone:    memberInfo.Phone,
 		Email:    memberInfo.Email,
 	}
