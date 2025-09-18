@@ -33,9 +33,7 @@ service gateway-api {
 	prefix:     /api/v1/gateway/oms/rbac
 	tags:       "Oms - rbac"
 )
-service gateway-api {
-
-}
+service gateway-api {}
 
 type (
 	KeyUsageReq {

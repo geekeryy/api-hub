@@ -173,6 +173,14 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.OmsJwtMiddleware},
+			[]rest.Route{}...,
+		),
+		rest.WithPrefix("/api/v1/gateway/oms/rbac"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.AdminJwtMiddleware},
 			[]rest.Route{
 				{

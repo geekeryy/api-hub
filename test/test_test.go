@@ -20,8 +20,32 @@ import (
 	"github.com/geekeryy/api-hub/core/xcontext"
 	"github.com/geekeryy/api-hub/library/validator"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestChan(t *testing.T) {
+	ch := make(chan string)
+	close(ch)
+	close(ch)
+}
+
+func TestRedis(t *testing.T) {
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "TianRong@123",
+	})
+	_, err := redisClient.Ping(context.Background()).Result()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ch := make(chan string)
+	redisClient.Monitor(context.Background(), ch).Start()
+	for msg := range ch {
+		fmt.Println(msg)
+	}
+}
 
 func TestSendEmail(t *testing.T) {
 	loador := sync.Map{}

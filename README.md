@@ -7,7 +7,7 @@
 
 ## 🏗️ 项目架构概览
 
-![excalidraw.com](architecture.svg)
+![excalidraw.com](doc/assets/architecture.svg)
 
 ### 外部依赖层
 
@@ -177,7 +177,7 @@ EMAIL_FORMAT_ERRO = "Email format error"
 
 > 每次push需要压缩提交，commit描述清楚，让每次提交的功能尽可能清晰和单一；分支合并使用rebase，多次少量原则
 
-* feat： 新增 featur
+* feat： 新增 feature
 * fix: 修复 bug
 * docs: 仅仅修改了文档，比如 README, CHANGELOG, CONTRIBUTE等等
 * style: 仅仅修改了空格、格式缩进、逗号等等，不改变代码逻辑

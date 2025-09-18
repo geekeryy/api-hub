@@ -8,6 +8,7 @@ require (
 	github.com/MicahParks/keyfunc/v3 v3.4.0
 	github.com/SpectatorNan/gorm-zero v1.7.0
 	github.com/dlclark/regexp2 v1.11.5
+	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
@@ -23,6 +24,7 @@ require (
 	github.com/nicksnyder/go-i18n/v2 v2.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.5.0
+	github.com/redis/go-redis/v9 v9.10.0
 	github.com/stretchr/testify v1.10.0
 	github.com/zeromicro/go-zero v1.8.4
 	go.opentelemetry.io/otel v1.35.0
@@ -104,7 +106,6 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/redis/go-redis/v9 v9.10.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
