@@ -3,17 +3,17 @@ package jwks
 import (
 	"net/http"
 
-	"github.com/geekeryy/api-hub/api/gateway/internal/logic/oms/jwks"
-	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
-	"github.com/geekeryy/api-hub/api/gateway/internal/types"
+	"github.com/geekeryy/api-hub/api/oms/internal/logic/jwks"
+	"github.com/geekeryy/api-hub/api/oms/internal/svc"
+	"github.com/geekeryy/api-hub/api/oms/internal/types"
 	"github.com/geekeryy/api-hub/library/xerror"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 删除公钥
-func DeleteKeyHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 公钥使用记录
+func KeyUsageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.DeleteKeyReq
+		var req types.KeyUsageReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, xerror.InvalidParameterErr)
 			return
@@ -23,12 +23,12 @@ func DeleteKeyHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := jwks.NewDeleteKeyLogic(r.Context(), svcCtx)
-		err := l.DeleteKey(&req)
+		l := jwks.NewKeyUsageLogic(r.Context(), svcCtx)
+		resp, err := l.KeyUsage(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
-			httpx.Ok(w)
+			httpx.OkJsonCtx(r.Context(), w, resp)
 		}
 	}
 }

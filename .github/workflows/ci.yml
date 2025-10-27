@@ -2,7 +2,7 @@ name: Golang CI Lint
 
 on:
   push:
-    branches: [ "dev","feature/**","fix/**","main" ]
+    branches: [ "dev","feature/**","fix/**" ]
   pull_request:
 
 jobs:

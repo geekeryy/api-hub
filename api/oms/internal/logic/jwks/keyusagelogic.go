@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
-	"github.com/geekeryy/api-hub/api/gateway/internal/types"
+	"github.com/geekeryy/api-hub/api/oms/internal/svc"
+	"github.com/geekeryy/api-hub/api/oms/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

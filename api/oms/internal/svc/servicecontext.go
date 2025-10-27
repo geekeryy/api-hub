@@ -6,13 +6,8 @@ import (
 	"time"
 
 	"github.com/MicahParks/keyfunc/v3"
-	"github.com/geekeryy/api-hub/api/gateway/internal/config"
-	"github.com/geekeryy/api-hub/api/gateway/internal/middleware"
-	"github.com/geekeryy/api-hub/core/jwks"
-	"github.com/geekeryy/api-hub/core/limiter"
-	"github.com/geekeryy/api-hub/core/pgcache"
-	"github.com/geekeryy/api-hub/core/validate"
-	"github.com/geekeryy/api-hub/core/xgorm"
+	"github.com/geekeryy/api-hub/api/oms/internal/config"
+	"github.com/geekeryy/api-hub/api/oms/internal/middleware"
 	"github.com/geekeryy/api-hub/library/validator"
 	"github.com/geekeryy/api-hub/rpc/model/authmodel"
 	"github.com/geekeryy/api-hub/rpc/model/usermodel"
@@ -22,13 +17,17 @@ import (
 	"github.com/zeromicro/go-zero/zrpc"
 	"golang.org/x/time/rate"
 	"gorm.io/gorm"
+
+	"github.com/geekeryy/api-hub/core/jwks"
+	"github.com/geekeryy/api-hub/core/limiter"
+	"github.com/geekeryy/api-hub/core/pgcache"
+	"github.com/geekeryy/api-hub/core/validate"
+	"github.com/geekeryy/api-hub/core/xgorm"
 )
 
 type ServiceContext struct {
 	Config                  config.Config
 	ContextMiddleware       rest.Middleware
-	JwtMiddleware           rest.Middleware
-	AdminJwtMiddleware      rest.Middleware
 	OmsOtpMiddleware        rest.Middleware
 	OmsJwtMiddleware        rest.Middleware
 	Validator               *validate.Validate
@@ -74,8 +73,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	svc := &ServiceContext{
 		Config:                  c,
 		ContextMiddleware:       middleware.NewContextMiddleware().Handle,
-		JwtMiddleware:           middleware.NewJwtMiddleware(kfunc).Handle,
-		AdminJwtMiddleware:      middleware.NewAdminJwtMiddleware(kfunc).Handle,
+		OmsJwtMiddleware:        middleware.NewOmsJwtMiddleware(kfunc).Handle,
 		Kfunc:                   kfunc,
 		JwksModel:               authmodel.NewJwksModel(pg),
 		TokenRefreshRecordModel: authmodel.NewTokenRefreshRecordModel(pg),
@@ -94,11 +92,5 @@ func NewServiceContext(c config.Config) *ServiceContext {
 }
 
 func (s *ServiceContext) Close() {
-	if s.Cache != nil {
-		s.Cache.Close()
-	}
-	if s.DB != nil {
-		db, _ := s.DB.DB()
-		db.Close()
-	}
+	// TODO graceful stop
 }

@@ -9,7 +9,6 @@ info (
 	basePath:     ""
 )
 
-import "oms.api"
 import "auth.api"
 import "user.api"
 

@@ -1,0 +1,76 @@
+Name: oms-api
+Host: 0.0.0.0
+Port: 8881
+Log:
+  Mode: console
+  Level: info
+
+
+PgSql:
+  Username: ${PG_USERNAME}
+  Password: ${PG_PASSWORD}
+  Path: "${PG_PATH}"
+  Port: 5432
+  SslMode: disable
+  TimeZone: America/New_York
+  Dbname: ${PG_DBNAME}
+  LogMode: dev
+  LogZap: false
+  SlowThreshold: 1000
+  MaxIdleConns: 2
+  MaxOpenConns: 10
+
+MemberService:
+  Timeout: 10000
+  Endpoints:
+    - "user:8080"
+    - "localhost:8080"
+
+Jwks:
+  ServerURL:
+  RefreshInterval: 
+
+Facebook:
+  AppID: 
+  AppSecret: 
+
+MailGun:
+  Domain: 
+  ApiKey: 
+  Sender: 
+
+Secret:
+  RefreshToken: 
+  PrivateKey: 
+  PublicKey: 
+
+Oms:
+  OtpSecret: 
+
+
+Telemetry:
+  Batcher: otlphttp
+  OtlpHeaders:
+    Authorization: "${TELEMETRY_AUTH}"
+  Endpoint: "${TELEMETRY_ENDPOINT}"
+  OtlpHttpPath: /otlp/v1/traces
+  OtlpHttpSecure: true
+
+Profiling:
+  ServerAddr: ${PROFILING_SERVER_ADDR}
+  AuthUser: "${PROFILING_AUTH_USER}"
+  AuthPassword: ${PROFILING_AUTH_PASSWORD}
+  CpuThreshold: 0
+  ProfileType:
+    Logger: true
+    CPU: true
+    Goroutines: true
+    Memory: true
+    Mutex: false
+    Block: false
+
+DevServer:
+  Enabled: true
+  Port: 6470
+  MetricsPath: /metrics
+  EnableMetrics: true

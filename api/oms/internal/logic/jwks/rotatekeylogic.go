@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/MicahParks/jwkset"
-	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
+	"github.com/geekeryy/api-hub/api/oms/internal/svc"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xstrings"
 	"github.com/geekeryy/api-hub/rpc/model/authmodel"

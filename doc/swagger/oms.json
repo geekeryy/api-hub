@@ -1,0 +1,182 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "运维管理服务",
+    "title": "oms",
+    "contact": {
+      "name": "jiangyang",
+      "email": "jiangyang.me@gmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://github.com/geekeryy/api-hub/blob/main/LICENSE"
+    },
+    "version": "1.0"
+  },
+  "host": "localhost:8881",
+  "basePath": "/",
+  "paths": {
+    "/api/v1/oms/jwks/delete": {
+      "delete": {
+        "description": "删除公钥",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Oms - jwks"
+        ],
+        "summary": "删除公钥",
+        "operationId": "jwksDeleteKeyHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "kid"
+              ],
+              "properties": {
+                "kid": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/oms/jwks/rotate": {
+      "put": {
+        "description": "轮换公钥",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Oms - jwks"
+        ],
+        "summary": "轮换公钥",
+        "operationId": "jwksRotateKeyHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/oms/jwks/usage": {
+      "get": {
+        "description": "公钥使用记录",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Oms - jwks"
+        ],
+        "summary": "公钥使用记录",
+        "operationId": "jwksKeyUsageHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "kid"
+              ],
+              "properties": {
+                "kid": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "records": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "time",
+                      "count"
+                    ],
+                    "properties": {
+                      "count": {
+                        "type": "integer"
+                      },
+                      "time": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/oms/ping": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "健康检查"
+        ],
+        "summary": "健康检查",
+        "operationId": "healthzPingHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    }
+  },
+  "x-date": "2025-10-27 18:00:02",
+  "x-description": "This is a goctl generated swagger file.",
+  "x-github": "https://github.com/zeromicro/go-zero",
+  "x-go-zero-doc": "https://go-zero.dev/",
+  "x-goctl-version": "1.9.2"
+}

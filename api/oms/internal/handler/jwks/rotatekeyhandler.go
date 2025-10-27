@@ -5,8 +5,8 @@ import (
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 
-	"github.com/geekeryy/api-hub/api/gateway/internal/logic/oms/jwks"
-	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
+	"github.com/geekeryy/api-hub/api/oms/internal/logic/jwks"
+	"github.com/geekeryy/api-hub/api/oms/internal/svc"
 )
 
 // 轮换公钥
