@@ -1,6 +1,6 @@
 Name: gateway-api
 Host: 0.0.0.0
-Port: 8888
+Port: 8080
 Log:
   Mode: console
   Level: info
@@ -20,8 +20,8 @@ Redis:
 MemberService:
   Timeout: 10000
   Endpoints:
-    - "user:8080"
-    - "localhost:8080"
+    - "user:8881"
+    - "localhost:8881"
 
 Jwks:
   ServerURL:

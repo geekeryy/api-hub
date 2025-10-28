@@ -1,0 +1,30 @@
+Name: auth.rpc
+ListenOn: 0.0.0.0:8880
+Log:
+  Mode: console
+  Level: info
+
+Mysql:
+  Username: ${MYSQL_USERNAME}
+  Password: ${MYSQL_PASSWORD}
+  Host: ${MYSQL_HOST}
+  Port: ${MYSQL_PORT}
+  Dbname: ${MYSQL_DBNAME}
+
+Auth:
+  AccessExpire: ${AUTH_ACCESS_EXPIRE}
+  RefreshExpire: ${AUTH_REFRESH_EXPIRE}
+
+Redis:
+  Addr: ${REDIS_ADDR}
+  Password: ${REDIS_PASSWORD}
+  Db: ${REDIS_DB}
+
+Secret:
+  RefreshToken: ${SECRET_REFRESH_TOKEN}
+  PrivateKey: ${SECRET_PRIVATE_KEY}
+  PublicKey: ${SECRET_PUBLIC_KEY}
+
+Facebook:
+  AppID: ${FACEBOOK_APP_ID}
+  AppSecret: ${FACEBOOK_APP_SECRET}

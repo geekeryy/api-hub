@@ -13,6 +13,7 @@ import (
 	"github.com/geekeryy/api-hub/core/limiter"
 	"github.com/geekeryy/api-hub/core/validate"
 	"github.com/geekeryy/api-hub/library/validator"
+	"github.com/geekeryy/api-hub/rpc/auth/client/authservice"
 	"github.com/geekeryy/api-hub/rpc/model/authmodel"
 	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 	"github.com/geekeryy/api-hub/rpc/user/client/memberservice"
@@ -38,6 +39,7 @@ type ServiceContext struct {
 	MemberInfoModel         membermodel.MemberInfoModel
 	RefreshTokenModel       authmodel.RefreshTokenModel
 	MemberService           memberservice.MemberService
+	AuthService             authservice.AuthService
 	DB                      sqlx.SqlConn
 	Kfunc                   keyfunc.Keyfunc
 	CodeLimiter             *lru.Cache[string, *limiter.Limiter]
@@ -98,6 +100,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		RedisClient:   redisClient,
 		CodeLimiter:   codeLimiter,
 		MemberService: memberservice.NewMemberService(client),
+		AuthService:   authservice.NewAuthService(client),
 	}
 	return svc
 }

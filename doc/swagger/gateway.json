@@ -74,7 +74,7 @@
       "post": {
         "description": "登录",
         "consumes": [
-          "application/x-www-form-urlencoded"
+          "application/json"
         ],
         "produces": [
           "application/json"
@@ -87,11 +87,58 @@
         ],
         "summary": "登录",
         "operationId": "auth/AdminAdminLoginHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "identity_type",
+                "credential"
+              ],
+              "properties": {
+                "credential": {
+                  "description": "凭证 密码/验证码/access_token",
+                  "type": "string"
+                },
+                "identifier": {
+                  "description": "标识符 账号/手机号/邮箱",
+                  "type": "string"
+                },
+                "identity_type": {
+                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
+                  "type": "integer",
+                  "enum": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7"
+                  ]
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
             "schema": {
-              "type": "object"
+              "type": "object",
+              "properties": {
+                "refresh_token": {
+                  "description": "刷新token",
+                  "type": "string"
+                },
+                "token": {
+                  "description": "新token",
+                  "type": "string"
+                }
+              }
             }
           }
         }
@@ -101,7 +148,7 @@
       "post": {
         "description": "注册",
         "consumes": [
-          "application/x-www-form-urlencoded"
+          "application/json"
         ],
         "produces": [
           "application/json"
@@ -114,11 +161,58 @@
         ],
         "summary": "注册",
         "operationId": "auth/AdminAdminRegisterHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "identity_type",
+                "credential"
+              ],
+              "properties": {
+                "credential": {
+                  "description": "凭证 密码/验证码/access_token",
+                  "type": "string"
+                },
+                "identifier": {
+                  "description": "标识符 账号/手机号/邮箱",
+                  "type": "string"
+                },
+                "identity_type": {
+                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
+                  "type": "integer",
+                  "enum": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7"
+                  ]
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
             "schema": {
-              "type": "object"
+              "type": "object",
+              "properties": {
+                "refresh_token": {
+                  "description": "刷新token",
+                  "type": "string"
+                },
+                "token": {
+                  "description": "新token",
+                  "type": "string"
+                }
+              }
             }
           }
         }
@@ -140,21 +234,11 @@
         "operationId": "auth/JwksGetJWKSHandler",
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "service"
-              ],
-              "properties": {
-                "service": {
-                  "description": "服务名称",
-                  "type": "string"
-                }
-              }
-            }
+            "type": "string",
+            "description": "服务名称",
+            "name": "service",
+            "in": "query",
+            "required": true
           }
         ],
         "responses": {
@@ -166,11 +250,8 @@
       }
     },
     "/api/v1/gateway/auth/member/activate-email": {
-      "post": {
+      "get": {
         "description": "用户点击邮箱激活链接，前端页面调用激活邮箱接口，激活邮箱",
-        "consumes": [
-          "application/json"
-        ],
         "produces": [
           "application/json"
         ],
@@ -184,21 +265,11 @@
         "operationId": "auth/MemberMemberActivateEmailHandler",
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "token"
-              ],
-              "properties": {
-                "token": {
-                  "description": "激活token",
-                  "type": "string"
-                }
-              }
-            }
+            "type": "string",
+            "description": "激活token",
+            "name": "token",
+            "in": "query",
+            "required": true
           }
         ],
         "responses": {
@@ -424,58 +495,33 @@
               "type": "object",
               "required": [
                 "identity_type",
-                "identifier"
+                "credential"
               ],
               "properties": {
-                "avatar": {
-                  "description": "头像",
-                  "type": "string"
-                },
-                "birthday": {
-                  "description": "生日",
-                  "type": "string"
-                },
                 "code": {
                   "description": "验证码",
                   "type": "string"
                 },
-                "email": {
-                  "description": "邮箱",
+                "credential": {
+                  "description": "凭证 密码/access_token",
                   "type": "string"
-                },
-                "gender": {
-                  "description": "性别 1: 男 2: 女 3: 未知",
-                  "type": "integer",
-                  "enum": [
-                    "1",
-                    "2",
-                    "3"
-                  ]
                 },
                 "identifier": {
                   "description": "标识符 账号/手机号/邮箱",
                   "type": "string"
                 },
                 "identity_type": {
-                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名",
+                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
                   "type": "integer",
                   "enum": [
                     "1",
                     "2",
-                    "3"
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7"
                   ]
-                },
-                "nickname": {
-                  "description": "昵称",
-                  "type": "string"
-                },
-                "password": {
-                  "description": "密码",
-                  "type": "string"
-                },
-                "phone": {
-                  "description": "手机号",
-                  "type": "string"
                 }
               }
             }
@@ -991,7 +1037,7 @@
       }
     }
   },
-  "x-date": "2025-10-28 14:30:38",
+  "x-date": "2025-10-28 23:26:32",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

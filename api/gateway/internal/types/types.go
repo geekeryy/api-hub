@@ -14,18 +14,25 @@ type AdminInfoResp struct {
 }
 
 type AdminLoginReq struct {
+	IdentityType int64  `json:"identity_type,options=1|2|3|4|5|6|7"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
+	Identifier   string `json:"identifier,optional"`                 // 标识符 账号/手机号/邮箱
+	Credential   string `json:"credential"`                          // 凭证 密码/验证码/access_token
 }
 
 type AdminLoginResp struct {
-}
-
-type AdminLogoutReq struct {
+	Token        string `json:"token"`         // 新token
+	RefreshToken string `json:"refresh_token"` // 刷新token
 }
 
 type AdminRegisterReq struct {
+	IdentityType int64  `json:"identity_type,options=1|2|3|4|5|6|7"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
+	Identifier   string `json:"identifier,optional"`                 // 标识符 账号/手机号/邮箱
+	Credential   string `json:"credential"`                          // 凭证 密码/验证码/access_token
 }
 
 type AdminRegisterResp struct {
+	Token        string `json:"token"`         // 新token
+	RefreshToken string `json:"refresh_token"` // 刷新token
 }
 
 type DailySentenceReq struct {
@@ -38,11 +45,11 @@ type DailySentenceResp struct {
 }
 
 type JWKSReq struct {
-	Service string `json:"service"` // 服务名称
+	Service string `form:"service"` // 服务名称
 }
 
 type MemberActivateEmailReq struct {
-	Token string `json:"token"` // 激活token
+	Token string `form:"token"` // 激活token
 }
 
 type MemberBindEmailReq struct {
@@ -96,16 +103,10 @@ type MemberRefreshTokenResp struct {
 }
 
 type MemberRegisterReq struct {
-	IdentityType int64  `json:"identity_type,options=1|2|3"`   // 身份类型 1: 手机号 2: 邮箱 3: 用户名
-	Identifier   string `json:"identifier"`                    // 标识符 账号/手机号/邮箱
-	Password     string `json:"password,optional"`             // 密码
-	Code         string `json:"code,optional"`                 // 验证码
-	Nickname     string `json:"nickname,optional"`             // 昵称
-	Avatar       string `json:"avatar,optional"`               // 头像
-	Gender       int64  `json:"gender,options=1|2|3,optional"` // 性别 1: 男 2: 女 3: 未知
-	Birthday     string `json:"birthday,optional"`             // 生日
-	Phone        string `json:"phone,optional"`                // 手机号
-	Email        string `json:"email,optional"`                // 邮箱
+	IdentityType int64  `json:"identity_type,options=1|2|3|4|5|6|7"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
+	Identifier   string `json:"identifier,optional"`                 // 标识符 账号/手机号/邮箱
+	Credential   string `json:"credential"`                          // 凭证 密码/access_token
+	Code         string `json:"code,optional"`                       // 验证码
 }
 
 type MemberSendEmailCodeReq struct {

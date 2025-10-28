@@ -1,18 +1,28 @@
 package config
 
 import (
-	"github.com/zeromicro/go-zero/rest"
+	"errors"
+
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type Config struct {
-	rest.RestConf
-	Mysql         Mysql
-	Redis         Redis
-	Jwks          Jwks
-	MailGun       MailGun
-	Secret        Secret
-	MemberService zrpc.RpcClientConf
+	zrpc.RpcServerConf
+	Auth struct {
+		AccessExpire  int `json:",env=AUTH_ACCESS_EXPIRE,default=600"`
+		RefreshExpire int `json:",env=AUTH_REFRESH_EXPIRE,default=2592000"`
+	}
+	Facebook Facebook
+	Mysql    Mysql
+	Redis    Redis
+	Secret   Secret
+}
+
+func (c *Config) Validate() error {
+	if c.Auth.AccessExpire <= 0 {
+		return errors.New("AUTH_ACCESS_EXPIRE must be greater than 0")
+	}
+	return nil
 }
 
 type Mysql struct {
@@ -35,13 +45,7 @@ type Secret struct {
 	PublicKey    string `json:",env=SECRET_PUBLIC_KEY"`
 }
 
-type Jwks struct {
-	ServerURL       string `json:",env=JWKS_SERVER_URL"`
-	RefreshInterval int    `json:",env=JWKS_REFRESH_INTERVAL"`
-}
-
-type MailGun struct {
-	Domain string `json:",env=MAILGUN_DOMAIN"`
-	ApiKey string `json:",env=MAILGUN_API_KEY"`
-	Sender string `json:",env=MAILGUN_SENDER"`
+type Facebook struct {
+	AppID     string `json:",env=FACEBOOK_APP_ID"`
+	AppSecret string `json:",env=FACEBOOK_APP_SECRET"`
 }

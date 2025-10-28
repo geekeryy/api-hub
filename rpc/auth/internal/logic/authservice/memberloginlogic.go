@@ -1,0 +1,238 @@
+package authservicelogic
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/geekeryy/api-hub/core/facebook"
+	"github.com/geekeryy/api-hub/core/google"
+	"github.com/geekeryy/api-hub/core/jwks"
+	"github.com/geekeryy/api-hub/core/xcontext"
+	"github.com/geekeryy/api-hub/core/xstrings"
+	"github.com/geekeryy/api-hub/library/consts"
+	"github.com/geekeryy/api-hub/library/xerror"
+	"github.com/geekeryy/api-hub/rpc/auth/auth"
+	"github.com/geekeryy/api-hub/rpc/auth/internal/svc"
+	"github.com/geekeryy/api-hub/rpc/model/authmodel"
+	"github.com/geekeryy/api-hub/rpc/model/membermodel"
+	"github.com/google/uuid"
+
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
+)
+
+type MemberLoginLogic struct {
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+	logx.Logger
+}
+
+func NewMemberLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MemberLoginLogic {
+	return &MemberLoginLogic{
+		ctx:    ctx,
+		svcCtx: svcCtx,
+		Logger: logx.WithContext(ctx),
+	}
+}
+
+// C端用户授权
+func (l *MemberLoginLogic) MemberLogin(in *auth.MemberLoginReq) (*auth.MemberLoginResp, error) {
+	var memberID string
+	var thirdPartyId string
+	var memberInfo *membermodel.MemberInfo
+	switch in.IdentityType {
+	case consts.IdentityTypePhone:
+		cacheValue, err := l.svcCtx.RedisClient.Get(l.ctx, fmt.Sprintf("phone_code_%s", in.Identifier)).Result()
+		if err != nil {
+			l.Errorf("Failed to get cache. Error: %s", err)
+			return nil, xerror.InternalServerErr
+		}
+		if in.Credential != cacheValue {
+			l.Infof("Member login failed. Identity: %s, Credential: %s code not match", in.Identifier, in.Credential)
+			return nil, xerror.UnauthorizedErr
+		}
+		memberIdentities, err := l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, in.IdentityType, in.Identifier)
+		if err != nil {
+			l.Errorf("Failed to find member identity. Error: %s", err)
+			return nil, xerror.InternalServerErr
+		}
+
+		if len(memberIdentities) == 0 {
+			l.Errorf("Member identity not found. IdentityType: %d, Identity: %s", in.IdentityType, in.Identifier)
+			return nil, xerror.NotFoundErr
+		}
+		if err := l.svcCtx.RedisClient.Del(l.ctx, fmt.Sprintf("phone_code_%s", in.Identifier)).Err(); err != nil {
+			l.Errorf("Failed to delete cache. Error: %s", err)
+		}
+		memberID = memberIdentities[0].MemberUuid
+	case consts.IdentityTypeEmail:
+		cacheValue, err := l.svcCtx.RedisClient.Get(l.ctx, fmt.Sprintf("email_code_%s", in.Identifier)).Result()
+		if err != nil {
+			l.Errorf("Failed to get cache. Error: %s", err)
+			return nil, xerror.InternalServerErr
+		}
+		if in.Credential != cacheValue {
+			l.Infof("Member login failed. Identity: %s, Credential: %s code not match", in.Identifier, in.Credential)
+			return nil, xerror.UnauthorizedErr
+		}
+		memberIdentities, err := l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, in.IdentityType, in.Identifier)
+		if err != nil {
+			l.Errorf("Failed to find member identity. Error: %s", err)
+			return nil, xerror.InternalServerErr
+		}
+
+		if len(memberIdentities) == 0 {
+			l.Errorf("Member identity not found. IdentityType: %d, Identity: %s", in.IdentityType, in.Identifier)
+			return nil, xerror.NotFoundErr
+		}
+		if err := l.svcCtx.RedisClient.Del(l.ctx, fmt.Sprintf("email_code_%s", in.Identifier)).Err(); err != nil {
+			l.Errorf("Failed to delete cache. Error: %s", err)
+		}
+		memberID = memberIdentities[0].MemberUuid
+	case consts.IdentityTypePassword:
+		// 支持邮箱/手机号作为账号登录
+		var memberIdentities []*membermodel.MemberIdentity
+		var err error
+		for _, v := range []int64{consts.IdentityTypePassword, consts.IdentityTypeEmail, consts.IdentityTypePhone} {
+			memberIdentities, err = l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, v, in.Identifier)
+			if err != nil {
+				return nil, xerror.InternalServerErr
+			}
+			if len(memberIdentities) > 0 {
+				break
+			}
+		}
+		if len(memberIdentities) == 0 {
+			l.Errorf("Member identity not found. IdentityType: %d, Identity: %s", in.IdentityType, in.Identifier)
+			return nil, xerror.NotFoundErr
+		}
+		if !xstrings.PasswordMatch(memberIdentities[0].Credential, in.Credential) {
+			l.Infof("Member login failed. Identity: %s, Credential: %s code not match", in.Identifier, in.Credential)
+			return nil, xerror.UnauthorizedErr
+		}
+		memberID = memberIdentities[0].MemberUuid
+	case consts.IdentityTypeWechat:
+		// TODO: 实现微信登录
+	case consts.IdentityTypeGoogle:
+		userInfo, err := google.GetUserInfo(l.ctx, in.Credential)
+		if err != nil {
+			l.Errorf("Failed to get google user info. Error: %s", err)
+			return nil, xerror.InternalServerErr
+		}
+		thirdPartyId = userInfo.Sub
+		memberInfo.Nickname = userInfo.Name
+		memberInfo.Avatar = userInfo.Picture
+		memberInfo.Email = userInfo.Email
+	case consts.IdentityTypeFacebook:
+		userInfo, err := facebook.NewFaceBookApp(l.svcCtx.Config.Facebook.AppID, l.svcCtx.Config.Facebook.AppSecret).GetUserInfo(l.ctx, in.Credential)
+		if err != nil {
+			l.Errorf("Failed to get facebook user info. Error: %s", err)
+			return nil, xerror.InternalServerErr
+		}
+		thirdPartyId = userInfo.UserID
+		memberInfo.Email = userInfo.Email
+	case consts.IdentityTypeGithub:
+		// TODO: 实现github登录
+	}
+
+	if len(thirdPartyId) > 0 {
+		memberIdentities, err := l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, in.IdentityType, thirdPartyId)
+		if err != nil {
+			l.Errorf("Failed to find member identity. Error: %s", err)
+			return nil, xerror.InternalServerErr
+		}
+		if len(memberIdentities) == 0 {
+			l.Infof("Member identity not found. IdentityType: %d, Identity: %s", in.IdentityType, in.Identifier)
+			// 创建新用户
+			memberID = uuid.New().String()
+			err = l.svcCtx.DB.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
+				_, err = l.svcCtx.MemberIdentityModel.Insert(l.ctx, session, &membermodel.MemberIdentity{
+					MemberUuid:   memberID,
+					IdentityType: in.IdentityType,
+					Identifier:   thirdPartyId,
+				})
+				if err != nil {
+					return err
+				}
+				memberInfo.MemberUuid = memberID
+				memberInfo.Status = consts.MemberStatusEnabled
+				_, err = l.svcCtx.MemberInfoModel.Insert(l.ctx, session, memberInfo)
+				if err != nil {
+					return err
+				}
+				return nil
+			})
+			if err != nil {
+				l.Errorf("Failed to create member identity. Error: %s", err)
+				return nil, xerror.InternalServerErr
+			}
+		} else {
+			memberID = memberIdentities[0].MemberUuid
+		}
+	}
+
+	if memberID == "" {
+		l.Errorf("Member identity not found. IdentityType: %d, Identity: %s", in.IdentityType, in.Identifier)
+		return nil, xerror.NotFoundErr
+	}
+
+	// 生成token、refresh token
+	jwksRecord, err := l.svcCtx.JwksModel.FindLatest(l.ctx)
+	if err != nil {
+		l.Errorf("Failed to find latest jwks public. Error: %s", err)
+		return nil, xerror.InternalServerErr
+	}
+	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, "private_key_secr", nil)
+	if err != nil {
+		l.Errorf("Failed to decrypt private key. Error: %s", err)
+		return nil, err
+	}
+	token, exp, err := jwks.GenerateToken(jwksRecord.Kid, memberID, privateKey, int64(l.svcCtx.Config.Auth.AccessExpire), nil)
+	if err != nil {
+		l.Errorf("Failed to generate token. Error: %s", err)
+		return nil, err
+	}
+	refreshToken, refreshExp, err := jwks.GenerateToken(jwksRecord.Kid, memberID, privateKey, int64(l.svcCtx.Config.Auth.RefreshExpire), nil)
+	if err != nil {
+		l.Errorf("Failed to generate token. Error: %s", err)
+		return nil, err
+	}
+	refreshTokenHash, err := xstrings.AesCbcEncryptBase64(token, l.svcCtx.Config.Secret.RefreshToken, nil)
+	if err != nil {
+		l.Errorf("Failed to encrypt refresh token. Error: %s", err)
+		return nil, err
+	}
+
+	// 保存token、refresh token
+	err = l.svcCtx.DB.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
+		_, err = l.svcCtx.RefreshTokenModel.Insert(l.ctx, session, &authmodel.RefreshToken{
+			MemberId:         memberID,
+			RefreshTokenHash: refreshTokenHash,
+			Status:           consts.RefreshTokenStatusEnabled,
+			ExpiredAt:        exp,
+		})
+		if err != nil {
+			return err
+		}
+		_, err = l.svcCtx.TokenRefreshRecordModel.Insert(l.ctx, session, &authmodel.TokenRefreshRecord{
+			RefreshTokenHash: refreshTokenHash,
+			Token:            token,
+			Kid:              jwksRecord.Kid,
+			Ip:               xcontext.GetClientIp(l.ctx),
+			ExpiredAt:        refreshExp,
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		l.Errorf("Failed to insert token refresh record. Error: %s", err)
+		return nil, xerror.InternalServerErr
+	}
+	resp := &auth.MemberLoginResp{
+		Token:        token,
+		RefreshToken: refreshToken,
+	}
+	return resp, nil
+}

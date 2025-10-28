@@ -6,8 +6,7 @@ import (
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/geekeryy/api-hub/core/jwks"
-	"github.com/geekeryy/api-hub/library/consts"
-	"github.com/geekeryy/api-hub/rpc/model/membermodel"
+	"github.com/geekeryy/api-hub/rpc/auth/client/authservice"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -37,28 +36,18 @@ func (l *MemberActivateEmailLogic) MemberActivateEmail(req *types.MemberActivate
 	if err != nil {
 		return err
 	}
-	identities, err := l.svcCtx.MemberIdentityModel.FindByMemberUUID(l.ctx, memberUUID)
-	if err != nil {
-		return err
-	}
 	email, err := jwks.MapClaimsParseString(claims, "email")
 	if err != nil {
 		return err
 	}
-	identityPassword := ""
-	for _, identity := range identities {
-		if identity.IdentityType == consts.IdentityTypePassword {
-			identityPassword = identity.Identifier
-		}
-	}
-	_, err = l.svcCtx.MemberIdentityModel.Insert(l.ctx, nil, &membermodel.MemberIdentity{
-		MemberUuid:   memberUUID,
-		IdentityType: consts.IdentityTypeEmail,
-		Identifier:   email,
-		Credential:   identityPassword,
+
+	_, err = l.svcCtx.AuthService.MemberActivateEmail(l.ctx, &authservice.MemberActivateEmailReq{
+		MemberUuid: memberUUID,
+		Email:      email,
 	})
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

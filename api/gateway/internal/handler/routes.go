@@ -73,7 +73,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					// 激活邮箱
-					Method:  http.MethodPost,
+					Method:  http.MethodGet,
 					Path:    "/activate-email",
 					Handler: authmember.MemberActivateEmailHandler(serverCtx),
 				},
