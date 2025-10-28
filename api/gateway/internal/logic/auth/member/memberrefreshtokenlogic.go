@@ -79,7 +79,7 @@ func (l *MemberRefreshTokenLogic) MemberRefreshToken(req *types.MemberRefreshTok
 		return nil, err
 	}
 
-	err = l.svcCtx.TokenRefreshRecordModel.Insert(l.ctx, nil, &authmodel.TokenRefreshRecord{
+	_, err = l.svcCtx.TokenRefreshRecordModel.Insert(l.ctx, nil, &authmodel.TokenRefreshRecord{
 		RefreshTokenHash: refreshTokenHash,
 		Token:            token,
 		Kid:              jwksRecord.Kid,

@@ -13,15 +13,11 @@ gen-rpc:
 	goctl rpc --home tpl protoc rpc/${s}/${s}.proto --go_out=rpc/${s} --go-grpc_out=rpc/${s} --zrpc_out=rpc/${s} -m
 
 # Generate model
-# ENV: export PG=user:pwd@localhost:5432/db
-# Example: make model table=stock dir=testmodel
+# Example: make model
 model:
-	@if [ -z "$(table)" ]; then echo "table is not set"; exit 1; fi
-	@if [ -z "$(dir)" ]; then echo "dir is not set"; exit 1; fi
-	@if [ -z "$(PG)" ]; then echo "url is not set"; exit 1; fi
-	goctl model pg datasource --table="${table}" -dir ./rpc/model/${dir} --url="postgres://$(PG)" --schema="public" --home=tpl
-
-
+	goctl model mysql ddl --home tpl -s doc/sql/auth.sql -d rpc/model/authmodel
+	goctl model mysql ddl --home tpl -s doc/sql/member.sql -d rpc/model/membermodel
+	goctl model mysql ddl --home tpl -s doc/sql/admin.sql -d rpc/model/adminmodel
 
 # Import api to apifox
 # ENV: export APIFOX_TOKEN=APS-xxxxxxxxxxxxxxxxxxx
@@ -47,6 +43,7 @@ lint:
 
 build:
 	GOOS=linux go build -o build/gateway api/gateway/gateway.go
+	GOOS=linux go build -o build/oms api/oms/oms.go
 
 restart:
 	docker compose -f deploy/local/docker-compose.yml up -d

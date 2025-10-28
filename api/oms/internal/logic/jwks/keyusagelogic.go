@@ -37,7 +37,7 @@ func (l *KeyUsageLogic) KeyUsage(req *types.KeyUsageReq) (resp *types.KeyUsageRe
 	}
 	groupByTime := make(map[string]int)
 	for _, record := range records {
-		timeStr := record.CreatedAt.Time.Format(time.DateTime)
+		timeStr := record.CreatedAt.Format(time.DateTime)
 		groupByTime[timeStr]++
 	}
 	for timeStr, count := range groupByTime {

@@ -1,14 +1,16 @@
 import (
 	"context"
-	"errors"
+	"database/sql"
 	"fmt"
+	"strings"
 	{{if .time}}"time"{{end}}
-	{{if .containsDbSql}}"database/sql"{{end}}
-	"github.com/SpectatorNan/gorm-zero/gormc"
-    "github.com/SpectatorNan/gorm-zero/gormc/batchx"
-	"github.com/SpectatorNan/gorm-zero/gormc/pagex"
-	"github.com/zeromicro/go-zero/core/stores/cache"
-	"gorm.io/gorm"
 
-	{{if .third}}{{.third}}{{end}}
+	{{if .containsPQ}}"github.com/lib/pq"{{end}}
+	"github.com/zeromicro/go-zero/core/stores/builder"
+	"github.com/zeromicro/go-zero/core/stores/cache"
+	"github.com/zeromicro/go-zero/core/stores/sqlc"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"github.com/zeromicro/go-zero/core/stringx"
+
+	{{.third}}
 )

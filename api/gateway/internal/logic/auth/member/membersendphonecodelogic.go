@@ -41,7 +41,7 @@ func (l *MemberSendPhoneCodeLogic) MemberSendPhoneCode(req *types.MemberSendPhon
 	l.Infof("send phone code to %s code: %s", req.Phone, code)
 	// TODO: 发送短信
 
-	if err := l.svcCtx.Cache.Set(fmt.Sprintf("phone_code_%s", req.Phone), code, time.Minute*10); err != nil {
+	if err := l.svcCtx.RedisClient.Set(l.ctx, fmt.Sprintf("phone_code_%s", req.Phone), code, time.Minute*10).Err(); err != nil {
 		return err
 	}
 	return nil

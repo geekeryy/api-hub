@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -10,18 +11,17 @@ import (
 	"github.com/geekeryy/api-hub/api/gateway/internal/middleware"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/limiter"
-	"github.com/geekeryy/api-hub/core/pgcache"
 	"github.com/geekeryy/api-hub/core/validate"
-	"github.com/geekeryy/api-hub/core/xgorm"
 	"github.com/geekeryy/api-hub/library/validator"
 	"github.com/geekeryy/api-hub/rpc/model/authmodel"
-	"github.com/geekeryy/api-hub/rpc/model/usermodel"
+	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 	"github.com/geekeryy/api-hub/rpc/user/client/memberservice"
 	lru "github.com/hashicorp/golang-lru/v2"
+	"github.com/redis/go-redis/v9"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
 	"golang.org/x/time/rate"
-	"gorm.io/gorm"
 )
 
 type ServiceContext struct {
@@ -34,25 +34,34 @@ type ServiceContext struct {
 	Validator               *validate.Validate
 	JwksModel               authmodel.JwksModel
 	TokenRefreshRecordModel authmodel.TokenRefreshRecordModel
-	MemberIdentityModel     authmodel.MemberIdentityModel
-	MemberInfoModel         usermodel.MemberInfoModel
+	MemberIdentityModel     membermodel.MemberIdentityModel
+	MemberInfoModel         membermodel.MemberInfoModel
 	RefreshTokenModel       authmodel.RefreshTokenModel
 	MemberService           memberservice.MemberService
-	DB                      *gorm.DB
-	Cache                   *pgcache.Cache
+	DB                      sqlx.SqlConn
 	Kfunc                   keyfunc.Keyfunc
 	CodeLimiter             *lru.Cache[string, *limiter.Limiter]
+	RedisClient             *redis.Client
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	pg, err := xgorm.ConnectPg(c.PgSql)
+	mysqlClient, err := sqlx.NewConn(sqlx.SqlConf{
+		DataSource: fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", c.Mysql.Username, c.Mysql.Password, c.Mysql.Host, c.Mysql.Dbname),
+		DriverName: "mysql",
+		Replicas:   nil,
+		Policy:     "",
+	})
 	if err != nil {
-		log.Fatalf("Failed to connect to database. Error: %s", err)
+		log.Fatalf("failed to open mysql: %v", err)
 	}
 
-	cache, err := pgcache.NewCache(c.PgSql)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     c.Redis.Addr,
+		Password: c.Redis.Password,
+		DB:       c.Redis.Db,
+	})
 	if err != nil {
-		log.Fatalf("Failed to init cache. Error: %s", err)
+		log.Fatalf("failed to open redis: %v", err)
 	}
 
 	kfunc, err := jwks.InitKeyfunc(context.Background(), c.Jwks.ServerURL, keyfunc.Override{
@@ -77,16 +86,16 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		JwtMiddleware:           middleware.NewJwtMiddleware(kfunc).Handle,
 		AdminJwtMiddleware:      middleware.NewAdminJwtMiddleware(kfunc).Handle,
 		Kfunc:                   kfunc,
-		JwksModel:               authmodel.NewJwksModel(pg),
-		TokenRefreshRecordModel: authmodel.NewTokenRefreshRecordModel(pg),
-		MemberIdentityModel:     authmodel.NewMemberIdentityModel(pg),
-		MemberInfoModel:         usermodel.NewMemberInfoModel(pg),
-		RefreshTokenModel:       authmodel.NewRefreshTokenModel(pg),
+		JwksModel:               authmodel.NewJwksModel(mysqlClient),
+		TokenRefreshRecordModel: authmodel.NewTokenRefreshRecordModel(mysqlClient),
+		MemberIdentityModel:     membermodel.NewMemberIdentityModel(mysqlClient),
+		MemberInfoModel:         membermodel.NewMemberInfoModel(mysqlClient),
+		RefreshTokenModel:       authmodel.NewRefreshTokenModel(mysqlClient),
 		Validator: validate.New([]validate.ValidatorFn{
 			validator.ChineseNameValidator,
 		}, []string{"zh", "en"}),
-		Cache:         cache,
-		DB:            pg,
+		DB:            mysqlClient,
+		RedisClient:   redisClient,
 		CodeLimiter:   codeLimiter,
 		MemberService: memberservice.NewMemberService(client),
 	}
@@ -94,11 +103,5 @@ func NewServiceContext(c config.Config) *ServiceContext {
 }
 
 func (s *ServiceContext) Close() {
-	if s.Cache != nil {
-		s.Cache.Close()
-	}
-	if s.DB != nil {
-		db, _ := s.DB.DB()
-		db.Close()
-	}
+
 }

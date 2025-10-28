@@ -6,19 +6,16 @@ Log:
   Level: info
 
 
-PgSql:
-  Username: ${PG_USERNAME}
-  Password: ${PG_PASSWORD}
-  Path: "${PG_PATH}"
-  Port: 5432
-  SslMode: disable
-  TimeZone: America/New_York
-  Dbname: ${PG_DBNAME}
-  LogMode: dev
-  LogZap: false
-  SlowThreshold: 1000
-  MaxIdleConns: 2
-  MaxOpenConns: 10
+Mysql:
+  Username: ${MYSQL_USERNAME}
+  Password: ${MYSQL_PASSWORD}
+  Host: ${MYSQL_HOST}
+  Port: ${MYSQL_PORT}
+  Dbname: ${MYSQL_DBNAME}
+Redis:
+  Addr: ${REDIS_ADDR}
+  Password: ${REDIS_PASSWORD}
+  Db: ${REDIS_DB}
 
 MemberService:
   Timeout: 10000
@@ -43,9 +40,6 @@ Secret:
   RefreshToken: 
   PrivateKey: 
   PublicKey: 
-
-Oms:
-  OtpSecret: 
 
 
 Telemetry:

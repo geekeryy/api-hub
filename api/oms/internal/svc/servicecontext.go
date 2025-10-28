@@ -2,27 +2,25 @@ package svc
 
 import (
 	"context"
+	"fmt"
 	"log"
-	"time"
 
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/geekeryy/api-hub/api/oms/internal/config"
 	"github.com/geekeryy/api-hub/api/oms/internal/middleware"
 	"github.com/geekeryy/api-hub/library/validator"
 	"github.com/geekeryy/api-hub/rpc/model/authmodel"
-	"github.com/geekeryy/api-hub/rpc/model/usermodel"
+	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 	"github.com/geekeryy/api-hub/rpc/user/client/memberservice"
 	lru "github.com/hashicorp/golang-lru/v2"
+	"github.com/redis/go-redis/v9"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
-	"golang.org/x/time/rate"
-	"gorm.io/gorm"
 
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/limiter"
-	"github.com/geekeryy/api-hub/core/pgcache"
 	"github.com/geekeryy/api-hub/core/validate"
-	"github.com/geekeryy/api-hub/core/xgorm"
 )
 
 type ServiceContext struct {
@@ -33,32 +31,36 @@ type ServiceContext struct {
 	Validator               *validate.Validate
 	JwksModel               authmodel.JwksModel
 	TokenRefreshRecordModel authmodel.TokenRefreshRecordModel
-	MemberIdentityModel     authmodel.MemberIdentityModel
-	MemberInfoModel         usermodel.MemberInfoModel
+	MemberInfoModel         membermodel.MemberInfoModel
 	RefreshTokenModel       authmodel.RefreshTokenModel
 	MemberService           memberservice.MemberService
-	DB                      *gorm.DB
-	Cache                   *pgcache.Cache
+	DB                      sqlx.SqlConn
+	RedisClient             *redis.Client
 	Kfunc                   keyfunc.Keyfunc
 	CodeLimiter             *lru.Cache[string, *limiter.Limiter]
+	GenerateTokenFunc       jwks.GenerateTokenFunc
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	pg, err := xgorm.ConnectPg(c.PgSql)
-	if err != nil {
-		log.Fatalf("Failed to connect to database. Error: %s", err)
-	}
-
-	cache, err := pgcache.NewCache(c.PgSql)
-	if err != nil {
-		log.Fatalf("Failed to init cache. Error: %s", err)
-	}
-
-	kfunc, err := jwks.InitKeyfunc(context.Background(), c.Jwks.ServerURL, keyfunc.Override{
-		RefreshInterval:   time.Duration(c.Jwks.RefreshInterval) * time.Second,
-		RateLimitWaitMax:  time.Duration(c.Jwks.RefreshInterval/2) * time.Second,
-		RefreshUnknownKID: rate.NewLimiter(rate.Every(1*time.Minute), 2),
+	mysqlClient, err := sqlx.NewConn(sqlx.SqlConf{
+		DataSource: fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", c.Mysql.Username, c.Mysql.Password, c.Mysql.Host, c.Mysql.Dbname),
+		DriverName: "mysql",
+		Replicas:   nil,
+		Policy:     "",
 	})
+	if err != nil {
+		log.Fatalf("failed to open mysql: %v", err)
+	}
+
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     c.Redis.Addr,
+		Password: c.Redis.Password,
+		DB:       c.Redis.Db,
+	})
+	if err != nil {
+		log.Fatalf("failed to open redis: %v", err)
+	}
+	kfunc, generateTokenFunc, err := jwks.NewKeyfunc(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to init keyfunc. Error: %s", err)
 	}
@@ -71,21 +73,22 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	client := zrpc.MustNewClient(c.MemberService)
 
 	svc := &ServiceContext{
-		Config:                  c,
-		ContextMiddleware:       middleware.NewContextMiddleware().Handle,
-		OmsJwtMiddleware:        middleware.NewOmsJwtMiddleware(kfunc).Handle,
-		Kfunc:                   kfunc,
-		JwksModel:               authmodel.NewJwksModel(pg),
-		TokenRefreshRecordModel: authmodel.NewTokenRefreshRecordModel(pg),
-		MemberIdentityModel:     authmodel.NewMemberIdentityModel(pg),
-		MemberInfoModel:         usermodel.NewMemberInfoModel(pg),
-		RefreshTokenModel:       authmodel.NewRefreshTokenModel(pg),
+		Config:            c,
+		ContextMiddleware: middleware.NewContextMiddleware().Handle,
+		OmsJwtMiddleware:  middleware.NewOmsJwtMiddleware(kfunc).Handle,
+		Kfunc:             kfunc,
+		GenerateTokenFunc: generateTokenFunc,
 		Validator: validate.New([]validate.ValidatorFn{
 			validator.ChineseNameValidator,
 		}, []string{"zh", "en"}),
-		Cache:         cache,
-		DB:            pg,
-		CodeLimiter:   codeLimiter,
+		RedisClient: redisClient,
+		CodeLimiter: codeLimiter,
+
+		JwksModel:               authmodel.NewJwksModel(mysqlClient),
+		TokenRefreshRecordModel: authmodel.NewTokenRefreshRecordModel(mysqlClient),
+		MemberInfoModel:         membermodel.NewMemberInfoModel(mysqlClient),
+		RefreshTokenModel:       authmodel.NewRefreshTokenModel(mysqlClient),
+
 		MemberService: memberservice.NewMemberService(client),
 	}
 	return svc

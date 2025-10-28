@@ -6,6 +6,7 @@ package handler
 import (
 	"net/http"
 
+	auth "github.com/geekeryy/api-hub/api/oms/internal/handler/auth"
 	healthz "github.com/geekeryy/api-hub/api/oms/internal/handler/healthz"
 	jwks "github.com/geekeryy/api-hub/api/oms/internal/handler/jwks"
 	"github.com/geekeryy/api-hub/api/oms/internal/svc"
@@ -14,6 +15,42 @@ import (
 )
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware},
+			[]rest.Route{
+				{
+					// 登录
+					Method:  http.MethodPost,
+					Path:    "/login",
+					Handler: auth.LoginHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/oms/auth"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware, serverCtx.OmsJwtMiddleware},
+			[]rest.Route{
+				{
+					// 获取用户信息
+					Method:  http.MethodGet,
+					Path:    "/info",
+					Handler: auth.MemberInfoHandler(serverCtx),
+				},
+				{
+					// 登出
+					Method:  http.MethodPost,
+					Path:    "/logout",
+					Handler: auth.LogoutHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/oms/auth"),
+	)
+
 	server.AddRoutes(
 		[]rest.Route{
 			{

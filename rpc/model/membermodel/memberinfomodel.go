@@ -1,7 +1,7 @@
-package usermodel
+package membermodel
 
 import (
-	"gorm.io/gorm"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 var _ MemberInfoModel = (*customMemberInfoModel)(nil)
@@ -11,20 +11,21 @@ type (
 	// and implement the added methods in customMemberInfoModel.
 	MemberInfoModel interface {
 		memberInfoModel
-		customMemberInfoLogicModel
+		withSession(session sqlx.Session) MemberInfoModel
 	}
 
 	customMemberInfoModel struct {
 		*defaultMemberInfoModel
 	}
-
-	customMemberInfoLogicModel interface {
-	}
 )
 
 // NewMemberInfoModel returns a model for the database table.
-func NewMemberInfoModel(conn *gorm.DB) MemberInfoModel {
+func NewMemberInfoModel(conn sqlx.SqlConn) MemberInfoModel {
 	return &customMemberInfoModel{
 		defaultMemberInfoModel: newMemberInfoModel(conn),
 	}
+}
+
+func (m *customMemberInfoModel) withSession(session sqlx.Session) MemberInfoModel {
+	return NewMemberInfoModel(sqlx.NewSqlConnFromSession(session))
 }

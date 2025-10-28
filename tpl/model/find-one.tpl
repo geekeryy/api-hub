@@ -1,47 +1,26 @@
-
 func (m *default{{.upperStartCamelObject}}Model) FindOne(ctx context.Context, {{.lowerStartCamelPrimaryKey}} {{.dataType}}) (*{{.upperStartCamelObject}}, error) {
 	{{if .withCache}}{{.cacheKey}}
 	var resp {{.upperStartCamelObject}}
-	err := m.QueryCtx(ctx, &resp, {{.cacheKeyVariable}}, func(conn *gorm.DB) error {
-    		return conn.Model(&{{.upperStartCamelObject}}{}).Where("{{.originalPrimaryKey}} = ?", {{.lowerStartCamelPrimaryKey}}).First(&resp).Error
-    	})
+	err := m.QueryRowCtx(ctx, &resp, {{.cacheKeyVariable}}, func(ctx context.Context, conn sqlx.SqlConn, v any) error {
+		query :=  fmt.Sprintf("select %s from %s where {{.originalPrimaryKey}} = {{if .postgreSql}}$1{{else}}?{{end}} limit 1", {{.lowerStartCamelObject}}Rows, m.table)
+		return conn.QueryRowCtx(ctx, v, query, {{.lowerStartCamelPrimaryKey}})
+	})
 	switch err {
 	case nil:
 		return &resp, nil
-	case gormc.ErrNotFound:
+	case sqlc.ErrNotFound:
 		return nil, ErrNotFound
 	default:
 		return nil, err
-	}{{else}}var resp {{.upperStartCamelObject}}
-	err := m.conn.WithContext(ctx).Model(&{{.upperStartCamelObject}}{}).Where("{{.originalPrimaryKey}} = ?", {{.lowerStartCamelPrimaryKey}}).Take(&resp).Error
+	}{{else}}query := fmt.Sprintf("select %s from %s where {{.originalPrimaryKey}} = {{if .postgreSql}}$1{{else}}?{{end}} limit 1", {{.lowerStartCamelObject}}Rows, m.table)
+	var resp {{.upperStartCamelObject}}
+	err := m.conn.QueryRowCtx(ctx, &resp, query, {{.lowerStartCamelPrimaryKey}})
 	switch err {
 	case nil:
 		return &resp, nil
-	case gormc.ErrNotFound:
+	case sqlx.ErrNotFound:
 		return nil, ErrNotFound
 	default:
 		return nil, err
 	}{{end}}
-}
-func (m *default{{.upperStartCamelObject}}Model) FindPageList(ctx context.Context, page *pagex.ListReq, orderBy pagex.OrderBy,
-	orderKeys map[string]string, whereClause func(db *gorm.DB) *gorm.DB) ([]{{.upperStartCamelObject}}, int64, error) {
-	{{if .withCache}}formatDB := func(conn *gorm.DB) (*gorm.DB, *gorm.DB) {
-    		db := conn.Model(&{{.upperStartCamelObject}}{})
-    		if whereClause != nil {
-    			db = whereClause(db)
-    		}
-    		return db, nil
-    	}
-    	res, total, err := pagex.FindPageList[{{.upperStartCamelObject}}](ctx, m, page, orderBy, orderKeys, formatDB)
-    	return res, total, err{{else}}conn := m.conn
-                                      	formatDB := func() (*gorm.DB, *gorm.DB) {
-                                      		db := conn.Model(&{{.upperStartCamelObject}}{})
-                                      		if whereClause != nil {
-                                      			db = whereClause(db)
-                                      		}
-                                      		return db, nil
-                                      	}
-
-                                      	res, total, err := pagex.FindPageListWithCount[{{.upperStartCamelObject}}](ctx, page, orderBy, orderKeys, formatDB)
-                                      	return res, total, err{{end}}
 }

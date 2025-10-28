@@ -2,8 +2,9 @@ package authmodel
 
 import (
 	"context"
+	"fmt"
 
-	"gorm.io/gorm"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 var _ TokenRefreshRecordModel = (*customTokenRefreshRecordModel)(nil)
@@ -13,30 +14,32 @@ type (
 	// and implement the added methods in customTokenRefreshRecordModel.
 	TokenRefreshRecordModel interface {
 		tokenRefreshRecordModel
-		customTokenRefreshRecordLogicModel
+		withSession(session sqlx.Session) TokenRefreshRecordModel
+		FindByKid(ctx context.Context, kid string) ([]*TokenRefreshRecord, error)
 	}
 
 	customTokenRefreshRecordModel struct {
 		*defaultTokenRefreshRecordModel
 	}
-
-	customTokenRefreshRecordLogicModel interface {
-		FindByKid(ctx context.Context, kid string) ([]TokenRefreshRecord, error)
-	}
 )
 
 // NewTokenRefreshRecordModel returns a model for the database table.
-func NewTokenRefreshRecordModel(conn *gorm.DB) TokenRefreshRecordModel {
+func NewTokenRefreshRecordModel(conn sqlx.SqlConn) TokenRefreshRecordModel {
 	return &customTokenRefreshRecordModel{
 		defaultTokenRefreshRecordModel: newTokenRefreshRecordModel(conn),
 	}
 }
 
-// FindByKid 根据kid查询
-func (m *customTokenRefreshRecordModel) FindByKid(ctx context.Context, kid string) ([]TokenRefreshRecord, error) {
-	var records []TokenRefreshRecord
-	if err := m.conn.WithContext(ctx).Where("kid = ?", kid).Find(&records).Error; err != nil {
+func (m *customTokenRefreshRecordModel) withSession(session sqlx.Session) TokenRefreshRecordModel {
+	return NewTokenRefreshRecordModel(sqlx.NewSqlConnFromSession(session))
+}
+
+func (m *customTokenRefreshRecordModel) FindByKid(ctx context.Context, kid string) ([]*TokenRefreshRecord, error) {
+	query := fmt.Sprintf("select %s from %s where `kid` = ?", tokenRefreshRecordRows, m.table)
+	var resp []*TokenRefreshRecord
+	err := m.conn.QueryRowsCtx(ctx, &resp, query, kid)
+	if err != nil {
 		return nil, err
 	}
-	return records, nil
+	return resp, nil
 }

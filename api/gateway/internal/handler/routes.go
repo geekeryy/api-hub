@@ -10,7 +10,6 @@ import (
 	authadmin "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/admin"
 	authjwks "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/jwks"
 	authmember "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/member"
-	authoms "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/oms"
 	healthz "github.com/geekeryy/api-hub/api/gateway/internal/handler/healthz"
 	useradmin "github.com/geekeryy/api-hub/api/gateway/internal/handler/user/admin"
 	usermember "github.com/geekeryy/api-hub/api/gateway/internal/handler/user/member"
@@ -62,7 +61,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				// 获取公钥
 				Method:  http.MethodGet,
 				Path:    "/get",
-				Handler: authjwks.JWKSHandler(serverCtx),
+				Handler: authjwks.GetJWKSHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/api/v1/gateway/auth/jwks"),
@@ -117,18 +116,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			}...,
 		),
 		rest.WithPrefix("/api/v1/gateway/auth/member"),
-	)
-
-	server.AddRoutes(
-		[]rest.Route{
-			{
-				// Oms登录
-				Method:  http.MethodPost,
-				Path:    "/login",
-				Handler: authoms.OmsLoginHandler(serverCtx),
-			},
-		},
-		rest.WithPrefix("/api/v1/gateway/auth/oms"),
 	)
 
 	server.AddRoutes(

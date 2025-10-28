@@ -25,6 +25,127 @@
   "host": "localhost:8881",
   "basePath": "/",
   "paths": {
+    "/api/v1/oms/auth/info": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Oms - auth"
+        ],
+        "summary": "获取用户信息",
+        "operationId": "authMemberInfoHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "avatar": {
+                  "description": "头像",
+                  "type": "string"
+                },
+                "email": {
+                  "description": "邮箱",
+                  "type": "string"
+                },
+                "nickname": {
+                  "description": "昵称",
+                  "type": "string"
+                },
+                "phone": {
+                  "description": "手机号",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/oms/auth/login": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Oms - auth"
+        ],
+        "summary": "登录",
+        "operationId": "authLoginHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "identity_type",
+                "credential"
+              ],
+              "properties": {
+                "credential": {
+                  "description": "凭证 密码/验证码/access_token",
+                  "type": "string"
+                },
+                "identity_type": {
+                  "description": "身份类型 8: otp",
+                  "type": "integer",
+                  "enum": [
+                    "8"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "description": "令牌",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/oms/auth/logout": {
+      "post": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Oms - auth"
+        ],
+        "summary": "登出",
+        "operationId": "authLogoutHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
     "/api/v1/oms/jwks/delete": {
       "delete": {
         "description": "删除公钥",
@@ -174,7 +295,7 @@
       }
     }
   },
-  "x-date": "2025-10-27 18:00:02",
+  "x-date": "2025-10-28 11:04:32",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

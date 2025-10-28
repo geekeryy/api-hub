@@ -37,6 +37,10 @@ type DailySentenceResp struct {
 	Sentence string `json:"sentence"` // 句子
 }
 
+type JWKSReq struct {
+	Service string `json:"service"` // 服务名称
+}
+
 type MemberActivateEmailReq struct {
 	Token string `json:"token"` // 激活token
 }
@@ -125,13 +129,4 @@ type MemberUpdateInfoReq struct {
 	Avatar   string `json:"avatar,optional"`   // 头像
 	Gender   int    `json:"gender,optional"`   // 性别
 	Birthday string `json:"birthday,optional"` // 生日
-}
-
-type OmsLoginReq struct {
-	Username string `json:"username"` // 用户名
-	Code     string `json:"code"`     // 验证码
-}
-
-type OmsLoginResp struct {
-	Token string `json:"token"` // 令牌
 }

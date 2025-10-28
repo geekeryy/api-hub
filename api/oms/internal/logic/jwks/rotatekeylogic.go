@@ -45,7 +45,7 @@ func (l *RotateKeyLogic) RotateKey() error {
 		l.Errorf("Failed to encrypt private key. Error: %s", err)
 		return err
 	}
-	if err := l.svcCtx.JwksModel.Insert(l.ctx, nil, &authmodel.Jwks{
+	if _, err := l.svcCtx.JwksModel.Insert(l.ctx, nil, &authmodel.Jwks{
 		Kid:        kid,
 		PublicKey:  encryptPub,
 		PrivateKey: encryptPriv,

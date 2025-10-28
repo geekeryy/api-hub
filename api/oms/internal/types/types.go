@@ -15,6 +15,22 @@ type KeyUsageResp struct {
 	Records []TokenRefreshRecord `json:"records"`
 }
 
+type LoginReq struct {
+	IdentityType int64  `json:"identity_type,options=8"` // 身份类型 8: otp
+	Credential   string `json:"credential"`              // 凭证 密码/验证码/access_token
+}
+
+type LoginResp struct {
+	Token string `json:"token"` // 令牌
+}
+
+type MemberInfoResp struct {
+	Nickname string `json:"nickname"` // 昵称
+	Avatar   string `json:"avatar"`   // 头像
+	Phone    string `json:"phone"`    // 手机号
+	Email    string `json:"email"`    // 邮箱
+}
+
 type TokenRefreshRecord struct {
 	Time  string `json:"time"`
 	Count int    `json:"count"`

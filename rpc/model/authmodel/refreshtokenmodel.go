@@ -1,7 +1,7 @@
 package authmodel
 
 import (
-	"gorm.io/gorm"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 var _ RefreshTokenModel = (*customRefreshTokenModel)(nil)
@@ -11,20 +11,21 @@ type (
 	// and implement the added methods in customRefreshTokenModel.
 	RefreshTokenModel interface {
 		refreshTokenModel
-		customRefreshTokenLogicModel
+		withSession(session sqlx.Session) RefreshTokenModel
 	}
 
 	customRefreshTokenModel struct {
 		*defaultRefreshTokenModel
 	}
-
-	customRefreshTokenLogicModel interface {
-	}
 )
 
 // NewRefreshTokenModel returns a model for the database table.
-func NewRefreshTokenModel(conn *gorm.DB) RefreshTokenModel {
+func NewRefreshTokenModel(conn sqlx.SqlConn) RefreshTokenModel {
 	return &customRefreshTokenModel{
 		defaultRefreshTokenModel: newRefreshTokenModel(conn),
 	}
+}
+
+func (m *customRefreshTokenModel) withSession(session sqlx.Session) RefreshTokenModel {
+	return NewRefreshTokenModel(sqlx.NewSqlConnFromSession(session))
 }

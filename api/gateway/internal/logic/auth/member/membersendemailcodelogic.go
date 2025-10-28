@@ -48,7 +48,7 @@ func (l *MemberSendEmailCodeLogic) MemberSendEmailCode(req *types.MemberSendEmai
 	if err != nil {
 		return err
 	}
-	if err := l.svcCtx.Cache.Set(fmt.Sprintf("email_code_%s", req.Email), code, time.Minute*10); err != nil {
+	if err := l.svcCtx.RedisClient.Set(l.ctx, fmt.Sprintf("email_code_%s", req.Email), code, time.Minute*10).Err(); err != nil {
 		return err
 	}
 

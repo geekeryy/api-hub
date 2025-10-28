@@ -2,8 +2,9 @@ package authmodel
 
 import (
 	"context"
+	"fmt"
 
-	"gorm.io/gorm"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 var _ JwksModel = (*customJwksModel)(nil)
@@ -13,48 +14,51 @@ type (
 	// and implement the added methods in customJwksModel.
 	JwksModel interface {
 		jwksModel
-		customJwksLogicModel
+		withSession(session sqlx.Session) JwksModel
+		FindLatest(ctx context.Context) (*Jwks, error)
+		DeleteByKid(ctx context.Context, kid string) error
+		FindAll(ctx context.Context) ([]*Jwks, error)
 	}
 
 	customJwksModel struct {
 		*defaultJwksModel
 	}
-
-	customJwksLogicModel interface {
-		FindAll(ctx context.Context) ([]*Jwks, error)
-		FindLatest(ctx context.Context) (*Jwks, error)
-		DeleteByKid(ctx context.Context, kid string) error
-	}
 )
 
 // NewJwksModel returns a model for the database table.
-func NewJwksModel(conn *gorm.DB) JwksModel {
+func NewJwksModel(conn sqlx.SqlConn) JwksModel {
 	return &customJwksModel{
 		defaultJwksModel: newJwksModel(conn),
 	}
 }
 
-// FindAll
-func (c *customJwksModel) FindAll(ctx context.Context) ([]*Jwks, error) {
-	var jwkss []*Jwks
-	err := c.conn.WithContext(ctx).Model(&Jwks{}).Order("id desc").Find(&jwkss).Error
+func (m *customJwksModel) withSession(session sqlx.Session) JwksModel {
+	return NewJwksModel(sqlx.NewSqlConnFromSession(session))
+}
+
+// FindLatest finds the latest jwks.
+func (m *customJwksModel) FindLatest(ctx context.Context) (*Jwks, error) {
+	query := fmt.Sprintf("select %s from %s order by `created_at` desc limit 1", jwksFieldNames, m.table)
+	var resp Jwks
+	err := m.conn.QueryRowCtx(ctx, &resp, query)
 	if err != nil {
 		return nil, err
 	}
-	return jwkss, nil
+	return &resp, nil
 }
 
-// FindLatest
-func (c *customJwksModel) FindLatest(ctx context.Context) (*Jwks, error) {
-	var jwks Jwks
-	err := c.conn.WithContext(ctx).Model(&Jwks{}).Order("id desc").First(&jwks).Error
+func (m *customJwksModel) DeleteByKid(ctx context.Context, kid string) error {
+	query := fmt.Sprintf("delete from %s where `kid` = ?", m.table)
+	_, err := m.conn.ExecCtx(ctx, query, kid)
+	return err
+}
+
+func (m *customJwksModel) FindAll(ctx context.Context) ([]*Jwks, error) {
+	query := fmt.Sprintf("select %s from %s", jwksRows, m.table)
+	var resp []*Jwks
+	err := m.conn.QueryRowsCtx(ctx, &resp, query)
 	if err != nil {
 		return nil, err
 	}
-	return &jwks, nil
-}
-
-// DeleteByKid
-func (c *customJwksModel) DeleteByKid(ctx context.Context, kid string) error {
-	return c.conn.WithContext(ctx).Model(&Jwks{}).Where("kid = ?", kid).Delete(&Jwks{}).Error
+	return resp, nil
 }

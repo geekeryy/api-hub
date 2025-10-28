@@ -14,11 +14,11 @@ import (
 	"github.com/geekeryy/api-hub/library/consts"
 	"github.com/geekeryy/api-hub/library/xerror"
 	"github.com/geekeryy/api-hub/rpc/model/authmodel"
-	"github.com/geekeryy/api-hub/rpc/model/usermodel"
+	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 type MemberLoginLogic struct {
@@ -40,10 +40,10 @@ func NewMemberLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Membe
 func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.MemberLoginResp, err error) {
 	var memberID string
 	var thirdPartyId string
-	var memberInfo *usermodel.MemberInfo
+	var memberInfo *membermodel.MemberInfo
 	switch req.IdentityType {
 	case consts.IdentityTypePhone:
-		cacheValue, err := l.svcCtx.Cache.Get(fmt.Sprintf("phone_code_%s", req.Identifier))
+		cacheValue, err := l.svcCtx.RedisClient.Get(l.ctx, fmt.Sprintf("phone_code_%s", req.Identifier)).Result()
 		if err != nil {
 			l.Errorf("Failed to get cache. Error: %s", err)
 			return nil, xerror.InternalServerErr
@@ -62,12 +62,12 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 			l.Errorf("Member identity not found. IdentityType: %d, Identity: %s", req.IdentityType, req.Identifier)
 			return nil, xerror.NotFoundErr
 		}
-		if err := l.svcCtx.Cache.Delete(fmt.Sprintf("phone_code_%s", req.Identifier)); err != nil {
+		if err := l.svcCtx.RedisClient.Del(l.ctx, fmt.Sprintf("phone_code_%s", req.Identifier)).Err(); err != nil {
 			l.Errorf("Failed to delete cache. Error: %s", err)
 		}
-		memberID = memberIdentities[0].MemberId
+		memberID = memberIdentities[0].MemberUuid
 	case consts.IdentityTypeEmail:
-		cacheValue, err := l.svcCtx.Cache.Get(fmt.Sprintf("email_code_%s", req.Identifier))
+		cacheValue, err := l.svcCtx.RedisClient.Get(l.ctx, fmt.Sprintf("email_code_%s", req.Identifier)).Result()
 		if err != nil {
 			l.Errorf("Failed to get cache. Error: %s", err)
 			return nil, xerror.InternalServerErr
@@ -86,13 +86,13 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 			l.Errorf("Member identity not found. IdentityType: %d, Identity: %s", req.IdentityType, req.Identifier)
 			return nil, xerror.NotFoundErr
 		}
-		if err := l.svcCtx.Cache.Delete(fmt.Sprintf("email_code_%s", req.Identifier)); err != nil {
+		if err := l.svcCtx.RedisClient.Del(l.ctx, fmt.Sprintf("email_code_%s", req.Identifier)).Err(); err != nil {
 			l.Errorf("Failed to delete cache. Error: %s", err)
 		}
-		memberID = memberIdentities[0].MemberId
+		memberID = memberIdentities[0].MemberUuid
 	case consts.IdentityTypePassword:
 		// 支持邮箱/手机号作为账号登录
-		var memberIdentities []authmodel.MemberIdentity
+		var memberIdentities []*membermodel.MemberIdentity
 		for _, v := range []int64{consts.IdentityTypePassword, consts.IdentityTypeEmail, consts.IdentityTypePhone} {
 			memberIdentities, err = l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, v, req.Identifier)
 			if err != nil {
@@ -110,7 +110,7 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 			l.Infof("Member login failed. Identity: %s, Credential: %s code not match", req.Identifier, req.Credential)
 			return nil, xerror.UnauthorizedErr
 		}
-		memberID = memberIdentities[0].MemberId
+		memberID = memberIdentities[0].MemberUuid
 	case consts.IdentityTypeWechat:
 		// TODO: 实现微信登录
 	case consts.IdentityTypeGoogle:
@@ -145,18 +145,18 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 			l.Infof("Member identity not found. IdentityType: %d, Identity: %s", req.IdentityType, req.Identifier)
 			// 创建新用户
 			memberID = uuid.New().String()
-			err = l.svcCtx.DB.Transaction(func(tx *gorm.DB) error {
-				err = l.svcCtx.MemberIdentityModel.Insert(l.ctx, tx, &authmodel.MemberIdentity{
-					MemberId:     memberID,
+			err = l.svcCtx.DB.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
+				_, err = l.svcCtx.MemberIdentityModel.Insert(l.ctx, session, &membermodel.MemberIdentity{
+					MemberUuid:   memberID,
 					IdentityType: req.IdentityType,
 					Identifier:   thirdPartyId,
 				})
 				if err != nil {
 					return err
 				}
-				memberInfo.MemberId = memberID
+				memberInfo.MemberUuid = memberID
 				memberInfo.Status = consts.MemberStatusEnabled
-				err = l.svcCtx.MemberInfoModel.Insert(l.ctx, tx, memberInfo)
+				_, err = l.svcCtx.MemberInfoModel.Insert(l.ctx, session, memberInfo)
 				if err != nil {
 					return err
 				}
@@ -167,7 +167,7 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 				return nil, xerror.InternalServerErr
 			}
 		} else {
-			memberID = memberIdentities[0].MemberId
+			memberID = memberIdentities[0].MemberUuid
 		}
 	}
 
@@ -204,8 +204,8 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 	}
 
 	// 保存token、refresh token
-	err = l.svcCtx.DB.Transaction(func(tx *gorm.DB) error {
-		err = l.svcCtx.RefreshTokenModel.Insert(l.ctx, tx, &authmodel.RefreshToken{
+	err = l.svcCtx.DB.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
+		_, err = l.svcCtx.RefreshTokenModel.Insert(l.ctx, session, &authmodel.RefreshToken{
 			MemberId:         memberID,
 			RefreshTokenHash: refreshTokenHash,
 			Status:           consts.RefreshTokenStatusEnabled,
@@ -214,7 +214,7 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 		if err != nil {
 			return err
 		}
-		l.svcCtx.TokenRefreshRecordModel.Insert(l.ctx, tx, &authmodel.TokenRefreshRecord{
+		_, err = l.svcCtx.TokenRefreshRecordModel.Insert(l.ctx, session, &authmodel.TokenRefreshRecord{
 			RefreshTokenHash: refreshTokenHash,
 			Token:            token,
 			Kid:              jwksRecord.Kid,

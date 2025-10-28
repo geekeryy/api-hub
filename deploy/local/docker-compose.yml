@@ -10,6 +10,17 @@ services:
     volumes:
       - ../../api/gateway/etc/gateway-api.yaml:/app/etc/gateway-api.yaml
       - ../../build/gateway:/app/gateway
+  oms:
+    image: alpine:latest
+    ports:
+      - 8881:8881
+      - 6471:6470
+    env_file:
+      - ../../.env
+    command: ["/app/oms", "-f", "/app/etc/oms-api.yaml"]
+    volumes:
+      - ../../api/oms/etc/oms-api.yaml:/app/etc/oms-api.yaml
+      - ../../build/oms:/app/oms
 
 
 

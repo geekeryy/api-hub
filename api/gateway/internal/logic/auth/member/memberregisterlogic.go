@@ -8,12 +8,11 @@ import (
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/geekeryy/api-hub/core/xstrings"
 	"github.com/geekeryy/api-hub/library/consts"
-	"github.com/geekeryy/api-hub/rpc/model/authmodel"
-	"github.com/geekeryy/api-hub/rpc/model/usermodel"
+	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 type MemberRegisterLogic struct {
@@ -63,9 +62,9 @@ func (l *MemberRegisterLogic) registerPassword(req *types.MemberRegisterReq) err
 		return err
 	}
 
-	err = l.svcCtx.DB.Transaction(func(tx *gorm.DB) error {
-		err = l.svcCtx.MemberIdentityModel.Insert(l.ctx, tx, &authmodel.MemberIdentity{
-			MemberId:     memberID,
+	err = l.svcCtx.DB.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
+		_, err = l.svcCtx.MemberIdentityModel.Insert(l.ctx, session, &membermodel.MemberIdentity{
+			MemberUuid:   memberID,
 			IdentityType: consts.IdentityTypePassword,
 			Identifier:   req.Identifier,
 			Credential:   hash,
@@ -73,9 +72,9 @@ func (l *MemberRegisterLogic) registerPassword(req *types.MemberRegisterReq) err
 		if err != nil {
 			return err
 		}
-		err = l.svcCtx.MemberInfoModel.Insert(l.ctx, tx, &usermodel.MemberInfo{
-			MemberId: memberID,
-			Status:   consts.MemberStatusEnabled,
+		_, err = l.svcCtx.MemberInfoModel.Insert(l.ctx, session, &membermodel.MemberInfo{
+			MemberUuid: memberID,
+			Status:     consts.MemberStatusEnabled,
 		})
 		if err != nil {
 			return err
@@ -90,7 +89,7 @@ func (l *MemberRegisterLogic) registerPassword(req *types.MemberRegisterReq) err
 }
 
 func (l *MemberRegisterLogic) registerPhone(req *types.MemberRegisterReq) error {
-	cacheValue, err := l.svcCtx.Cache.Get(fmt.Sprintf("phone_code_%s", req.Identifier))
+	cacheValue, err := l.svcCtx.RedisClient.Get(l.ctx, fmt.Sprintf("phone_code_%s", req.Identifier)).Result()
 	if err != nil {
 		return err
 	}
@@ -104,9 +103,9 @@ func (l *MemberRegisterLogic) registerPhone(req *types.MemberRegisterReq) error 
 	if len(memberIdentities) > 0 {
 		return fmt.Errorf("手机号已注册")
 	}
-	memberID := uuid.New().String()
-	insertIdentities := []authmodel.MemberIdentity{{
-		MemberId:     memberID,
+	memberUUID := uuid.New().String()
+	insertIdentities := []membermodel.MemberIdentity{{
+		MemberUuid:   memberUUID,
 		IdentityType: consts.IdentityTypePhone,
 		Identifier:   req.Identifier,
 	}}
@@ -115,8 +114,8 @@ func (l *MemberRegisterLogic) registerPhone(req *types.MemberRegisterReq) error 
 		if err != nil {
 			return err
 		}
-		insertIdentities = []authmodel.MemberIdentity{{
-			MemberId:     memberID,
+		insertIdentities = []membermodel.MemberIdentity{{
+			MemberUuid:   memberUUID,
 			IdentityType: consts.IdentityTypePhone,
 			Identifier:   req.Identifier,
 			Credential:   hash,
@@ -126,23 +125,23 @@ func (l *MemberRegisterLogic) registerPhone(req *types.MemberRegisterReq) error 
 			return err
 		}
 		if len(memberIdentities) == 0 {
-			insertIdentities = append(insertIdentities, authmodel.MemberIdentity{
-				MemberId:     memberID,
+			insertIdentities = append(insertIdentities, membermodel.MemberIdentity{
+				MemberUuid:   memberUUID,
 				IdentityType: consts.IdentityTypePassword,
 				Identifier:   req.Identifier,
 				Credential:   hash,
 			})
 		}
 	}
-	err = l.svcCtx.DB.Transaction(func(tx *gorm.DB) error {
-		err = l.svcCtx.MemberIdentityModel.BatchInsert(l.ctx, tx, insertIdentities)
+	err = l.svcCtx.DB.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
+		err = l.svcCtx.MemberIdentityModel.BatchInsert(l.ctx, session, insertIdentities)
 		if err != nil {
 			return err
 		}
-		err = l.svcCtx.MemberInfoModel.Insert(l.ctx, tx, &usermodel.MemberInfo{
-			MemberId: memberID,
-			Status:   consts.MemberStatusEnabled,
-			Phone:    req.Identifier,
+		_, err = l.svcCtx.MemberInfoModel.Insert(l.ctx, session, &membermodel.MemberInfo{
+			MemberUuid: memberUUID,
+			Status:     consts.MemberStatusEnabled,
+			Phone:      req.Identifier,
 		})
 		if err != nil {
 			return err
@@ -156,7 +155,7 @@ func (l *MemberRegisterLogic) registerPhone(req *types.MemberRegisterReq) error 
 }
 
 func (l *MemberRegisterLogic) registerEmail(req *types.MemberRegisterReq) error {
-	cacheValue, err := l.svcCtx.Cache.Get(fmt.Sprintf("email_code_%s", req.Identifier))
+	cacheValue, err := l.svcCtx.RedisClient.Get(l.ctx, fmt.Sprintf("email_code_%s", req.Identifier)).Result()
 	if err != nil {
 		return err
 	}
@@ -172,9 +171,9 @@ func (l *MemberRegisterLogic) registerEmail(req *types.MemberRegisterReq) error 
 		return fmt.Errorf("邮箱已注册")
 	}
 
-	memberID := uuid.New().String()
-	insertIdentities := []authmodel.MemberIdentity{{
-		MemberId:     memberID,
+	memberUUID := uuid.New().String()
+	insertIdentities := []membermodel.MemberIdentity{{
+		MemberUuid:   memberUUID,
 		IdentityType: consts.IdentityTypeEmail,
 		Identifier:   req.Identifier,
 	}}
@@ -183,8 +182,8 @@ func (l *MemberRegisterLogic) registerEmail(req *types.MemberRegisterReq) error 
 		if err != nil {
 			return err
 		}
-		insertIdentities = []authmodel.MemberIdentity{{
-			MemberId:     memberID,
+		insertIdentities = []membermodel.MemberIdentity{{
+			MemberUuid:   memberUUID,
 			IdentityType: consts.IdentityTypeEmail,
 			Identifier:   req.Identifier,
 			Credential:   hash,
@@ -194,23 +193,23 @@ func (l *MemberRegisterLogic) registerEmail(req *types.MemberRegisterReq) error 
 			return err
 		}
 		if len(memberIdentities) == 0 {
-			insertIdentities = append(insertIdentities, authmodel.MemberIdentity{
-				MemberId:     memberID,
+			insertIdentities = append(insertIdentities, membermodel.MemberIdentity{
+				MemberUuid:   memberUUID,
 				IdentityType: consts.IdentityTypePassword,
 				Identifier:   req.Identifier,
 				Credential:   hash,
 			})
 		}
 	}
-	err = l.svcCtx.DB.Transaction(func(tx *gorm.DB) error {
-		err = l.svcCtx.MemberIdentityModel.BatchInsert(l.ctx, tx, insertIdentities)
+	err = l.svcCtx.DB.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
+		err = l.svcCtx.MemberIdentityModel.BatchInsert(l.ctx, session, insertIdentities)
 		if err != nil {
 			return err
 		}
-		err = l.svcCtx.MemberInfoModel.Insert(l.ctx, tx, &usermodel.MemberInfo{
-			MemberId: memberID,
-			Status:   consts.MemberStatusEnabled,
-			Email:    req.Identifier,
+		_, err = l.svcCtx.MemberInfoModel.Insert(l.ctx, session, &membermodel.MemberInfo{
+			MemberUuid: memberUUID,
+			Status:     consts.MemberStatusEnabled,
+			Email:      req.Identifier,
 		})
 		if err != nil {
 			return err

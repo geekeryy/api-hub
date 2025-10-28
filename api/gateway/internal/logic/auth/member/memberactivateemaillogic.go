@@ -7,7 +7,7 @@ import (
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/library/consts"
-	"github.com/geekeryy/api-hub/rpc/model/authmodel"
+	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -33,11 +33,11 @@ func (l *MemberActivateEmailLogic) MemberActivateEmail(req *types.MemberActivate
 		return err
 	}
 	l.Infof("claims: %v", claims)
-	memberId, err := claims.GetSubject()
+	memberUUID, err := claims.GetSubject()
 	if err != nil {
 		return err
 	}
-	identities, err := l.svcCtx.MemberIdentityModel.FindByMemberId(l.ctx, memberId)
+	identities, err := l.svcCtx.MemberIdentityModel.FindByMemberUUID(l.ctx, memberUUID)
 	if err != nil {
 		return err
 	}
@@ -51,8 +51,8 @@ func (l *MemberActivateEmailLogic) MemberActivateEmail(req *types.MemberActivate
 			identityPassword = identity.Identifier
 		}
 	}
-	err = l.svcCtx.MemberIdentityModel.Insert(l.ctx, nil, &authmodel.MemberIdentity{
-		MemberId:     memberId,
+	_, err = l.svcCtx.MemberIdentityModel.Insert(l.ctx, nil, &membermodel.MemberIdentity{
+		MemberUuid:   memberUUID,
 		IdentityType: consts.IdentityTypeEmail,
 		Identifier:   email,
 		Credential:   identityPassword,

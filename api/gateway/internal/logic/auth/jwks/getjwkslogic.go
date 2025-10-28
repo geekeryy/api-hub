@@ -6,27 +6,29 @@ import (
 
 	"github.com/MicahParks/jwkset"
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
+	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xstrings"
+
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type JWKSLogic struct {
+type GetJWKSLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
 // 获取公钥
-func NewJWKSLogic(ctx context.Context, svcCtx *svc.ServiceContext) *JWKSLogic {
-	return &JWKSLogic{
+func NewGetJWKSLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetJWKSLogic {
+	return &GetJWKSLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *JWKSLogic) JWKS(w http.ResponseWriter) error {
+func (l *GetJWKSLogic) GetJWKS(req *types.JWKSReq, w http.ResponseWriter) error {
 	jwksets := jwkset.NewMemoryStorage()
 	jwksList, err := l.svcCtx.JwksModel.FindAll(l.ctx)
 	if err != nil {

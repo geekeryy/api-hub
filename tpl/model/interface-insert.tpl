@@ -1,2 +1,1 @@
-Insert(ctx context.Context, tx *gorm.DB, data *{{.upperStartCamelObject}}) error
-BatchInsert(ctx context.Context, tx *gorm.DB, news []{{.upperStartCamelObject}}) error
+Insert(ctx context.Context, session sqlx.Session, data *{{.upperStartCamelObject}}) (sql.Result,error)

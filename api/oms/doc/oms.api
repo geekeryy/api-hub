@@ -23,6 +23,42 @@ service oms-api {
 }
 
 @server (
+	group:      auth
+	middleware: ContextMiddleware
+	prefix:     /api/v1/oms/auth
+	tags:       "Oms - auth"
+)
+service oms-api {
+	@doc (
+		summary: "登录"
+	)
+	@handler LoginHandler
+	post /login (LoginReq) returns (LoginResp)
+}
+
+@server (
+	group:      auth
+	middleware: ContextMiddleware,OmsJwtMiddleware
+	prefix:     /api/v1/oms/auth
+	tags:       "Oms - auth"
+)
+service oms-api {
+	@doc (
+		summary: "登出"
+	)
+	@handler LogoutHandler
+	post /logout
+
+	@doc (
+		summary: "获取用户信息"
+	)
+	@handler MemberInfoHandler
+	get /info returns (MemberInfoResp)
+}
+
+
+
+@server (
 	group:      jwks
 	middleware: ContextMiddleware,OmsJwtMiddleware
 	prefix:     /api/v1/oms/jwks
@@ -60,6 +96,19 @@ service oms-api {
 service oms-api {}
 
 type (
+	LoginReq {
+		IdentityType int64  `json:"identity_type,options=8"` // 身份类型 8: otp
+		Credential   string `json:"credential"` // 凭证 密码/验证码/access_token
+	}
+	LoginResp {
+		Token string `json:"token"` // 令牌
+	}
+	MemberInfoResp {
+		Nickname string `json:"nickname"` // 昵称
+		Avatar   string `json:"avatar"` // 头像
+		Phone    string `json:"phone"` // 手机号
+		Email    string `json:"email"` // 邮箱
+	}
 	KeyUsageReq {
 		Kid string `json:"kid"`
 	}

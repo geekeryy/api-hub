@@ -13,11 +13,11 @@ service MemberService {
 }
 
 message GetMemberInfoReq {
-    string member_id = 1;
+    string member_uuid = 1;
 }
 
 message GetMemberInfoResp {
-    string MemberId = 1; // 用户ID
+    string MemberUuid = 1; // 用户ID
     string Nickname = 2; // 昵称
     string Avatar = 3; // 头像
     int64 Gender = 4; // 性别
@@ -27,11 +27,11 @@ message GetMemberInfoResp {
 }
 
 message GetAdminInfoReq {
-    string admin_id = 1;
+    string admin_uuid = 1;
 }
 
 message GetAdminInfoResp {
-    string AdminId = 1; // 管理员ID
+    string AdminUuid = 1; // 管理员ID
     string Username = 2; // 用户名
     string Email = 3; // 邮箱
 }

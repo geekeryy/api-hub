@@ -1,35 +1,35 @@
 package svc
 
 import (
+	"fmt"
 	"log"
 
-	"github.com/geekeryy/api-hub/core/pgcache"
-	"github.com/geekeryy/api-hub/core/xgorm"
-	"github.com/geekeryy/api-hub/rpc/model/usermodel"
+	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 	"github.com/geekeryy/api-hub/rpc/user/internal/config"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 type ServiceContext struct {
 	Config          config.Config
-	MemberInfoModel usermodel.MemberInfoModel
-	Cache           *pgcache.Cache
+	MemberInfoModel membermodel.MemberInfoModel
+	DB              sqlx.SqlConn
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	pg, err := xgorm.ConnectPg(c.PgSql)
+	mysqlClient, err := sqlx.NewConn(sqlx.SqlConf{
+		DataSource: fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", c.Mysql.Username, c.Mysql.Password, c.Mysql.Host, c.Mysql.Dbname),
+		DriverName: "mysql",
+		Replicas:   nil,
+		Policy:     "",
+	})
 	if err != nil {
-		log.Fatalf("Failed to connect to database. Error: %s", err)
-	}
-
-	cache, err := pgcache.NewCache(c.PgSql)
-	if err != nil {
-		log.Fatalf("Failed to init cache. Error: %s", err)
+		log.Fatalf("failed to open mysql: %v", err)
 	}
 
 	svc := &ServiceContext{
 		Config:          c,
-		MemberInfoModel: usermodel.NewMemberInfoModel(pg),
-		Cache:           cache,
+		MemberInfoModel: membermodel.NewMemberInfoModel(mysqlClient),
+		DB:              mysqlClient,
 	}
 
 	return svc

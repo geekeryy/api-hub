@@ -8,8 +8,7 @@ import (
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/geekeryy/api-hub/core/xstrings"
 	"github.com/geekeryy/api-hub/library/consts"
-	"github.com/geekeryy/api-hub/rpc/model/authmodel"
-	"gorm.io/gorm"
+	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,40 +28,47 @@ func NewMemberForgetPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContex
 	}
 }
 
-// TODO 手机号绑定两个账号的情况，需要优化
 func (l *MemberForgetPasswordLogic) MemberForgetPassword(req *types.MemberForgetPasswordReq) error {
-	var memberIdentities []authmodel.MemberIdentity
+	var memberIdentitie *membermodel.MemberIdentity
 	switch req.IdentityType {
 	case consts.IdentityTypeEmail:
-		cacheValue, err := l.svcCtx.Cache.Get(fmt.Sprintf("email_code_%s", req.Identifier))
+		cacheValue, err := l.svcCtx.RedisClient.Get(l.ctx, fmt.Sprintf("email_code_%s", req.Identifier)).Result()
 		if err != nil {
 			return err
 		}
 		if req.Code != cacheValue {
 			return fmt.Errorf("邮箱验证码不正确")
 		}
-		memberIdentities, err = l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, consts.IdentityTypeEmail, req.Identifier)
+		memberIdentities, err := l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, consts.IdentityTypeEmail, req.Identifier)
 		if err != nil {
 			return err
+		}
+		if len(memberIdentities) > 1 {
+			return fmt.Errorf("邮箱绑定多个账号")
 		}
 		if len(memberIdentities) == 0 {
 			return fmt.Errorf("邮箱未绑定")
 		}
+		memberIdentitie = memberIdentities[0]
 	case consts.IdentityTypePhone:
-		cacheValue, err := l.svcCtx.Cache.Get(fmt.Sprintf("phone_code_%s", req.Identifier))
+		cacheValue, err := l.svcCtx.RedisClient.Get(l.ctx, fmt.Sprintf("phone_code_%s", req.Identifier)).Result()
 		if err != nil {
 			return err
 		}
 		if req.Code != cacheValue {
 			return fmt.Errorf("手机验证码不正确")
 		}
-		memberIdentities, err = l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, consts.IdentityTypePhone, req.Identifier)
+		memberIdentities, err := l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, consts.IdentityTypePhone, req.Identifier)
 		if err != nil {
 			return err
+		}
+		if len(memberIdentities) > 1 {
+			return fmt.Errorf("手机号绑定多个账号")
 		}
 		if len(memberIdentities) == 0 {
 			return fmt.Errorf("手机号未绑定")
 		}
+		memberIdentitie = memberIdentities[0]
 	default:
 		return fmt.Errorf("身份类型不正确")
 	}
@@ -71,16 +77,8 @@ func (l *MemberForgetPasswordLogic) MemberForgetPassword(req *types.MemberForget
 	if err != nil {
 		return err
 	}
-	memberIdentities[0].Credential = hash
 
-	err = l.svcCtx.DB.Transaction(func(tx *gorm.DB) error {
-		err = l.svcCtx.MemberIdentityModel.Update(l.ctx, tx, &memberIdentities[0])
-		if err != nil {
-			return err
-		}
-		// TODO 密码更新记录，禁止使用最近设置的密码，需要优化
-		return nil
-	})
+	err = l.svcCtx.MemberIdentityModel.UpdateCredential(l.ctx, memberIdentitie.Id, hash)
 	if err != nil {
 		return err
 	}

@@ -12,7 +12,31 @@ import (
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xstrings"
 	"github.com/pquerna/otp/totp"
+	"github.com/stretchr/testify/assert"
 )
+
+func TestNewKeyfunc(t *testing.T) {
+	k, generateTokenFunc, err := jwks.NewKeyfunc(context.Background())
+	if err != nil {
+		t.Fatalf("Failed to init keyfunc.\nError: %s", err)
+	}
+	token, _, err := generateTokenFunc("1234567890", 60, nil)
+	if err != nil {
+		t.Fatalf("Failed to generate token.\nError: %s", err)
+	}
+	t.Logf("token: %s", token)
+	claims, err := jwks.ValidateToken(token, k)
+	if err != nil {
+		t.Fatalf("Failed to validate token.\nError: %s", err)
+	}
+	t.Logf("claims: %+v", claims)
+	memberId, err := claims.GetSubject()
+	if err != nil {
+		t.Fatalf("Failed to get member id.\nError: %s", err)
+	}
+	assert.Equal(t, memberId, "1234567890")
+
+}
 
 func TestGenerateOTP(t *testing.T) {
 	otp, qrCode, err := jwks.GenerateOTP("api-hub", "admin")

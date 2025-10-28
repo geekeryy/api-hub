@@ -137,7 +137,26 @@
           "Auth - jwks"
         ],
         "summary": "获取公钥",
-        "operationId": "auth/JwksJWKSHandler",
+        "operationId": "auth/JwksGetJWKSHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "service"
+              ],
+              "properties": {
+                "service": {
+                  "description": "服务名称",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -558,63 +577,6 @@
         }
       }
     },
-    "/api/v1/gateway/auth/oms/login": {
-      "post": {
-        "description": "Oms登录",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - oms授权"
-        ],
-        "summary": "Oms登录",
-        "operationId": "auth/OmsOmsLoginHandler",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "username",
-                "code"
-              ],
-              "properties": {
-                "code": {
-                  "description": "验证码",
-                  "type": "string"
-                },
-                "username": {
-                  "description": "用户名",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "token": {
-                  "description": "令牌",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/gateway/ping": {
       "get": {
         "produces": [
@@ -1029,7 +991,7 @@
       }
     }
   },
-  "x-date": "2025-10-27 18:01:01",
+  "x-date": "2025-10-28 14:30:38",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

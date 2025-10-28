@@ -4,6 +4,13 @@ Log:
   Mode: console
   Level: info
 
+Mysql:
+  Username: ${MYSQL_USERNAME}
+  Password: ${MYSQL_PASSWORD}
+  Host: ${MYSQL_HOST}
+  Port: ${MYSQL_PORT}
+  Dbname: ${MYSQL_DBNAME}
+
 Telemetry:
   Batcher: otlphttp
   OtlpHeaders:
@@ -12,19 +19,6 @@ Telemetry:
   OtlpHttpPath: /otlp/v1/traces
   OtlpHttpSecure: true
 
-PgSql:
-  Username: ${PG_USERNAME}
-  Password: ${PG_PASSWORD}
-  Path: "${PG_PATH}"
-  Port: 5432
-  SslMode: disable
-  TimeZone: America/New_York
-  Dbname: ${PG_DBNAME}
-  LogMode: dev
-  LogZap: false
-  SlowThreshold: 1000
-  MaxIdleConns: 2
-  MaxOpenConns: 10
 
 Profiling:
   ServerAddr: ${PROFILING_SERVER_ADDR}
