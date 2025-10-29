@@ -10,18 +10,24 @@ Mysql:
   Username: ${MYSQL_USERNAME}
   Password: ${MYSQL_PASSWORD}
   Host: ${MYSQL_HOST}
-  Port: ${MYSQL_PORT}
   Dbname: ${MYSQL_DBNAME}
 Redis:
   Addr: ${REDIS_ADDR}
   Password: ${REDIS_PASSWORD}
   Db: ${REDIS_DB}
 
-MemberService:
+
+UserService:
   Timeout: 10000
   Endpoints:
     - "user:8881"
     - "localhost:8881"
+
+AuthService:
+  Timeout: 10000
+  Endpoints:
+    - "auth:8880"
+    - "localhost:8880"
 
 Jwks:
   ServerURL:

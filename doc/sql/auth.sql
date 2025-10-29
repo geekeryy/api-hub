@@ -65,8 +65,8 @@ create table permissions
     id         bigint auto_increment,
     name       varchar(255) not null, -- 权限名称
     type       int not null, -- 权限类型 1: 菜单 2: 按钮 3: 接口
-    params     json not null default '{}', -- 权限参数 不同类型对应不同的权限参数
-    apis       json not null default '{}', -- 接口列表 用于后端鉴权
+    params     json not null, -- 权限参数 不同类型对应不同的权限参数
+    apis       json not null, -- 接口列表 用于后端鉴权
     pid  bigint not null, -- 父级ID
     description varchar(255) not null default '', -- 权限描述
     created_at datetime default current_timestamp not null, -- 创建时间

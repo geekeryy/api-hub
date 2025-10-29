@@ -9,6 +9,7 @@ const (
 	IdentityTypeGoogle   = 5
 	IdentityTypeFacebook = 6
 	IdentityTypeGithub   = 7
+	IdentityTypeOtp      = 8
 )
 
 // 刷新令牌状态

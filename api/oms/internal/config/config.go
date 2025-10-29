@@ -48,11 +48,6 @@ type Secret struct {
 	PublicKey    string `json:",env=SECRET_PUBLIC_KEY"`
 }
 
-type Jwks struct {
-	ServerURL       string `json:",env=JWKS_SERVER_URL"`
-	RefreshInterval int    `json:",env=JWKS_REFRESH_INTERVAL"`
-}
-
 type Facebook struct {
 	AppID     string `json:",env=FACEBOOK_APP_ID"`
 	AppSecret string `json:",env=FACEBOOK_APP_SECRET"`

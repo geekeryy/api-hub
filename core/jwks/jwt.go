@@ -1,11 +1,9 @@
 package jwks
 
 import (
-	"context"
 	"crypto/ed25519"
 	"errors"
 	"fmt"
-	"log"
 	"maps"
 	"time"
 
@@ -13,14 +11,6 @@ import (
 	"github.com/MicahParks/keyfunc/v3"
 	jwt "github.com/golang-jwt/jwt/v5"
 )
-
-func InitKeyfunc(ctx context.Context, serverURL string, override keyfunc.Override) (keyfunc.Keyfunc, error) {
-	k, err := keyfunc.NewDefaultOverrideCtx(ctx, []string{serverURL}, override)
-	if err != nil {
-		log.Fatalf("Failed to create a keyfunc.Keyfunc from the server's URL.\nError: %s", err)
-	}
-	return k, nil
-}
 
 func GenerateToken(kid string, memberId string, accessSecret string, accessExpire int64, extraClaims jwt.MapClaims) (string, time.Time, error) {
 	now := time.Now()

@@ -9,11 +9,11 @@ import (
 
 type memberid struct{}
 
-func WithMemberID(ctx context.Context, memberID string) context.Context {
+func WithMemberUUID(ctx context.Context, memberID string) context.Context {
 	return context.WithValue(ctx, memberid{}, memberID)
 }
 
-func GetMemberID(ctx context.Context) string {
+func GetMemberUUID(ctx context.Context) string {
 	memberID, ok := ctx.Value(memberid{}).(string)
 	if !ok {
 		return ""
@@ -21,14 +21,14 @@ func GetMemberID(ctx context.Context) string {
 	return memberID
 }
 
-type adminid struct{}
+type adminuuid struct{}
 
-func WithAdminID(ctx context.Context, adminID int64) context.Context {
-	return context.WithValue(ctx, adminid{}, adminID)
+func WithAdminUUID(ctx context.Context, adminID int64) context.Context {
+	return context.WithValue(ctx, adminuuid{}, adminID)
 }
 
-func GetAdminID(ctx context.Context) int64 {
-	adminID, ok := ctx.Value(adminid{}).(int64)
+func GetAdminUUID(ctx context.Context) int64 {
+	adminID, ok := ctx.Value(adminuuid{}).(int64)
 	if !ok {
 		return 0
 	}

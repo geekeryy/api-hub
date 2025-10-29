@@ -23,5 +23,5 @@ TestResults.xml
 
 .DS_Store
 .env
-test/data/
+test/*.png
 build/

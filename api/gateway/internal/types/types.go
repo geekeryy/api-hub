@@ -45,7 +45,7 @@ type DailySentenceResp struct {
 }
 
 type JWKSReq struct {
-	Service string `form:"service"` // 服务名称
+	Service string `form:"service,optional"` // 服务名称
 }
 
 type MemberActivateEmailReq struct {

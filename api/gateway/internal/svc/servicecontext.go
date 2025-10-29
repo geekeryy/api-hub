@@ -9,7 +9,6 @@ import (
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/geekeryy/api-hub/api/gateway/internal/config"
 	"github.com/geekeryy/api-hub/api/gateway/internal/middleware"
-	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/limiter"
 	"github.com/geekeryy/api-hub/core/validate"
 	"github.com/geekeryy/api-hub/library/validator"
@@ -66,13 +65,13 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		log.Fatalf("failed to open redis: %v", err)
 	}
 
-	kfunc, err := jwks.InitKeyfunc(context.Background(), c.Jwks.ServerURL, keyfunc.Override{
+	kfunc, err := keyfunc.NewDefaultOverrideCtx(context.Background(), []string{c.Jwks.ServerURL}, keyfunc.Override{
 		RefreshInterval:   time.Duration(c.Jwks.RefreshInterval) * time.Second,
 		RateLimitWaitMax:  time.Duration(c.Jwks.RefreshInterval/2) * time.Second,
 		RefreshUnknownKID: rate.NewLimiter(rate.Every(1*time.Minute), 2),
 	})
 	if err != nil {
-		log.Fatalf("Failed to init keyfunc. Error: %s", err)
+		log.Fatalf("Failed to create a keyfunc.Keyfunc from the server's URL.\nError: %s", err)
 	}
 
 	codeLimiter, err := lru.New[string, *limiter.Limiter](1000)
@@ -80,7 +79,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		log.Fatalf("Failed to init code limiter. Error: %s", err)
 	}
 
-	client := zrpc.MustNewClient(c.MemberService)
+	userClient := zrpc.MustNewClient(c.UserService)
+	authClient := zrpc.MustNewClient(c.AuthService)
 
 	svc := &ServiceContext{
 		Config:                  c,
@@ -99,8 +99,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		DB:            mysqlClient,
 		RedisClient:   redisClient,
 		CodeLimiter:   codeLimiter,
-		MemberService: memberservice.NewMemberService(client),
-		AuthService:   authservice.NewAuthService(client),
+		MemberService: memberservice.NewMemberService(userClient),
+		AuthService:   authservice.NewAuthService(authClient),
 	}
 	return svc
 }

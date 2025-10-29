@@ -8,7 +8,6 @@ Mysql:
   Username: ${MYSQL_USERNAME}
   Password: ${MYSQL_PASSWORD}
   Host: ${MYSQL_HOST}
-  Port: ${MYSQL_PORT}
   Dbname: ${MYSQL_DBNAME}
 
 Telemetry:

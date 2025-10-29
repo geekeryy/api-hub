@@ -22,7 +22,6 @@
     },
     "version": "1.0"
   },
-  "host": "localhost:8888",
   "basePath": "/",
   "paths": {
     "/api/v1/gateway/ai/daily-sentence": {
@@ -238,7 +237,7 @@
             "description": "服务名称",
             "name": "service",
             "in": "query",
-            "required": true
+            "allowEmptyValue": true
           }
         ],
         "responses": {
@@ -1037,7 +1036,7 @@
       }
     }
   },
-  "x-date": "2025-10-28 23:26:32",
+  "x-date": "2025-10-29 17:58:07",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

@@ -8,32 +8,33 @@ import (
 
 type Config struct {
 	zrpc.RpcServerConf
-	Auth struct {
-		AccessExpire  int `json:",env=AUTH_ACCESS_EXPIRE,default=600"`
-		RefreshExpire int `json:",env=AUTH_REFRESH_EXPIRE,default=2592000"`
-	}
-	Facebook Facebook
-	Mysql    Mysql
-	Redis    Redis
-	Secret   Secret
+	Jwt       Jwt
+	Facebook  Facebook
+	Mysql     Mysql
+	RedisConf RedisConf
+	Secret    Secret
 }
 
 func (c *Config) Validate() error {
-	if c.Auth.AccessExpire <= 0 {
+	if c.Jwt.AccessExpire <= 0 {
 		return errors.New("AUTH_ACCESS_EXPIRE must be greater than 0")
 	}
 	return nil
+}
+
+type Jwt struct {
+	AccessExpire  int `json:",env=AUTH_ACCESS_EXPIRE,default=600"`
+	RefreshExpire int `json:",env=AUTH_REFRESH_EXPIRE,default=2592000"`
 }
 
 type Mysql struct {
 	Username string `json:",env=MYSQL_USERNAME"`
 	Password string `json:",env=MYSQL_PASSWORD"`
 	Host     string `json:",env=MYSQL_HOST"`
-	Port     int    `json:",env=MYSQL_PORT,default=3306"`
 	Dbname   string `json:",env=MYSQL_DBNAME"`
 }
 
-type Redis struct {
+type RedisConf struct {
 	Addr     string `json:",env=REDIS_ADDR"`
 	Password string `json:",env=REDIS_PASSWORD"`
 	Db       int    `json:",env=REDIS_DB,default=0"`

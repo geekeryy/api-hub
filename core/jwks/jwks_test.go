@@ -44,12 +44,13 @@ func TestGenerateOTP(t *testing.T) {
 		t.Fatalf("Failed to generate OTP.\nError: %s", err)
 	}
 	t.Logf("otp: %s", otp)
-	os.WriteFile("../../test/data/qrcode.png", qrCode, 0644)
+	os.WriteFile("../../test/qrcode.png", qrCode, 0644)
 }
 
 func TestValidateOTP(t *testing.T) {
-	ok := totp.Validate("370550", "II5UPLT5LHFTKEIY2Q4NP2VWWHPEWOOV")
-	t.Logf("ok: %v", ok)
+	secret := "A6D6BY6X7LYUXX5W7HWS7S2FBVBLNCM6"
+	assert.True(t, totp.Validate("927432", secret))
+	assert.False(t, totp.Validate("976604", secret))
 }
 
 func TestJwt(t *testing.T) {

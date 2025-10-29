@@ -1,4 +1,4 @@
-.PHONY: gen-api gen-rpc model lint apifox build restart
+.PHONY: gen-api gen-rpc model sync-api-doc lint apifox build restart
 
 # Generate api go files
 # Example: make gen-api s=oms
@@ -13,16 +13,15 @@ gen-rpc:
 	goctl rpc --home tpl protoc rpc/${s}/${s}.proto --go_out=rpc/${s} --go-grpc_out=rpc/${s} --zrpc_out=rpc/${s} -m
 
 # Generate model
-# Example: make model
+# Example: make model s=auth
 model:
-	goctl model mysql ddl --home tpl -s doc/sql/auth.sql -d rpc/model/authmodel
-	goctl model mysql ddl --home tpl -s doc/sql/member.sql -d rpc/model/membermodel
-	goctl model mysql ddl --home tpl -s doc/sql/admin.sql -d rpc/model/adminmodel
+	goctl model mysql ddl --home tpl -s doc/sql/$(s).sql -d rpc/model/$(s)model
 
-# Import api to apifox
+
+# Sync api doc to apifox
 # ENV: export APIFOX_TOKEN=APS-xxxxxxxxxxxxxxxxxxx
-# Example: make apifox s=gateway PROJECT_ID=6567759
-apifox:
+# Example: make sync-api-doc s=gateway PROJECT_ID=xxx
+sync-api-doc:
 	@if [ -z "$(PROJECT_ID)" ]; then echo "PROJECT_ID is not set"; exit 1; fi
 	@if [ -z "$(APIFOX_TOKEN)" ]; then echo "APIFOX_TOKEN is not set"; exit 1; fi
 	@swaggerfile=./doc/swagger/$(s).json; \
@@ -33,17 +32,31 @@ apifox:
 		--header "Content-Type: application/json" \
 		--data-raw "$$(printf '{"importFormat": "openapi","data":"%s"}' "$$jsondata")"
 
+
 # 静态代码检查
 # VSCode: "go.lintFlags": ["--config=./.golangci.yml"] 
 lint:
 	golangci-lint fmt
 	golangci-lint run
 
-############################################ Docker本地调试 #################################################
+
+############################################ 辅助命令 #################################################
+
+# Import api to apifox
+# ENV: export APIFOX_TOKEN=APS-xxxxxxxxxxxxxxxxxxx
+# Example: make apifox
+apifox:
+	make sync-api-doc s=gateway PROJECT_ID=6567759
+	make sync-api-doc s=oms PROJECT_ID=7317140
+
+
+############################################ Docker本地调试 #############################################
 
 build:
 	GOOS=linux go build -o build/gateway api/gateway/gateway.go
 	GOOS=linux go build -o build/oms api/oms/oms.go
+	GOOS=linux go build -o build/auth rpc/auth/auth.go
+	GOOS=linux go build -o build/user rpc/user/user.go
 
-restart:
+restart: build
 	docker compose -f deploy/local/docker-compose.yml up -d

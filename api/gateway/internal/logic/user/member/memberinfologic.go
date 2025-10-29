@@ -27,7 +27,7 @@ func NewMemberInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Member
 }
 
 func (l *MemberInfoLogic) MemberInfo() (resp *types.MemberInfoResp, err error) {
-	memberUUID := xcontext.GetMemberID(l.ctx)
+	memberUUID := xcontext.GetMemberUUID(l.ctx)
 	if memberUUID == "" {
 		return nil, xerror.ForbiddenErr
 	}

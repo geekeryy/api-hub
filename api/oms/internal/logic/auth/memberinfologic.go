@@ -25,7 +25,11 @@ func NewMemberInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Member
 }
 
 func (l *MemberInfoLogic) MemberInfo() (resp *types.MemberInfoResp, err error) {
-	// todo: add your logic here and delete this line
+	return &types.MemberInfoResp{
+		Nickname: "admin",
+		Avatar:   "",
+		Phone:    "13356781234",
+		Email:    "admin@api-hub.com",
+	}, nil
 
-	return
 }

@@ -92,15 +92,15 @@ func NewKeyfunc(ctx context.Context) (keyfunc.Keyfunc, GenerateTokenFunc, error)
 	return k, GetGenerateTokenFunc(kid, priv), nil
 }
 
-type GenerateTokenFunc func(string, int64, jwt.MapClaims) (string, time.Time, error)
+type GenerateTokenFunc func(memberUUID string, accessExpire int64, extraClaims jwt.MapClaims) (token string, exp time.Time, err error)
 
 func GetGenerateTokenFunc(kid string, priv ed25519.PrivateKey) func(string, int64, jwt.MapClaims) (string, time.Time, error) {
-	return func(memberId string, accessExpire int64, extraClaims jwt.MapClaims) (string, time.Time, error) {
+	return func(memberUUID string, accessExpire int64, extraClaims jwt.MapClaims) (string, time.Time, error) {
 		now := time.Now()
 		exp := now.Add(time.Duration(accessExpire) * time.Second)
 		claims := map[string]interface{}{
 			"exp": exp.Unix(),
-			"sub": memberId,
+			"sub": memberUUID,
 			"iat": now.Unix(),
 			"nbf": now.Unix(),
 		}

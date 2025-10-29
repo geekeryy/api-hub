@@ -43,14 +43,14 @@ func (m *OmsJwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		memberId, err := claims.GetSubject()
-		if err != nil || len(memberId) == 0 {
+		memberUUID, err := claims.GetSubject()
+		if err != nil || len(memberUUID) == 0 {
 			logx.Errorf("validate claims err:%v %+v", err, claims)
 			httpx.ErrorCtx(r.Context(), w, xerror.UnauthorizedErr)
 			return
 		}
 
-		r = r.WithContext(xcontext.WithMemberID(r.Context(), memberId))
+		r = r.WithContext(xcontext.WithMemberUUID(r.Context(), memberUUID))
 		next(w, r)
 	}
 }

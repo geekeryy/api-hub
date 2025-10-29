@@ -12,6 +12,7 @@ import (
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 var configFile = flag.String("f", "etc/{{.serviceName}}.yaml", "the config file")
@@ -32,6 +33,8 @@ func main() {
 	})
 	s.AddUnaryInterceptors(coreerror.ErrorInterceptor)
 	defer s.Stop()
+
+	logx.DisableStat()
 
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)
 	s.Start()

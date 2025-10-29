@@ -34,9 +34,9 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     c.Redis.Addr,
-		Password: c.Redis.Password,
-		DB:       c.Redis.Db,
+		Addr:     c.RedisConf.Addr,
+		Password: c.RedisConf.Password,
+		DB:       c.RedisConf.Db,
 	})
 	if err != nil {
 		log.Fatalf("failed to open redis: %v", err)

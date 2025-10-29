@@ -5,7 +5,6 @@ info (
 	contactEmail: "jiangyang.me@gmail.com"
 	licenseName:  "MIT"
 	licenseUrl:   "https://github.com/geekeryy/api-hub/blob/main/LICENSE"
-	host:         "localhost:8881"
 	basePath:     ""
 )
 

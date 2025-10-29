@@ -47,7 +47,7 @@ func (m *JwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		r = r.WithContext(xcontext.WithMemberID(r.Context(), memberId))
+		r = r.WithContext(xcontext.WithMemberUUID(r.Context(), memberId))
 		next(w, r)
 	}
 }

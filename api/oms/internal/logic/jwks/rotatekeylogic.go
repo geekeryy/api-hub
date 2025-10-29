@@ -47,6 +47,7 @@ func (l *RotateKeyLogic) RotateKey() error {
 	}
 	if _, err := l.svcCtx.JwksModel.Insert(l.ctx, nil, &authmodel.Jwks{
 		Kid:        kid,
+		Service:    "",
 		PublicKey:  encryptPub,
 		PrivateKey: encryptPriv,
 	}); err != nil {
