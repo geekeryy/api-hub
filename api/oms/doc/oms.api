@@ -55,8 +55,6 @@ service oms-api {
 	get /info returns (MemberInfoResp)
 }
 
-
-
 @server (
 	group:      jwks
 	middleware: ContextMiddleware,OmsJwtMiddleware
@@ -64,6 +62,13 @@ service oms-api {
 	tags:       "Oms - jwks"
 )
 service oms-api {
+	@doc (
+		summary:     "jwks密钥列表"
+		description: "jwks密钥列表"
+	)
+	@handler GetJWKSHandler
+	get /list returns (GetJWKSResp)
+
 	@doc (
 		summary:     "公钥使用记录"
 		description: "公钥使用记录"
@@ -95,6 +100,16 @@ service oms-api {
 service oms-api {}
 
 type (
+	GetJWKSResp {
+		Data []GetJWKSItem `json:"data"` // 数据
+	}
+	GetJWKSItem {
+		Kid string `json:"kid"` // 密钥ID
+		Kty string `json:"kty"` // 密钥类型
+		Alg string `json:"alg"` // 算法
+		Crv string `json:"crv"` // 加密算法曲线
+		X   string `json:"x"` // 公钥
+	}
 	LoginReq {
 		IdentityType int64  `json:"identity_type,options=8"` // 身份类型 8: otp
 		Credential   string `json:"credential"` // 凭证 密码/验证码/access_token
@@ -109,7 +124,7 @@ type (
 		Email    string `json:"email"` // 邮箱
 	}
 	KeyUsageReq {
-		Kid string `json:"kid"`
+		Kid string `form:"kid"`
 	}
 	KeyUsageResp {
 		Records []TokenRefreshRecord `json:"records"`

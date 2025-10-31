@@ -33,7 +33,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 		return nil, xerror.InvalidParameterErr
 	case consts.IdentityTypeOtp:
 		if !totp.Validate(req.Credential, l.svcCtx.Config.Oms.OtpSecret) {
-			return nil, xerror.UnauthorizedErr
+			return nil, xerror.NotFoundErr
 		}
 		token, _, err := l.svcCtx.GenerateTokenFunc("admin", 10*60, nil)
 		if err != nil {

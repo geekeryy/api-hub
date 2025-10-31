@@ -7,15 +7,21 @@ import (
 
 	"github.com/geekeryy/api-hub/core/consts"
 	"github.com/geekeryy/api-hub/core/xcontext"
+	"github.com/geekeryy/api-hub/core/xgrpc"
+	"github.com/geekeryy/api-hub/rpc/monitor/client/monitorservice"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
 	"google.golang.org/grpc/metadata"
 )
 
 type ContextMiddleware struct {
+	MonitorService monitorservice.MonitorService
 }
 
-func NewContextMiddleware() *ContextMiddleware {
-	return &ContextMiddleware{}
+func NewContextMiddleware(monitorLazyClient *xgrpc.LazyClient) *ContextMiddleware {
+	return &ContextMiddleware{
+		MonitorService: monitorservice.NewMonitorService(monitorLazyClient),
+	}
 }
 
 // 添加accept-language和clientip到上下文
@@ -35,6 +41,22 @@ func (m *ContextMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			ip = addr
 		}
 		r = r.WithContext(xcontext.WithClientIP(metadata.AppendToOutgoingContext(r.Context(), consts.CONTEXT_CLIENT_IP, ip), ip))
+
+		_, err := m.MonitorService.ReportUserLoginMetrics(r.Context(), &monitorservice.ReportUserLoginMetricsReq{
+			Items: []*monitorservice.ReportUserLoginMetricsItem{
+				{
+					Ip:       ip,
+					Service:  "gateway",
+					Kid:      "gateway",
+					Api:      r.URL.Path,
+					Duration: 0,
+					Status:   200,
+				},
+			},
+		})
+		if err != nil {
+			logx.Errorf("Failed to report user login metrics. Error: %s", err)
+		}
 
 		next(w, r)
 	}

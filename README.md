@@ -156,13 +156,6 @@ EMAIL_FORMAT_ERRO = "Email format error"
 
 * 使用模板生成代码出现`<no value>`，如何解决？
   * 由于目前go-zero官方还未合并我的pr，暂时不支持projectPkg模板变量，可以选择使用我fork的goctl版本，或者等待官方合并。
-  * 使用我fork的goctl版本：
-
-      ```shell
-      git clone https://github.com/geekeryy/go-zero.git
-      cd go-zero/tools/goctl
-      go install
-      ```
 
 * 为什么配置项的类型不能使用`int64`？
   * 因为go-zero使用环境变量覆盖配置项时，使用类型为int64的配置项会被误认为time.Duration，我已经提交pr修复，等待官方合并 [#4979](https://github.com/zeromicro/go-zero/pull/4979)

@@ -22,7 +22,6 @@
     },
     "version": "1.0"
   },
-  "host": "localhost:8881",
   "basePath": "/",
   "paths": {
     "/api/v1/oms/auth/info": {
@@ -189,6 +188,68 @@
         }
       }
     },
+    "/api/v1/oms/jwks/list": {
+      "get": {
+        "description": "jwks密钥列表",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Oms - jwks"
+        ],
+        "summary": "jwks密钥列表",
+        "operationId": "jwksGetJWKSHandler",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "description": "数据",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "kid",
+                      "kty",
+                      "alg",
+                      "crv",
+                      "x"
+                    ],
+                    "properties": {
+                      "alg": {
+                        "description": "算法",
+                        "type": "string"
+                      },
+                      "crv": {
+                        "description": "加密算法曲线",
+                        "type": "string"
+                      },
+                      "kid": {
+                        "description": "密钥ID",
+                        "type": "string"
+                      },
+                      "kty": {
+                        "description": "密钥类型",
+                        "type": "string"
+                      },
+                      "x": {
+                        "description": "公钥",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/oms/jwks/rotate": {
       "put": {
         "description": "轮换公钥",
@@ -227,20 +288,10 @@
         "operationId": "jwksKeyUsageHandler",
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "kid"
-              ],
-              "properties": {
-                "kid": {
-                  "type": "string"
-                }
-              }
-            }
+            "type": "string",
+            "name": "kid",
+            "in": "query",
+            "required": true
           }
         ],
         "responses": {
@@ -295,7 +346,7 @@
       }
     }
   },
-  "x-date": "2025-10-28 11:04:32",
+  "x-date": "2025-10-30 16:19:37",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

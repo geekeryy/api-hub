@@ -7,8 +7,20 @@ type DeleteKeyReq struct {
 	Kid string `json:"kid"`
 }
 
+type GetJWKSItem struct {
+	Kid string `json:"kid"` // 密钥ID
+	Kty string `json:"kty"` // 密钥类型
+	Alg string `json:"alg"` // 算法
+	Crv string `json:"crv"` // 加密算法曲线
+	X   string `json:"x"`   // 公钥
+}
+
+type GetJWKSResp struct {
+	Data []GetJWKSItem `json:"data"` // 数据
+}
+
 type KeyUsageReq struct {
-	Kid string `json:"kid"`
+	Kid string `form:"kid"`
 }
 
 type KeyUsageResp struct {

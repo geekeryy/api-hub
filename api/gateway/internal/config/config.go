@@ -7,13 +7,18 @@ import (
 
 type Config struct {
 	rest.RestConf
-	Mysql         Mysql
-	Redis         Redis
-	Jwks          Jwks
-	MailGun       MailGun
-	Secret        Secret
-	UserService zrpc.RpcClientConf
-	AuthService zrpc.RpcClientConf
+	Mysql          Mysql
+	Redis          Redis
+	Jwks           Jwks
+	MailGun        MailGun
+	Secret         Secret
+	UserService    zrpc.RpcClientConf
+	AuthService    zrpc.RpcClientConf
+	MonitorService zrpc.RpcClientConf
+}
+
+type Monitor struct{
+	ReportInterval int64 `json:",env=MONITOR_REPORTINTERVAL"`
 }
 
 type Mysql struct {
@@ -36,8 +41,7 @@ type Secret struct {
 }
 
 type Jwks struct {
-	ServerURL       string `json:",env=JWKS_SERVER_URL"`
-	RefreshInterval int    `json:",env=JWKS_REFRESH_INTERVAL"`
+	RefreshInterval int `json:",env=JWKS_REFRESH_INTERVAL"`
 }
 
 type MailGun struct {

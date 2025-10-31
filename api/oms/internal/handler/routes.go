@@ -74,6 +74,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: jwks.DeleteKeyHandler(serverCtx),
 				},
 				{
+					// jwks密钥列表
+					Method:  http.MethodGet,
+					Path:    "/list",
+					Handler: jwks.GetJWKSHandler(serverCtx),
+				},
+				{
 					// 轮换公钥
 					Method:  http.MethodPut,
 					Path:    "/rotate",

@@ -2,9 +2,10 @@ module github.com/geekeryy/api-hub
 
 go 1.25.0
 
+replace github.com/MicahParks/jwkset => ../jwkset
+
 require (
 	github.com/BurntSushi/toml v1.5.0
-	github.com/MicahParks/jwkset v0.9.6
 	github.com/MicahParks/keyfunc/v3 v3.4.0
 	github.com/SpectatorNan/gorm-zero v1.7.0
 	github.com/dlclark/regexp2 v1.11.5
@@ -37,6 +38,8 @@ require (
 	gorm.io/gorm v1.30.0
 	gorm.io/plugin/opentelemetry v0.1.15
 )
+
+require github.com/MicahParks/jwkset v0.8.0
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect

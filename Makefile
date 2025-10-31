@@ -57,6 +57,7 @@ build:
 	GOOS=linux go build -o build/oms api/oms/oms.go
 	GOOS=linux go build -o build/auth rpc/auth/auth.go
 	GOOS=linux go build -o build/user rpc/user/user.go
+	GOOS=linux go build -o build/monitor rpc/monitor/monitor.go
 
 restart: build
 	docker compose -f deploy/local/docker-compose.yml up -d

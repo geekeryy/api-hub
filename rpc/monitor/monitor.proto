@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package monitor;
+
+option go_package = "./monitor";
+
+service MonitorService {
+    rpc ReportUserLoginMetrics(ReportUserLoginMetricsReq) returns (Empty);
+}
+
+message Empty {
+}
+
+message ReportUserLoginMetricsReq {
+    repeated ReportUserLoginMetricsItem items = 1;
+}
+
+message ReportUserLoginMetricsItem {
+    string user_uuid = 1; // 用户UUID
+    int64 timestamp = 2; // 时间戳
+    string ip = 3; // IP地址
+    string service = 4; // 服务名称
+    string kid = 5; // 密钥ID
+    string api = 6; // API路径
+    double duration = 7; // 耗时
+    int64 status = 8; // 状态码
+}

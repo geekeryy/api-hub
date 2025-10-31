@@ -14,6 +14,7 @@ services:
       - user
   oms:
     image: alpine:latest
+    restart: always
     ports:
       - 8081:8081
     env_file:
@@ -47,5 +48,14 @@ services:
       - ../../build/user:/app/user
     depends_on:
       - auth
-
+  monitor:
+    image: alpine:latest
+    ports:
+      - 8882:8882
+    env_file:
+      - ../../.env
+    command: ["/app/monitor", "-f", "/app/etc/monitor.yaml"]
+    volumes:
+      - ../../rpc/monitor/etc/monitor.yaml:/app/etc/monitor.yaml
+      - ../../build/monitor:/app/monitor
 

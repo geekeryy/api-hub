@@ -4,7 +4,9 @@ import (
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
+	"fmt"
 	"log"
+	"log/slog"
 	"maps"
 	"time"
 
@@ -12,6 +14,7 @@ import (
 	"github.com/MicahParks/keyfunc/v3"
 	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"golang.org/x/time/rate"
 )
 
 func AddKey(ctx context.Context, kid string, pub ed25519.PublicKey, jwksets *jwkset.MemoryJWKSet) error {
@@ -113,4 +116,60 @@ func GetGenerateTokenFunc(kid string, priv ed25519.PrivateKey) func(string, int6
 		}
 		return token, exp, nil
 	}
+}
+
+func NewDefaultOverrideCtx(ctx context.Context, requestJWKSetFunc func(ctx context.Context) (jwkset.JWKSMarshal, error), override keyfunc.Override) (keyfunc.Keyfunc, error) {
+	rateLimitWaitMax := time.Minute
+	if override.RateLimitWaitMax != 0 {
+		rateLimitWaitMax = override.RateLimitWaitMax
+	}
+	refreshErrorHandler := func(u string) func(ctx context.Context, err error) {
+		return func(ctx context.Context, err error) {
+			slog.Default().ErrorContext(ctx, "Failed to refresh JWK Set from resource.", "error", err)
+		}
+	}
+	if override.RefreshErrorHandlerFunc != nil {
+		refreshErrorHandler = override.RefreshErrorHandlerFunc
+	}
+	refreshInterval := time.Hour
+	if override.RefreshInterval > 0 {
+		refreshInterval = override.RefreshInterval
+	}
+	refreshUnknownKID := rate.NewLimiter(rate.Every(5*time.Minute), 1)
+	if override.RefreshUnknownKID != nil {
+		refreshUnknownKID = override.RefreshUnknownKID
+	}
+
+	storage, err := jwkset.NewCustomStorage(jwkset.CustomStorageOptions{
+		Ctx:                   ctx,
+		NoErrorReturnFirstReq: true,
+		RefreshErrorHandler:   refreshErrorHandler(""),
+		RefreshInterval:       refreshInterval,
+		ValidateOptions: jwkset.JWKValidateOptions{
+			SkipAll: override.ValidationSkipAll,
+		},
+		RequestJWKSetFunc: requestJWKSetFunc,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create custom storage: %w", err)
+	}
+
+	storageOverride, err := jwkset.NewHTTPClient(jwkset.HTTPClientOptions{
+		HTTPURLs: map[string]jwkset.Storage{
+			"custom_storage": storage,
+		},
+		RateLimitWaitMax:  rateLimitWaitMax,
+		RefreshUnknownKID: refreshUnknownKID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create HTTP client storage: %w", err)
+	}
+
+	options := keyfunc.Options{
+		Ctx:          ctx,
+		Storage:      storageOverride,
+		UseWhitelist: nil,
+	}
+
+	return keyfunc.New(options)
 }
