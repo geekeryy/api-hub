@@ -57,27 +57,27 @@ func (*Empty) Descriptor() ([]byte, []int) {
 	return file_rpc_monitor_monitor_proto_rawDescGZIP(), []int{0}
 }
 
-type ReportUserLoginMetricsReq struct {
+type ReportApiAccessMetricsReq struct {
 	state         protoimpl.MessageState        `protogen:"open.v1"`
-	Items         []*ReportUserLoginMetricsItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	Items         []*ReportApiAccessMetricsItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReportUserLoginMetricsReq) Reset() {
-	*x = ReportUserLoginMetricsReq{}
+func (x *ReportApiAccessMetricsReq) Reset() {
+	*x = ReportApiAccessMetricsReq{}
 	mi := &file_rpc_monitor_monitor_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ReportUserLoginMetricsReq) String() string {
+func (x *ReportApiAccessMetricsReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ReportUserLoginMetricsReq) ProtoMessage() {}
+func (*ReportApiAccessMetricsReq) ProtoMessage() {}
 
-func (x *ReportUserLoginMetricsReq) ProtoReflect() protoreflect.Message {
+func (x *ReportApiAccessMetricsReq) ProtoReflect() protoreflect.Message {
 	mi := &file_rpc_monitor_monitor_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -89,46 +89,47 @@ func (x *ReportUserLoginMetricsReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReportUserLoginMetricsReq.ProtoReflect.Descriptor instead.
-func (*ReportUserLoginMetricsReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use ReportApiAccessMetricsReq.ProtoReflect.Descriptor instead.
+func (*ReportApiAccessMetricsReq) Descriptor() ([]byte, []int) {
 	return file_rpc_monitor_monitor_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ReportUserLoginMetricsReq) GetItems() []*ReportUserLoginMetricsItem {
+func (x *ReportApiAccessMetricsReq) GetItems() []*ReportApiAccessMetricsItem {
 	if x != nil {
 		return x.Items
 	}
 	return nil
 }
 
-type ReportUserLoginMetricsItem struct {
+type ReportApiAccessMetricsItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserUuid      string                 `protobuf:"bytes,1,opt,name=user_uuid,json=userUuid,proto3" json:"user_uuid,omitempty"` // 用户UUID
-	Timestamp     int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`              // 时间戳
+	Service       string                 `protobuf:"bytes,1,opt,name=service,proto3" json:"service,omitempty"`                   // 服务名称
+	UserUuid      string                 `protobuf:"bytes,2,opt,name=user_uuid,json=userUuid,proto3" json:"user_uuid,omitempty"` // 用户UUID
 	Ip            string                 `protobuf:"bytes,3,opt,name=ip,proto3" json:"ip,omitempty"`                             // IP地址
-	Service       string                 `protobuf:"bytes,4,opt,name=service,proto3" json:"service,omitempty"`                   // 服务名称
+	Api           string                 `protobuf:"bytes,4,opt,name=api,proto3" json:"api,omitempty"`                           // API路径
 	Kid           string                 `protobuf:"bytes,5,opt,name=kid,proto3" json:"kid,omitempty"`                           // 密钥ID
-	Api           string                 `protobuf:"bytes,6,opt,name=api,proto3" json:"api,omitempty"`                           // API路径
-	Duration      float64                `protobuf:"fixed64,7,opt,name=duration,proto3" json:"duration,omitempty"`               // 耗时
-	Status        int64                  `protobuf:"varint,8,opt,name=status,proto3" json:"status,omitempty"`                    // 状态码
+	Status        int64                  `protobuf:"varint,6,opt,name=status,proto3" json:"status,omitempty"`                    // 状态码
+	Duration      int64                  `protobuf:"varint,7,opt,name=duration,proto3" json:"duration,omitempty"`                // 耗时
+	TraceId       string                 `protobuf:"bytes,8,opt,name=trace_id,json=traceId,proto3" json:"trace_id,omitempty"`    // 追踪ID
+	Timestamp     int64                  `protobuf:"varint,9,opt,name=timestamp,proto3" json:"timestamp,omitempty"`              // 时间戳
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ReportUserLoginMetricsItem) Reset() {
-	*x = ReportUserLoginMetricsItem{}
+func (x *ReportApiAccessMetricsItem) Reset() {
+	*x = ReportApiAccessMetricsItem{}
 	mi := &file_rpc_monitor_monitor_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ReportUserLoginMetricsItem) String() string {
+func (x *ReportApiAccessMetricsItem) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ReportUserLoginMetricsItem) ProtoMessage() {}
+func (*ReportApiAccessMetricsItem) ProtoMessage() {}
 
-func (x *ReportUserLoginMetricsItem) ProtoReflect() protoreflect.Message {
+func (x *ReportApiAccessMetricsItem) ProtoReflect() protoreflect.Message {
 	mi := &file_rpc_monitor_monitor_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -140,63 +141,70 @@ func (x *ReportUserLoginMetricsItem) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReportUserLoginMetricsItem.ProtoReflect.Descriptor instead.
-func (*ReportUserLoginMetricsItem) Descriptor() ([]byte, []int) {
+// Deprecated: Use ReportApiAccessMetricsItem.ProtoReflect.Descriptor instead.
+func (*ReportApiAccessMetricsItem) Descriptor() ([]byte, []int) {
 	return file_rpc_monitor_monitor_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ReportUserLoginMetricsItem) GetUserUuid() string {
-	if x != nil {
-		return x.UserUuid
-	}
-	return ""
-}
-
-func (x *ReportUserLoginMetricsItem) GetTimestamp() int64 {
-	if x != nil {
-		return x.Timestamp
-	}
-	return 0
-}
-
-func (x *ReportUserLoginMetricsItem) GetIp() string {
-	if x != nil {
-		return x.Ip
-	}
-	return ""
-}
-
-func (x *ReportUserLoginMetricsItem) GetService() string {
+func (x *ReportApiAccessMetricsItem) GetService() string {
 	if x != nil {
 		return x.Service
 	}
 	return ""
 }
 
-func (x *ReportUserLoginMetricsItem) GetKid() string {
+func (x *ReportApiAccessMetricsItem) GetUserUuid() string {
 	if x != nil {
-		return x.Kid
+		return x.UserUuid
 	}
 	return ""
 }
 
-func (x *ReportUserLoginMetricsItem) GetApi() string {
+func (x *ReportApiAccessMetricsItem) GetIp() string {
+	if x != nil {
+		return x.Ip
+	}
+	return ""
+}
+
+func (x *ReportApiAccessMetricsItem) GetApi() string {
 	if x != nil {
 		return x.Api
 	}
 	return ""
 }
 
-func (x *ReportUserLoginMetricsItem) GetDuration() float64 {
+func (x *ReportApiAccessMetricsItem) GetKid() string {
+	if x != nil {
+		return x.Kid
+	}
+	return ""
+}
+
+func (x *ReportApiAccessMetricsItem) GetStatus() int64 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *ReportApiAccessMetricsItem) GetDuration() int64 {
 	if x != nil {
 		return x.Duration
 	}
 	return 0
 }
 
-func (x *ReportUserLoginMetricsItem) GetStatus() int64 {
+func (x *ReportApiAccessMetricsItem) GetTraceId() string {
 	if x != nil {
-		return x.Status
+		return x.TraceId
+	}
+	return ""
+}
+
+func (x *ReportApiAccessMetricsItem) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
 	}
 	return 0
 }
@@ -207,19 +215,20 @@ const file_rpc_monitor_monitor_proto_rawDesc = "" +
 	"\n" +
 	"\x19rpc/monitor/monitor.proto\x12\amonitor\"\a\n" +
 	"\x05Empty\"V\n" +
-	"\x19ReportUserLoginMetricsReq\x129\n" +
-	"\x05items\x18\x01 \x03(\v2#.monitor.ReportUserLoginMetricsItemR\x05items\"\xd9\x01\n" +
-	"\x1aReportUserLoginMetricsItem\x12\x1b\n" +
-	"\tuser_uuid\x18\x01 \x01(\tR\buserUuid\x12\x1c\n" +
-	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x12\x0e\n" +
-	"\x02ip\x18\x03 \x01(\tR\x02ip\x12\x18\n" +
-	"\aservice\x18\x04 \x01(\tR\aservice\x12\x10\n" +
-	"\x03kid\x18\x05 \x01(\tR\x03kid\x12\x10\n" +
-	"\x03api\x18\x06 \x01(\tR\x03api\x12\x1a\n" +
-	"\bduration\x18\a \x01(\x01R\bduration\x12\x16\n" +
-	"\x06status\x18\b \x01(\x03R\x06status2^\n" +
+	"\x19ReportApiAccessMetricsReq\x129\n" +
+	"\x05items\x18\x01 \x03(\v2#.monitor.ReportApiAccessMetricsItemR\x05items\"\xf4\x01\n" +
+	"\x1aReportApiAccessMetricsItem\x12\x18\n" +
+	"\aservice\x18\x01 \x01(\tR\aservice\x12\x1b\n" +
+	"\tuser_uuid\x18\x02 \x01(\tR\buserUuid\x12\x0e\n" +
+	"\x02ip\x18\x03 \x01(\tR\x02ip\x12\x10\n" +
+	"\x03api\x18\x04 \x01(\tR\x03api\x12\x10\n" +
+	"\x03kid\x18\x05 \x01(\tR\x03kid\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\x03R\x06status\x12\x1a\n" +
+	"\bduration\x18\a \x01(\x03R\bduration\x12\x19\n" +
+	"\btrace_id\x18\b \x01(\tR\atraceId\x12\x1c\n" +
+	"\ttimestamp\x18\t \x01(\x03R\ttimestamp2^\n" +
 	"\x0eMonitorService\x12L\n" +
-	"\x16ReportUserLoginMetrics\x12\".monitor.ReportUserLoginMetricsReq\x1a\x0e.monitor.EmptyB\vZ\t./monitorb\x06proto3"
+	"\x16ReportApiAccessMetrics\x12\".monitor.ReportApiAccessMetricsReq\x1a\x0e.monitor.EmptyB\vZ\t./monitorb\x06proto3"
 
 var (
 	file_rpc_monitor_monitor_proto_rawDescOnce sync.Once
@@ -236,13 +245,13 @@ func file_rpc_monitor_monitor_proto_rawDescGZIP() []byte {
 var file_rpc_monitor_monitor_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_rpc_monitor_monitor_proto_goTypes = []any{
 	(*Empty)(nil),                      // 0: monitor.Empty
-	(*ReportUserLoginMetricsReq)(nil),  // 1: monitor.ReportUserLoginMetricsReq
-	(*ReportUserLoginMetricsItem)(nil), // 2: monitor.ReportUserLoginMetricsItem
+	(*ReportApiAccessMetricsReq)(nil),  // 1: monitor.ReportApiAccessMetricsReq
+	(*ReportApiAccessMetricsItem)(nil), // 2: monitor.ReportApiAccessMetricsItem
 }
 var file_rpc_monitor_monitor_proto_depIdxs = []int32{
-	2, // 0: monitor.ReportUserLoginMetricsReq.items:type_name -> monitor.ReportUserLoginMetricsItem
-	1, // 1: monitor.MonitorService.ReportUserLoginMetrics:input_type -> monitor.ReportUserLoginMetricsReq
-	0, // 2: monitor.MonitorService.ReportUserLoginMetrics:output_type -> monitor.Empty
+	2, // 0: monitor.ReportApiAccessMetricsReq.items:type_name -> monitor.ReportApiAccessMetricsItem
+	1, // 1: monitor.MonitorService.ReportApiAccessMetrics:input_type -> monitor.ReportApiAccessMetricsReq
+	0, // 2: monitor.MonitorService.ReportApiAccessMetrics:output_type -> monitor.Empty
 	2, // [2:3] is the sub-list for method output_type
 	1, // [1:2] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

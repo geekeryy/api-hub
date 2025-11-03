@@ -6,8 +6,9 @@ package pgcache
 import (
 	"database/sql"
 	"fmt"
-	"github.com/SpectatorNan/gorm-zero/gormc/config/pg"
 	"time"
+
+	"github.com/SpectatorNan/gorm-zero/gormc/config/pg"
 
 	_ "github.com/lib/pq"
 )
@@ -29,6 +30,9 @@ func NewCache(conf pg.PgSql) (*Cache, error) {
 	connStr := fmt.Sprintf("user=%s dbname=%s host=%s port=%d password=%s sslmode=%s", conf.Username, conf.Dbname, conf.Path, conf.Port, conf.Password, conf.SslMode)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
+		return nil, err
+	}
+	if err := db.Ping(); err != nil {
 		return nil, err
 	}
 

@@ -23,7 +23,7 @@ func NewMonitorServiceServer(svcCtx *svc.ServiceContext) *MonitorServiceServer {
 	}
 }
 
-func (s *MonitorServiceServer) ReportUserLoginMetrics(ctx context.Context, in *monitor.ReportUserLoginMetricsReq) (*monitor.Empty, error) {
-	l := monitorservicelogic.NewReportUserLoginMetricsLogic(ctx, s.svcCtx)
-	return l.ReportUserLoginMetrics(in)
+func (s *MonitorServiceServer) ReportApiAccessMetrics(ctx context.Context, in *monitor.ReportApiAccessMetricsReq) (*monitor.Empty, error) {
+	l := monitorservicelogic.NewReportApiAccessMetricsLogic(ctx, s.svcCtx)
+	return l.ReportApiAccessMetrics(in)
 }

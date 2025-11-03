@@ -13,6 +13,7 @@ import (
 	_ "github.com/geekeryy/api-hub/library/localization" // 初始化翻译模块
 	"github.com/geekeryy/api-hub/library/xerror"
 	"github.com/pkg/errors"
+	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -44,7 +45,7 @@ func TestErrorHandler(t *testing.T) {
 			status.Error(codes.Unauthenticated, "unauthenticated"),
 			handler.BaseResponse{
 				Code: 500,
-				Msg:  "unknown error",
+				Msg:  "unknown grpc error",
 			},
 		},
 		{
@@ -67,7 +68,7 @@ func TestErrorHandler(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := xcontext.WithLang(context.Background(), language.ZH)
-			if _, got := handler.ErrorHandler(ctx, tt.err); !reflect.DeepEqual(got, tt.want) {
+			if _, got := handler.ErrorHandler(logx.WithContext(context.Background()))(ctx, tt.err); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ErrorHandler(err) got %v, want %v", got, tt.want)
 			}
 		})
@@ -103,7 +104,7 @@ func TestErrorInterceptor(t *testing.T) {
 			_, grpcgot := coreError.ErrorInterceptor(ctx, nil, nil, func(ctx context.Context, req interface{}) (interface{}, error) {
 				return nil, tt.err
 			})
-			if _, got := handler.ErrorHandler(ctx, grpcgot); !reflect.DeepEqual(got, tt.want) {
+			if _, got := handler.ErrorHandler(logx.WithContext(context.Background()))(ctx, grpcgot); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ErrorHandler(err) got %v, want %v", got, tt.want)
 			}
 		})

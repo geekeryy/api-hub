@@ -15,11 +15,11 @@ import (
 
 type (
 	Empty                      = monitor.Empty
-	ReportUserLoginMetricsItem = monitor.ReportUserLoginMetricsItem
-	ReportUserLoginMetricsReq  = monitor.ReportUserLoginMetricsReq
+	ReportApiAccessMetricsItem = monitor.ReportApiAccessMetricsItem
+	ReportApiAccessMetricsReq  = monitor.ReportApiAccessMetricsReq
 
 	MonitorService interface {
-		ReportUserLoginMetrics(ctx context.Context, in *ReportUserLoginMetricsReq, opts ...grpc.CallOption) (*Empty, error)
+		ReportApiAccessMetrics(ctx context.Context, in *ReportApiAccessMetricsReq, opts ...grpc.CallOption) (*Empty, error)
 	}
 
 	defaultMonitorService struct {
@@ -33,7 +33,7 @@ func NewMonitorService(cli zrpc.Client) MonitorService {
 	}
 }
 
-func (m *defaultMonitorService) ReportUserLoginMetrics(ctx context.Context, in *ReportUserLoginMetricsReq, opts ...grpc.CallOption) (*Empty, error) {
+func (m *defaultMonitorService) ReportApiAccessMetrics(ctx context.Context, in *ReportApiAccessMetricsReq, opts ...grpc.CallOption) (*Empty, error) {
 	client := monitor.NewMonitorServiceClient(m.cli.Conn())
-	return client.ReportUserLoginMetrics(ctx, in, opts...)
+	return client.ReportApiAccessMetrics(ctx, in, opts...)
 }

@@ -17,7 +17,7 @@ type Config struct {
 	MonitorService zrpc.RpcClientConf
 }
 
-type Monitor struct{
+type Monitor struct {
 	ReportInterval int64 `json:",env=MONITOR_REPORTINTERVAL"`
 }
 

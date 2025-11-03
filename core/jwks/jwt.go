@@ -39,6 +39,7 @@ func ValidateToken(tokenStr string, k keyfunc.Keyfunc) (jwt.MapClaims, error) {
 	if err != nil {
 		return nil, err
 	}
+	claims[jwkset.HeaderKID] = token.Header[jwkset.HeaderKID]
 	if !token.Valid {
 		return nil, errors.New("invalid token")
 	}

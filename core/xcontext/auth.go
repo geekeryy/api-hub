@@ -69,3 +69,17 @@ func GetClientIp(ctx context.Context) string {
 	}
 	return ip[0]
 }
+
+type kid struct{}
+
+func WithKID(ctx context.Context, KID string) context.Context {
+	return context.WithValue(ctx, kid{}, KID)
+}
+
+func GetKID(ctx context.Context) string {
+	KID, ok := ctx.Value(kid{}).(string)
+	if !ok {
+		return ""
+	}
+	return KID
+}

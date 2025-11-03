@@ -57,29 +57,29 @@ Secret:
   PublicKey: 
 
 
-Telemetry:
-  Batcher: otlphttp
-  OtlpHeaders:
-    Authorization: "${TELEMETRY_AUTH}"
-  Endpoint: "${TELEMETRY_ENDPOINT}"
-  OtlpHttpPath: /otlp/v1/traces
-  OtlpHttpSecure: true
+# Telemetry:
+#   Batcher: otlphttp
+#   OtlpHeaders:
+#     Authorization: "${TELEMETRY_AUTH}"
+#   Endpoint: "${TELEMETRY_ENDPOINT}"
+#   OtlpHttpPath: /otlp/v1/traces
+#   OtlpHttpSecure: true
 
-Profiling:
-  ServerAddr: ${PROFILING_SERVER_ADDR}
-  AuthUser: "${PROFILING_AUTH_USER}"
-  AuthPassword: ${PROFILING_AUTH_PASSWORD}
-  CpuThreshold: 0
-  ProfileType:
-    Logger: true
-    CPU: true
-    Goroutines: true
-    Memory: true
-    Mutex: false
-    Block: false
+# Profiling:
+#   ServerAddr: ${PROFILING_SERVER_ADDR}
+#   AuthUser: "${PROFILING_AUTH_USER}"
+#   AuthPassword: ${PROFILING_AUTH_PASSWORD}
+#   CpuThreshold: 0
+#   ProfileType:
+#     Logger: true
+#     CPU: true
+#     Goroutines: true
+#     Memory: true
+#     Mutex: false
+#     Block: false
 
-DevServer:
-  Enabled: true
-  Port: 6470
-  MetricsPath: /metrics
-  EnableMetrics: true
+# DevServer:
+#   Enabled: true
+#   Port: 6470
+#   MetricsPath: /metrics
+#   EnableMetrics: true

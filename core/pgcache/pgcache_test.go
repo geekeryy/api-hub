@@ -5,11 +5,12 @@ package pgcache_test
 
 import (
 	"fmt"
-	"github.com/SpectatorNan/gorm-zero/gormc/config/pg"
-	"github.com/geekeryy/api-hub/core/pgcache"
 	"log"
 	"testing"
 	"time"
+
+	"github.com/SpectatorNan/gorm-zero/gormc/config/pg"
+	"github.com/geekeryy/api-hub/core/pgcache"
 )
 
 var conf = pg.PgSql{
@@ -72,7 +73,8 @@ func TestLock(t *testing.T) {
 func TestPgCache(t *testing.T) {
 	var cache, err = pgcache.NewCache(conf)
 	if err != nil {
-		log.Fatal(err)
+		t.Skip("skip pgcache test")
+		return
 	}
 	defer cache.Close()
 

@@ -14,6 +14,7 @@ import (
 	"github.com/geekeryy/api-hub/rpc/user/client/memberservice"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/redis/go-redis/v9"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
@@ -39,6 +40,7 @@ type ServiceContext struct {
 	Kfunc                   keyfunc.Keyfunc
 	CodeLimiter             *lru.Cache[string, *limiter.Limiter]
 	GenerateTokenFunc       jwks.GenerateTokenFunc
+	logx.Logger
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -72,6 +74,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	client := zrpc.MustNewClient(c.MemberService)
 
+	logger := logx.WithContext(context.Background())
+
 	svc := &ServiceContext{
 		Config:            c,
 		ContextMiddleware: middleware.NewContextMiddleware().Handle,
@@ -90,6 +94,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		RefreshTokenModel:       authmodel.NewRefreshTokenModel(mysqlClient),
 
 		MemberService: memberservice.NewMemberService(client),
+		Logger:        logger,
 	}
 	return svc
 }

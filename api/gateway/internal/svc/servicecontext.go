@@ -23,6 +23,7 @@ import (
 	"github.com/geekeryy/api-hub/rpc/user/client/memberservice"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/redis/go-redis/v9"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
@@ -49,6 +50,7 @@ type ServiceContext struct {
 	CodeLimiter             *lru.Cache[string, *limiter.Limiter]
 	RedisClient             *redis.Client
 	MonitorService          monitorservice.MonitorService
+	logx.Logger
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -89,9 +91,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		log.Fatalf("Failed to create a keyfunc.Keyfunc from the server's URL.\nError: %s", err)
 	}
 
+	logger := logx.WithContext(context.Background())
+
 	svc := &ServiceContext{
 		Config:                  c,
-		ContextMiddleware:       middleware.NewContextMiddleware(monitorLazyClient).Handle,
+		ContextMiddleware:       middleware.NewContextMiddleware(monitorLazyClient, logger).Handle,
 		JwtMiddleware:           middleware.NewJwtMiddleware(kfunc).Handle,
 		AdminJwtMiddleware:      middleware.NewAdminJwtMiddleware(kfunc).Handle,
 		Kfunc:                   kfunc,
@@ -109,6 +113,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		MemberService:  memberservice.NewMemberService(userClient),
 		AuthService:    authservice.NewAuthService(authClient),
 		MonitorService: monitorservice.NewMonitorService(monitorLazyClient),
+		Logger:         logger,
 	}
 	return svc
 }

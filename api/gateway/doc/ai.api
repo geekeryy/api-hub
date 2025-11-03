@@ -2,7 +2,7 @@
 	group:      ai
 	prefix:     /api/v1/gateway/ai
 	tags:       "AI"
-	middleware: JwtMiddleware,ContextMiddleware
+	middleware: ContextMiddleware,JwtMiddleware
 )
 service gateway-api {
 	@doc (

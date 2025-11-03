@@ -11,4 +11,5 @@ message Error {
   repeated string slacks = 5;
   int64 status = 6;
   repeated string details = 7;
+  string originalError = 8;
 }

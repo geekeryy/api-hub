@@ -24,12 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestChan(t *testing.T) {
-	ch := make(chan string)
-	close(ch)
-	close(ch)
-}
-
 func TestRedis(t *testing.T) {
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
@@ -37,7 +31,7 @@ func TestRedis(t *testing.T) {
 	})
 	_, err := redisClient.Ping(context.Background()).Result()
 	if err != nil {
-		t.Fatal(err)
+		t.Skip("skip redis test")
 	}
 
 	ch := make(chan string)

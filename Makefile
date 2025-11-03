@@ -1,4 +1,4 @@
-.PHONY: gen-api gen-rpc model sync-api-doc lint apifox build restart
+.PHONY: gen-api gen-rpc model sync-api-doc lint test apifox build restart
 
 # Generate api go files
 # Example: make gen-api s=oms
@@ -39,6 +39,8 @@ lint:
 	golangci-lint fmt
 	golangci-lint run
 
+test:
+	go test -v ./...
 
 ############################################ 辅助命令 #################################################
 
@@ -61,3 +63,4 @@ build:
 
 restart: build
 	docker compose -f deploy/local/docker-compose.yml up -d
+	docker compose -f deploy/local/docker-compose.yml restart

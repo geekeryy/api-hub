@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/MicahParks/jwkset"
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/geekeryy/api-hub/core/consts"
 	"github.com/geekeryy/api-hub/core/jwks"
@@ -47,7 +48,9 @@ func (m *JwtMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		r = r.WithContext(xcontext.WithMemberUUID(r.Context(), memberId))
+		ctx := xcontext.WithKID(r.Context(), claims[jwkset.HeaderKID].(string))
+		ctx = xcontext.WithMemberUUID(ctx, memberId)
+		r = r.WithContext(ctx)
 		next(w, r)
 	}
 }

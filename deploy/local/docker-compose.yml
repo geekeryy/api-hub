@@ -1,6 +1,7 @@
 services:
   gateway:
     image: alpine:latest
+    restart: always
     ports:
       - 8080:8080
     env_file:
@@ -50,6 +51,7 @@ services:
       - auth
   monitor:
     image: alpine:latest
+    restart: always
     ports:
       - 8882:8882
     env_file:

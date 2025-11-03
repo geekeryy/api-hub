@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MonitorService_ReportUserLoginMetrics_FullMethodName = "/monitor.MonitorService/ReportUserLoginMetrics"
+	MonitorService_ReportApiAccessMetrics_FullMethodName = "/monitor.MonitorService/ReportApiAccessMetrics"
 )
 
 // MonitorServiceClient is the client API for MonitorService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MonitorServiceClient interface {
-	ReportUserLoginMetrics(ctx context.Context, in *ReportUserLoginMetricsReq, opts ...grpc.CallOption) (*Empty, error)
+	ReportApiAccessMetrics(ctx context.Context, in *ReportApiAccessMetricsReq, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type monitorServiceClient struct {
@@ -37,10 +37,10 @@ func NewMonitorServiceClient(cc grpc.ClientConnInterface) MonitorServiceClient {
 	return &monitorServiceClient{cc}
 }
 
-func (c *monitorServiceClient) ReportUserLoginMetrics(ctx context.Context, in *ReportUserLoginMetricsReq, opts ...grpc.CallOption) (*Empty, error) {
+func (c *monitorServiceClient) ReportApiAccessMetrics(ctx context.Context, in *ReportApiAccessMetricsReq, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, MonitorService_ReportUserLoginMetrics_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, MonitorService_ReportApiAccessMetrics_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *monitorServiceClient) ReportUserLoginMetrics(ctx context.Context, in *R
 // All implementations must embed UnimplementedMonitorServiceServer
 // for forward compatibility.
 type MonitorServiceServer interface {
-	ReportUserLoginMetrics(context.Context, *ReportUserLoginMetricsReq) (*Empty, error)
+	ReportApiAccessMetrics(context.Context, *ReportApiAccessMetricsReq) (*Empty, error)
 	mustEmbedUnimplementedMonitorServiceServer()
 }
 
@@ -62,8 +62,8 @@ type MonitorServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMonitorServiceServer struct{}
 
-func (UnimplementedMonitorServiceServer) ReportUserLoginMetrics(context.Context, *ReportUserLoginMetricsReq) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReportUserLoginMetrics not implemented")
+func (UnimplementedMonitorServiceServer) ReportApiAccessMetrics(context.Context, *ReportApiAccessMetricsReq) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReportApiAccessMetrics not implemented")
 }
 func (UnimplementedMonitorServiceServer) mustEmbedUnimplementedMonitorServiceServer() {}
 func (UnimplementedMonitorServiceServer) testEmbeddedByValue()                        {}
@@ -86,20 +86,20 @@ func RegisterMonitorServiceServer(s grpc.ServiceRegistrar, srv MonitorServiceSer
 	s.RegisterService(&MonitorService_ServiceDesc, srv)
 }
 
-func _MonitorService_ReportUserLoginMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReportUserLoginMetricsReq)
+func _MonitorService_ReportApiAccessMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReportApiAccessMetricsReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MonitorServiceServer).ReportUserLoginMetrics(ctx, in)
+		return srv.(MonitorServiceServer).ReportApiAccessMetrics(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MonitorService_ReportUserLoginMetrics_FullMethodName,
+		FullMethod: MonitorService_ReportApiAccessMetrics_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MonitorServiceServer).ReportUserLoginMetrics(ctx, req.(*ReportUserLoginMetricsReq))
+		return srv.(MonitorServiceServer).ReportApiAccessMetrics(ctx, req.(*ReportApiAccessMetricsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +112,8 @@ var MonitorService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*MonitorServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ReportUserLoginMetrics",
-			Handler:    _MonitorService_ReportUserLoginMetrics_Handler,
+			MethodName: "ReportApiAccessMetrics",
+			Handler:    _MonitorService_ReportApiAccessMetrics_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

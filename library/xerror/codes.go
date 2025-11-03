@@ -196,3 +196,18 @@ func newerr(c int64, msg string) *coreError.Error {
 		TemplateDate: make(map[string]string),
 	}
 }
+
+func New(err error, e *coreError.Error) *coreError.Error {
+	slacks := coreError.Callers()
+	if len(slacks) > 1 {
+		slacks = slacks[len(slacks)-1:]
+	}
+	return &coreError.Error{
+		Code:          e.Code,
+		MessageId:     e.MessageId,
+		Plural:        0,
+		TemplateDate:  make(map[string]string),
+		OriginalError: err.Error(),
+		Slacks:        slacks,
+	}
+}

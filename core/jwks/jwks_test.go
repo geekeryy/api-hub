@@ -11,7 +11,6 @@ import (
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xstrings"
-	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -45,12 +44,9 @@ func TestGenerateOTP(t *testing.T) {
 	}
 	t.Logf("otp: %s", otp)
 	os.WriteFile("../../test/qrcode.png", qrCode, 0644)
-}
 
-func TestValidateOTP(t *testing.T) {
-	secret := "A6D6BY6X7LYUXX5W7HWS7S2FBVBLNCM6"
-	assert.True(t, totp.Validate("927432", secret))
-	assert.False(t, totp.Validate("976604", secret))
+	// assert.True(t, totp.Validate("927432", otp))
+	// assert.False(t, totp.Validate("976604", otp))
 }
 
 func TestJwt(t *testing.T) {

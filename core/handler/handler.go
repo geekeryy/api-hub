@@ -21,92 +21,86 @@ type BaseResponse struct {
 }
 
 // ErrorHandler 处理http错误消息
-// 用法：
-//
-// 1. 返回内置错误
-// 2. 打印错误日志
-//
-//			http层：直接返回内置错误，隐藏下层错误
-//			    return xerror.SystemErr                                    // 直接返回内置错误消息（错误细节需要在发生出打印）
-//		    	return xerror.InvalidParameterErr.WithMessage(err.Error()) // 返回自定义错误消息（错误细节需要在发生出打印）
-//	            return xerror.New(err,xerror.InvalidParameterErr)          // 将内置错误追加到原始错误之后，给下层兜底
-//		    	return err                                                 // 当前层不做处理，直接返回原始错误（普通错误、grpc错误）
-//			grpc层：使用下层的内置错误（从details中查找最近一个内置错误）
-//			    return xerror.SystemErr.Rpc()                     // 直接返回内置错误消息（错误细节需要在发生出打印）
-//		    	return xerror.New(err,xerror.InvalidParameterErr) // 将内置错误追加到原始错误之后，给下层兜底
-//	                                                              // 将原始错误带给上层，让上层进行逻辑处理
-//		    	return err                                        // 当前层不做处理，让上层处理要返回的错误（错误细节需要在发生出打印）
-func ErrorHandler(ctx context.Context, err error) (statusCode int, errResponse any) {
-	if err == nil {
-		return http.StatusOK, nil
-	}
+// 1. 处理内置错误，支持国际化
+// 2. 处理标准grpc错误，提取最新内置错误
+// 3. 处理未知错误，打印详细错误日志
+// 4. 返回http响应
+func ErrorHandler(logger logx.Logger) func(ctx context.Context, err error) (statusCode int, errResponse any) {
+	return func(ctx context.Context, err error) (statusCode int, errResponse any) {
+		if err == nil {
+			return http.StatusOK, nil
+		}
+		logger := logger.WithContext(ctx).WithCallerSkip(4)
 
-	target := &coreError.Error{}
-	if errors.As(err, &target) {
-		fields := make([]logx.LogField, 0, len(target.Slacks)+1)
-		fields = append(fields, logx.Field("code", target.Code))
-		for i, v := range target.Slacks {
-			fields = append(fields, logx.Field(fmt.Sprintf("callers[%d]", i), v))
-		}
-		for i, v := range target.Details {
-			fields = append(fields, logx.Field(fmt.Sprintf("detail[%d]", i), v))
-		}
-		logx.WithContext(ctx).Errorw(target.MessageId, fields...)
-		return transform(ctx, target)
-	}
-
-	s, ok := status.FromError(err)
-	if !ok {
-		logx.WithContext(ctx).Error(err.Error())
-		return http.StatusInternalServerError, BaseResponse{
-			Code: 500,
-			Msg:  "unknown error",
-		}
-	}
-
-	found := false
-	for _, detail := range s.Proto().Details {
-		detail, err := detail.UnmarshalNew()
-		if err != nil {
-			logx.WithContext(ctx).Errorw("unmarshal detail", logx.Field("error", err))
-			continue
-		}
-		target, ok = detail.(*coreError.Error)
-		if !ok {
-			logx.WithContext(ctx).Errorw("unknown detail", logx.Field("error", detail))
-			continue
-		}
-		if !found {
-			fields := make([]logx.LogField, 0)
+		// 处理内置错误
+		target := &coreError.Error{}
+		if errors.As(err, &target) {
+			fields := make([]logx.LogField, 0, len(target.Slacks)+1)
+			fields = append(fields, logx.Field("code", target.Code))
 			for i, v := range target.Slacks {
 				fields = append(fields, logx.Field(fmt.Sprintf("callers[%d]", i), v))
 			}
 			for i, v := range target.Details {
 				fields = append(fields, logx.Field(fmt.Sprintf("detail[%d]", i), v))
 			}
-			logx.WithContext(ctx).Errorw(s.Message(), fields...)
-			statusCode, errResponse = transform(ctx, target)
-			found = true
+			if target.OriginalError != "" {
+				fields = append(fields, logx.Field("originalError", target.OriginalError))
+			}
+			logger.Errorw(target.MessageId, fields...)
+			return transform(ctx, target)
+		}
+
+		s, ok := status.FromError(err)
+		if !ok {
+			// 未知错误
+			logger.WithFields(logx.Field("error", err)).Error("unknown error")
+			return http.StatusInternalServerError, BaseResponse{
+				Code: 500,
+				Msg:  "unknown error",
+			}
+		}
+
+		// 处理标准grpc错误
+		found := false
+		proto := s.Proto()
+		for i := len(proto.Details) - 1; i >= 0; i-- {
+			detail, err := proto.Details[i].UnmarshalNew()
+			if err != nil {
+				logger.Errorw("UnmarshalNew detail", logx.Field("error", err))
+				continue
+			}
+			target, ok = detail.(*coreError.Error)
+			if !ok {
+				// 未知细节，打印
+				logger.Errorw("unknown detail", logx.Field("error", detail))
+				continue
+			}
+			if !found {
+				fields := make([]logx.LogField, 0)
+				for i, v := range target.Slacks {
+					fields = append(fields, logx.Field(fmt.Sprintf("callers[%d]", i), v))
+				}
+				for i, v := range target.Details {
+					fields = append(fields, logx.Field(fmt.Sprintf("detail[%d]", i), v))
+				}
+				logger.Errorw(s.Message(), fields...)
+				statusCode, errResponse = transform(ctx, target)
+				found = true
+			}
+		}
+
+		if found {
+			return statusCode, errResponse
+		}
+
+		// 未知grpc错误，http直接返回了没有附加内置错误的grpc错误
+		logger.WithFields(logx.Field("code", uint32(s.Code())), logx.Field("err", s)).Error("unknown grpc error")
+
+		return http.StatusInternalServerError, BaseResponse{
+			Code: 500,
+			Msg:  "unknown grpc error",
 		}
 	}
-
-	if found {
-		return statusCode, errResponse
-	}
-
-	logx.WithContext(ctx).WithFields(logx.Field("code", uint32(s.Code()))).Error(s)
-
-	return http.StatusInternalServerError, BaseResponse{
-		Code: 500,
-		Msg:  "unknown error",
-	}
-}
-
-func getCaller(slacks []string) string {
-	if len(slacks) == 0 {
-		return ""
-	}
-	return slacks[0]
 }
 
 // transform 将内置错误转换为http返回

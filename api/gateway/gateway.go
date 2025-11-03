@@ -31,7 +31,7 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
 
-	httpx.SetErrorHandlerCtx(coreHandler.ErrorHandler)
+	httpx.SetErrorHandlerCtx(coreHandler.ErrorHandler(ctx.Logger))
 	httpx.SetOkHandler(coreHandler.OkHandler)
 
 	proc.AddWrapUpListener(func() {

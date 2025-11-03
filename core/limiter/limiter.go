@@ -28,8 +28,8 @@ type Limiter struct {
 	windows  []*timeSlot
 	width    time.Duration
 	size     time.Duration
-	perCount int64
-	maxCount int64
+	perCount int64 // 每个size窗口内最多请求数量
+	maxCount int64 // width窗口内最大请求数量
 }
 
 func NewLimiter(width time.Duration, size time.Duration, perCount int64, maxCount int64) *Limiter {
