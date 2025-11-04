@@ -88,4 +88,4 @@ tag: tag-amd64 tag-arm64
 	docker manifest push $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)
 
 deploy:
-	docker compose -f deploy/prod/docker-compose.yml --env-file .env up -d --pull always
+	docker compose -f deploy/prod/docker-compose.yml up -d --pull always

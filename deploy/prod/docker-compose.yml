@@ -1,4 +1,10 @@
 services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
   gateway:
     image: ccr.ccs.tencentyun.com/private-0/api-hub-all:latest
     restart: always
