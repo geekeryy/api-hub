@@ -22,6 +22,7 @@ import (
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/limiter"
 	"github.com/geekeryy/api-hub/core/validate"
+	"github.com/geekeryy/api-hub/core/xgrpc"
 )
 
 type ServiceContext struct {
@@ -76,9 +77,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	logger := logx.WithContext(context.Background())
 
+	monitorLazyClient := xgrpc.NewLazyClient(c.MonitorService, 60)
+
 	svc := &ServiceContext{
 		Config:            c,
-		ContextMiddleware: middleware.NewContextMiddleware().Handle,
+		ContextMiddleware: middleware.NewContextMiddleware(monitorLazyClient, logger).Handle,
 		OmsJwtMiddleware:  middleware.NewOmsJwtMiddleware(kfunc).Handle,
 		Kfunc:             kfunc,
 		GenerateTokenFunc: generateTokenFunc,

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/MicahParks/jwkset"
@@ -54,6 +53,8 @@ type ServiceContext struct {
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
+	logger := logx.WithContext(context.Background())
+
 	mysqlClient, err := sqlx.NewConn(sqlx.SqlConf{
 		DataSource: fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", c.Mysql.Username, c.Mysql.Password, c.Mysql.Host, c.Mysql.Dbname),
 		DriverName: "mysql",
@@ -61,7 +62,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Policy:     "",
 	})
 	if err != nil {
-		log.Fatalf("failed to open mysql: %v", err)
+		logger.Errorf("failed to open mysql: %v", err)
 	}
 
 	redisClient := redis.NewClient(&redis.Options{
@@ -70,28 +71,31 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		DB:       c.Redis.Db,
 	})
 	if err != nil {
-		log.Fatalf("failed to open redis: %v", err)
+		logger.Errorf("failed to open redis: %v", err)
 	}
 
 	codeLimiter, err := lru.New[string, *limiter.Limiter](1000)
 	if err != nil {
-		log.Fatalf("Failed to init code limiter. Error: %s", err)
+		logger.Errorf("Failed to init code limiter. Error: %s", err)
 	}
 
 	userClient := zrpc.MustNewClient(c.UserService)
 	authClient := zrpc.MustNewClient(c.AuthService)
-	monitorLazyClient := xgrpc.NewLazyClient(c.MonitorService, 3)
+	monitorLazyClient := xgrpc.NewLazyClient(c.MonitorService, 60)
 
 	kfunc, err := jwks.NewDefaultOverrideCtx(context.Background(), requestJWKSetFromGrpc(authClient), keyfunc.Override{
 		RefreshInterval:   time.Duration(c.Jwks.RefreshInterval) * time.Second,
-		RateLimitWaitMax:  time.Duration(c.Jwks.RefreshInterval/2) * time.Second,
+		RateLimitWaitMax:  3 * time.Second,
 		RefreshUnknownKID: rate.NewLimiter(rate.Every(1*time.Minute), 2),
+		RefreshErrorHandlerFunc: func(u string) func(ctx context.Context, err error) {
+			return func(ctx context.Context, err error) {
+				logger.Errorf("Failed to refresh JWK Set from resource. Error: %v", err)
+			}
+		},
 	})
 	if err != nil {
-		log.Fatalf("Failed to create a keyfunc.Keyfunc from the server's URL.\nError: %s", err)
+		logger.Errorf("Failed to create a keyfunc.Keyfunc from the server's URL. Error: %s", err)
 	}
-
-	logger := logx.WithContext(context.Background())
 
 	svc := &ServiceContext{
 		Config:                  c,

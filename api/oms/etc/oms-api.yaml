@@ -22,6 +22,12 @@ MemberService:
     - "user:8881"
     - "localhost:8881"
 
+MonitorService:
+  Timeout: 10000
+  Endpoints:
+    - "monitor:8882"
+    - "localhost:8882"
+
 MailGun:
   Domain: 
   ApiKey: 

@@ -13,12 +13,13 @@ type Config struct {
 		AccessExpire  int `json:",env=AUTH_ACCESS_EXPIRE,default=600"`
 		RefreshExpire int `json:",env=AUTH_REFRESH_EXPIRE,default=2592000"`
 	}
-	Mysql         Mysql
-	Redis         Redis
-	MailGun       MailGun
-	Secret        Secret
-	Oms           Oms
-	MemberService zrpc.RpcClientConf
+	Mysql          Mysql
+	Redis          Redis
+	MailGun        MailGun
+	Secret         Secret
+	Oms            Oms
+	MemberService  zrpc.RpcClientConf
+	MonitorService zrpc.RpcClientConf
 }
 
 func (c *Config) Validate() error {
