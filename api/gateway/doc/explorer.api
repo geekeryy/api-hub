@@ -1,0 +1,23 @@
+@server (
+	group:      explorer
+	prefix:     /api/v1/gateway/explorer
+	tags:       "Explorer"
+	middleware: ContextMiddleware
+)
+service gateway-api {
+	@doc (
+		summary: "RSS代理"
+	)
+	@handler RssProxyHandler
+	get /rss-proxy (RssProxyReq) returns (RssProxyResp)
+}
+
+type (
+	RssProxyReq {
+		Url string `form:"url"` // RSS URL
+	}
+	RssProxyResp {
+		Content string `json:"content"` // RSS内容
+	}
+)
+

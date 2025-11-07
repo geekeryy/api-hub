@@ -10,6 +10,7 @@ import (
 	authadmin "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/admin"
 	authjwks "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/jwks"
 	authmember "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/member"
+	explorer "github.com/geekeryy/api-hub/api/gateway/internal/handler/explorer"
 	healthz "github.com/geekeryy/api-hub/api/gateway/internal/handler/healthz"
 	useradmin "github.com/geekeryy/api-hub/api/gateway/internal/handler/user/admin"
 	usermember "github.com/geekeryy/api-hub/api/gateway/internal/handler/user/member"
@@ -116,6 +117,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			}...,
 		),
 		rest.WithPrefix("/api/v1/gateway/auth/member"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware},
+			[]rest.Route{
+				{
+					// RSS代理
+					Method:  http.MethodGet,
+					Path:    "/rss-proxy",
+					Handler: explorer.RssProxyHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/gateway/explorer"),
 	)
 
 	server.AddRoutes(

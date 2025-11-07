@@ -622,6 +622,44 @@
         }
       }
     },
+    "/api/v1/gateway/explorer/rss-proxy": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "Explorer"
+        ],
+        "summary": "RSS代理",
+        "operationId": "explorerRssProxyHandler",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "RSS URL",
+            "name": "url",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "description": "RSS内容",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/gateway/ping": {
       "get": {
         "produces": [
@@ -1036,7 +1074,7 @@
       }
     }
   },
-  "x-date": "2025-11-03 10:10:19",
+  "x-date": "2025-11-07 11:04:03",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

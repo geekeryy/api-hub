@@ -39,6 +39,12 @@ var (
 
 	// 数据库错误
 	DBErr = newerr(1001, "DB_ERROR")
+
+	// 请求频率过高
+	RequestRateLimitErr = newerr(1002, "REQUEST_RATE_LIMIT_ERR")
+
+	// 请求失败
+	RequestFailedErr = newerr(1003, "REQUEST_FAILED_ERR")
 )
 
 // 自定义错误（10000~99999）

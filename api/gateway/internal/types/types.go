@@ -131,3 +131,11 @@ type MemberUpdateInfoReq struct {
 	Gender   int    `json:"gender,optional"`   // 性别
 	Birthday string `json:"birthday,optional"` // 生日
 }
+
+type RssProxyReq struct {
+	Url string `form:"url"` // RSS URL
+}
+
+type RssProxyResp struct {
+	Content string `json:"content"` // RSS内容
+}

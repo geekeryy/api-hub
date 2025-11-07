@@ -11,6 +11,7 @@ info (
 import "auth.api"
 import "user.api"
 import "ai.api"
+import "explorer.api"
 
 @server (
 	group:  healthz
