@@ -83,11 +83,10 @@ tag-arm64:
 	docker buildx build --platform linux/arm64 -t $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-arm64 -f Dockerfile .
 	docker push $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-arm64
 
-tag: tag-amd64 tag-arm64
-	@if ! docker manifest inspect $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG) > /dev/null 2>&1; then \
-		docker manifest create $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG) $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-amd64 $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-arm64; \
-		docker manifest push $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG); \
-	fi
+tag: 
+	docker manifest rm $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)
+	docker manifest create $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG) $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-amd64 $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-arm64; 
+	docker manifest push $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG); 
 
 deploy:
 	docker compose -f deploy/prod/docker-compose.yml up -d --pull always
