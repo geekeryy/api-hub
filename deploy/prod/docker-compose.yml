@@ -1,10 +1,14 @@
 services:
   nginx:
-    image: nginx:latest
+    image: nginx:1.29.3
     ports:
       - 80:80
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
+    restart: always
+    depends_on:
+      - gateway
+      - oms
   gateway:
     image: ccr.ccs.tencentyun.com/private-0/api-hub-all:latest
     restart: always
