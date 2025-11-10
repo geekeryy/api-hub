@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/geekeryy/api-hub/core/facebook"
+	"github.com/geekeryy/api-hub/core/github"
 	"github.com/geekeryy/api-hub/core/google"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xcontext"
@@ -132,7 +133,16 @@ func (l *MemberLoginLogic) MemberLogin(in *auth.MemberLoginReq) (*auth.MemberLog
 		thirdPartyId = userInfo.UserID
 		memberInfo.Email = userInfo.Email
 	case consts.IdentityTypeGithub:
-		// TODO: 实现github登录
+		token, err := github.GetToken(in.Credential, l.svcCtx.Config.Github.ClientID, l.svcCtx.Config.Github.ClientSecret)
+		if err != nil {
+			l.Errorf("Failed to get github token. Error: %s", err)
+			return nil, xerror.InternalServerErr
+		}
+		userInfo, err := github.GetUserInfo(token)
+		if err != nil {
+			return nil, err
+		}
+		thirdPartyId = fmt.Sprintf("%d", userInfo["id"])
 	}
 
 	if len(thirdPartyId) > 0 {

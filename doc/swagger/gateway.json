@@ -372,7 +372,7 @@
               ],
               "properties": {
                 "credential": {
-                  "description": "凭证 密码/验证码/access_token",
+                  "description": "凭证 密码/验证码/access_token/code",
                   "type": "string"
                 },
                 "identifier": {
@@ -1074,7 +1074,7 @@
       }
     }
   },
-  "x-date": "2025-11-07 11:04:03",
+  "x-date": "2025-11-11 00:01:01",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

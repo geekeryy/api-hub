@@ -2,7 +2,7 @@ module github.com/geekeryy/api-hub
 
 go 1.25.0
 
-replace github.com/MicahParks/jwkset => ../jwkset
+replace github.com/MicahParks/jwkset => github.com/geekeryy/jwkset v0.0.0-20251030070313-6ac7c02ef2b0
 
 require (
 	github.com/BurntSushi/toml v1.5.0
@@ -110,6 +110,7 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
+	github.com/sashabaranov/go-openai v1.41.2 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect

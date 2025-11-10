@@ -13,6 +13,7 @@ type Config struct {
 	Mysql     Mysql
 	RedisConf RedisConf
 	Secret    Secret
+	Github    Github
 }
 
 func (c *Config) Validate() error {
@@ -20,6 +21,11 @@ func (c *Config) Validate() error {
 		return errors.New("AUTH_ACCESS_EXPIRE must be greater than 0")
 	}
 	return nil
+}
+
+type Github struct {
+	ClientID     string `json:",env=GITHUB_CLIENT_ID"`
+	ClientSecret string `json:",env=GITHUB_CLIENT_SECRET"`
 }
 
 type Jwt struct {

@@ -86,7 +86,7 @@ type MemberInfoResp struct {
 type MemberLoginReq struct {
 	IdentityType int64  `json:"identity_type,options=1|2|3|4|5|6|7"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
 	Identifier   string `json:"identifier,optional"`                 // 标识符 账号/手机号/邮箱
-	Credential   string `json:"credential"`                          // 凭证 密码/验证码/access_token
+	Credential   string `json:"credential"`                          // 凭证 密码/验证码/access_token/code
 }
 
 type MemberLoginResp struct {

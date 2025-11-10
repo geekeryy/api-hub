@@ -15,6 +15,11 @@ type Config struct {
 	UserService    zrpc.RpcClientConf
 	AuthService    zrpc.RpcClientConf
 	MonitorService zrpc.RpcClientConf
+	Deepseek       Deepseek
+}
+
+type Deepseek struct {
+	ApiKey string `json:",env=DEEPSEEK_API_KEY"`
 }
 
 type Monitor struct {

@@ -56,6 +56,9 @@ Secret:
   PrivateKey: 
   PublicKey: 
 
+Deepseek:
+  ApiKey: 
+
 
 # Telemetry:
 #   Batcher: otlphttp
