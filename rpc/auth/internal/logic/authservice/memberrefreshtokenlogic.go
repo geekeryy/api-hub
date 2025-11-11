@@ -56,7 +56,7 @@ func (l *MemberRefreshTokenLogic) MemberRefreshToken(in *auth.MemberRefreshToken
 		l.Errorf("Failed to find latest jwks public. Error: %s", err)
 		return nil, xerror.InternalServerErr
 	}
-	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, "private_key_secr", nil)
+	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, l.svcCtx.Config.Secret.PrivateKey, nil)
 	if err != nil {
 		l.Errorf("Failed to decrypt private key. Error: %s", err)
 		return nil, err

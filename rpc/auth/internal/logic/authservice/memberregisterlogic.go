@@ -3,6 +3,7 @@ package authservicelogic
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xcontext"
@@ -55,7 +56,7 @@ func (l *MemberRegisterLogic) MemberRegister(in *auth.MemberRegisterReq) (*auth.
 		l.Errorf("Failed to find latest jwks public. Error: %s", err)
 		return nil, xerror.InternalServerErr
 	}
-	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, "private_key_secr", nil)
+	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, l.svcCtx.Config.Secret.PrivateKey, nil)
 	if err != nil {
 		l.Errorf("Failed to decrypt private key. Error: %s", err)
 		return nil, err
@@ -275,6 +276,7 @@ func (l *MemberRegisterLogic) registerEmail(in *auth.MemberRegisterReq, memberUU
 			MemberUuid: memberUUID,
 			Status:     consts.MemberStatusEnabled,
 			Email:      in.Identifier,
+			Birthday:   time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
 		})
 		if err != nil {
 			return err

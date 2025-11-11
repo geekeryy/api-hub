@@ -27,7 +27,7 @@ func NewMemberLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Membe
 
 // TODO 多个账号绑定同一个第三方账号/手机号/邮箱，需要处理
 func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.MemberLoginResp, err error) {
-	_, err = l.svcCtx.AuthService.MemberLogin(l.ctx, &authservice.MemberLoginReq{
+	memberLoginResp, err := l.svcCtx.AuthService.MemberLogin(l.ctx, &authservice.MemberLoginReq{
 		IdentityType: req.IdentityType,
 		Identifier:   req.Identifier,
 		Credential:   req.Credential,
@@ -35,5 +35,8 @@ func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.M
 	if err != nil {
 		return nil, err
 	}
-	return
+	return &types.MemberLoginResp{
+		Token:        memberLoginResp.Token,
+		RefreshToken: memberLoginResp.RefreshToken,
+	}, nil
 }

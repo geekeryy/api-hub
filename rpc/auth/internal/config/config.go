@@ -26,6 +26,7 @@ func (c *Config) Validate() error {
 type Github struct {
 	ClientID     string `json:",env=GITHUB_CLIENT_ID"`
 	ClientSecret string `json:",env=GITHUB_CLIENT_SECRET"`
+	RedirectUri  string `json:",env=GITHUB_REDIRECT_URI"`
 }
 
 type Jwt struct {

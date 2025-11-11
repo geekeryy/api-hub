@@ -27,7 +27,6 @@ type (
 	refreshTokenModel interface {
 		Insert(ctx context.Context, session sqlx.Session, data *RefreshToken) (sql.Result, error)
 		FindOne(ctx context.Context, id int64) (*RefreshToken, error)
-		FindOneByRefreshTokenHash(ctx context.Context, refreshTokenHash string) (*RefreshToken, error)
 		Update(ctx context.Context, data *RefreshToken) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -75,20 +74,6 @@ func (m *defaultRefreshTokenModel) FindOne(ctx context.Context, id int64) (*Refr
 	}
 }
 
-func (m *defaultRefreshTokenModel) FindOneByRefreshTokenHash(ctx context.Context, refreshTokenHash string) (*RefreshToken, error) {
-	var resp RefreshToken
-	query := fmt.Sprintf("select %s from %s where `refresh_token_hash` = ? limit 1", refreshTokenRows, m.table)
-	err := m.conn.QueryRowCtx(ctx, &resp, query, refreshTokenHash)
-	switch err {
-	case nil:
-		return &resp, nil
-	case sqlx.ErrNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, err
-	}
-}
-
 func (m *defaultRefreshTokenModel) Insert(ctx context.Context, session sqlx.Session, data *RefreshToken) (sql.Result, error) {
 	if session == nil {
 		session = m.conn
@@ -98,9 +83,9 @@ func (m *defaultRefreshTokenModel) Insert(ctx context.Context, session sqlx.Sess
 	return ret, err
 }
 
-func (m *defaultRefreshTokenModel) Update(ctx context.Context, newData *RefreshToken) error {
+func (m *defaultRefreshTokenModel) Update(ctx context.Context, data *RefreshToken) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, refreshTokenRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, newData.RefreshTokenHash, newData.MemberId, newData.Status, newData.ExpiredAt, newData.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.RefreshTokenHash, data.MemberId, data.Status, data.ExpiredAt, data.Id)
 	return err
 }
 

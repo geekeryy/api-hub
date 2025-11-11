@@ -1,5 +1,6 @@
 Name: auth.rpc
 ListenOn: 0.0.0.0:8880
+Timeout: 10000
 Log:
   Mode: console
   Level: info
@@ -30,5 +31,6 @@ Facebook:
   AppSecret: ${FACEBOOK_APP_SECRET}
 
 Github:
-  ClientID: 
-  ClientSecret: 
+  ClientID: ${GITHUB_CLIENT_ID}
+  ClientSecret: ${GITHUB_CLIENT_SECRET}
+  RedirectUri: ${GITHUB_REDIRECT_URI}

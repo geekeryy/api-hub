@@ -38,7 +38,7 @@ func (m *customJwksModel) withSession(session sqlx.Session) JwksModel {
 
 // FindLatest finds the latest jwks.
 func (m *customJwksModel) FindLatest(ctx context.Context) (*Jwks, error) {
-	query := fmt.Sprintf("select %s from %s order by `created_at` desc limit 1", jwksFieldNames, m.table)
+	query := fmt.Sprintf("select %s from %s order by `created_at` desc limit 1", jwksRows, m.table)
 	var resp Jwks
 	err := m.conn.QueryRowCtx(ctx, &resp, query)
 	if err != nil {

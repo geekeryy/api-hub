@@ -16,7 +16,7 @@ create table jwks
 create table refresh_token
 (
     id                   bigint auto_increment,
-    refresh_token_hash   varchar(255) not null unique,         -- 刷新令牌哈希
+    refresh_token_hash   text(3000) not null ,         -- 刷新令牌哈希
     member_id            varchar(255) not null,                -- 用户ID
     status               int not null,                         -- 状态 1: 正常 2: 禁用
     expired_at           datetime not null, -- 过期时间
@@ -30,8 +30,8 @@ create table refresh_token
 create table token_refresh_record
 (
     id                   bigint auto_increment,
-    refresh_token_hash   varchar(255) not null,                        -- 刷新令牌哈希
-    token                varchar(255) not null unique,                 -- 令牌
+    refresh_token_hash   text(3000) not null,                        -- 刷新令牌哈希
+    token                text(3000) not null unique,                 -- 令牌
     kid                  varchar(255) not null,                        -- 密钥ID
     ip                   varchar(255) not null default '',     -- IP地址
     user_agent           varchar(255) not null default '',     -- 用户代理

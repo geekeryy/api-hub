@@ -4,14 +4,21 @@ import (
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
+	"encoding/json"
+	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/MicahParks/jwkset"
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xstrings"
+	"github.com/geekeryy/api-hub/rpc/auth/client/authservice"
 	"github.com/stretchr/testify/assert"
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/zrpc"
+	"golang.org/x/time/rate"
 )
 
 func TestNewKeyfunc(t *testing.T) {
@@ -134,4 +141,48 @@ func TestRotateKey(t *testing.T) {
 		t.Fatalf("Failed to get JWKS.\nError: %s", err)
 	}
 	t.Logf("rawJWKS: %s", string(rawJWKS))
+}
+
+func TestGrpcJwks(t *testing.T) {
+	logger := logx.WithContext(context.Background())
+	authClient := zrpc.MustNewClient(zrpc.RpcClientConf{
+		Endpoints: []string{"localhost:8880"},
+	})
+	kfunc, err := jwks.NewDefaultOverrideCtx(context.Background(), requestJWKSetFromGrpc(authClient), keyfunc.Override{
+		RefreshInterval:   time.Duration(100) * time.Second,
+		RateLimitWaitMax:  3 * time.Second,
+		RefreshUnknownKID: rate.NewLimiter(rate.Every(1*time.Minute), 2),
+		RefreshErrorHandlerFunc: func(u string) func(ctx context.Context, err error) {
+			return func(ctx context.Context, err error) {
+				logger.Errorf("Failed to refresh JWK Set from resource. Error: %v", err)
+			}
+		},
+	})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	token := `eyJhbGciOiJFZERTQSIsImtpZCI6IjQ0MjBiYTU5LWY4ZjItNDQyMC1iMjg5LTNjYzRlMjY1ZmY0NCIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJtZW1iZXIiLCJleHAiOjE3NjI4ODAzMDgsImlhdCI6MTc2Mjg3NjcwOCwiaXNzIjoiYXBpLWh1YiIsIm5iZiI6MTc2Mjg3NjcwOCwic3ViIjoiYTJiYWE4MzgtNzc1OC00YTAyLWEyOTktOWZjZTBhNTczOGJkIn0.Vekm17WjnUaw2Pi0A83rAEpq5bCXJTHsGVBrEHof8CI4XSfktvCyGhU1kMnSoVHmvp1lKXmWl1SCYdSnQLF7Dg`
+
+	claims, err := jwks.ValidateToken(token, kfunc)
+	if err != nil {
+		t.Fatalf("Failed to validate token.\nError: %s", err)
+	}
+	t.Logf("claims: %+v", claims)
+}
+func requestJWKSetFromGrpc(conn zrpc.Client) func(ctx context.Context) (jwkset.JWKSMarshal, error) {
+	return func(ctx context.Context) (jwkset.JWKSMarshal, error) {
+		response, err := authservice.NewAuthService(conn).GetJwks(ctx, &authservice.GetJwksReq{})
+		if err != nil {
+			return jwkset.JWKSMarshal{}, err
+		}
+		var jwks jwkset.JWKSMarshal
+		err = json.Unmarshal([]byte(response.Data), &jwks)
+		if err != nil {
+			return jwkset.JWKSMarshal{}, err
+		}
+		fmt.Printf("jwks: %+v \n", jwks)
+		return jwks, nil
+	}
 }

@@ -1,6 +1,7 @@
 Name: gateway-api
 Host: 0.0.0.0
 Port: 8080
+Timeout: 20000
 Log:
   Mode: console
   Level: info
@@ -22,12 +23,14 @@ AuthService:
   Endpoints:
     - "auth:8880"
     - "localhost:8880"
+    - "host.docker.internal:8880"
 
 UserService:
   Timeout: 10000
   Endpoints:
     - "user:8881"
     - "localhost:8881"
+    - "host.docker.internal:8881"
 
 
 MonitorService:
@@ -35,6 +38,7 @@ MonitorService:
   Endpoints:
     - "monitor:8882"
     - "localhost:8882"
+    - "host.docker.internal:8882"
 
 Monitor:
   ReportInterval: 60

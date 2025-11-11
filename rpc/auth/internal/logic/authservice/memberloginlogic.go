@@ -3,6 +3,7 @@ package authservicelogic
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/geekeryy/api-hub/core/facebook"
 	"github.com/geekeryy/api-hub/core/github"
@@ -40,7 +41,7 @@ func NewMemberLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Membe
 func (l *MemberLoginLogic) MemberLogin(in *auth.MemberLoginReq) (*auth.MemberLoginResp, error) {
 	var memberID string
 	var thirdPartyId string
-	var memberInfo *membermodel.MemberInfo
+	memberInfo := &membermodel.MemberInfo{}
 	switch in.IdentityType {
 	case consts.IdentityTypePhone:
 		cacheValue, err := l.svcCtx.RedisClient.Get(l.ctx, fmt.Sprintf("phone_code_%s", in.Identifier)).Result()
@@ -133,7 +134,7 @@ func (l *MemberLoginLogic) MemberLogin(in *auth.MemberLoginReq) (*auth.MemberLog
 		thirdPartyId = userInfo.UserID
 		memberInfo.Email = userInfo.Email
 	case consts.IdentityTypeGithub:
-		token, err := github.GetToken(in.Credential, l.svcCtx.Config.Github.ClientID, l.svcCtx.Config.Github.ClientSecret)
+		token, err := github.GetToken(in.Credential, l.svcCtx.Config.Github.RedirectUri, l.svcCtx.Config.Github.ClientID, l.svcCtx.Config.Github.ClientSecret)
 		if err != nil {
 			l.Errorf("Failed to get github token. Error: %s", err)
 			return nil, xerror.InternalServerErr
@@ -142,7 +143,11 @@ func (l *MemberLoginLogic) MemberLogin(in *auth.MemberLoginReq) (*auth.MemberLog
 		if err != nil {
 			return nil, err
 		}
-		thirdPartyId = fmt.Sprintf("%d", userInfo["id"])
+		l.Infof("github user info: %v", userInfo)
+		thirdPartyId = fmt.Sprintf("%d", userInfo.ID)
+		memberInfo.Nickname = userInfo.Name
+		memberInfo.Avatar = userInfo.AvatarURL
+		memberInfo.Email = userInfo.Email
 	}
 
 	if len(thirdPartyId) > 0 {
@@ -152,7 +157,7 @@ func (l *MemberLoginLogic) MemberLogin(in *auth.MemberLoginReq) (*auth.MemberLog
 			return nil, xerror.InternalServerErr
 		}
 		if len(memberIdentities) == 0 {
-			l.Infof("Member identity not found. IdentityType: %d, Identity: %s", in.IdentityType, in.Identifier)
+			l.Infof("Member identity not found. IdentityType: %d,Identifier: %s, Credential: %s", in.IdentityType, in.Identifier, in.Credential)
 			// 创建新用户
 			memberID = uuid.New().String()
 			err = l.svcCtx.DB.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
@@ -166,6 +171,7 @@ func (l *MemberLoginLogic) MemberLogin(in *auth.MemberLoginReq) (*auth.MemberLog
 				}
 				memberInfo.MemberUuid = memberID
 				memberInfo.Status = consts.MemberStatusEnabled
+				memberInfo.Birthday = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 				_, err = l.svcCtx.MemberInfoModel.Insert(l.ctx, session, memberInfo)
 				if err != nil {
 					return err
@@ -192,7 +198,7 @@ func (l *MemberLoginLogic) MemberLogin(in *auth.MemberLoginReq) (*auth.MemberLog
 		l.Errorf("Failed to find latest jwks public. Error: %s", err)
 		return nil, xerror.InternalServerErr
 	}
-	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, "private_key_secr", nil)
+	privateKey, err := xstrings.AesCbcDecryptBase64(jwksRecord.PrivateKey, l.svcCtx.Config.Secret.PrivateKey, nil)
 	if err != nil {
 		l.Errorf("Failed to decrypt private key. Error: %s", err)
 		return nil, err
