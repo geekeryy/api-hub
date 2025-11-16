@@ -31,7 +31,7 @@ create table token_refresh_record
 (
     id                   bigint auto_increment,
     refresh_token_hash   text(3000) not null,                        -- 刷新令牌哈希
-    token                text(3000) not null unique,                 -- 令牌
+    token                text(3000) not null ,                 -- 令牌
     kid                  varchar(255) not null,                        -- 密钥ID
     ip                   varchar(255) not null default '',     -- IP地址
     user_agent           varchar(255) not null default '',     -- 用户代理
