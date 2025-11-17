@@ -22,6 +22,7 @@ MemberService:
     - "user:8881"
     - "localhost:8881"
     - "host.docker.internal:8881"
+    - ${USER_SERVICE_ENDPOINT}
 
 MonitorService:
   Timeout: 10000
@@ -29,6 +30,7 @@ MonitorService:
     - "monitor:8882"
     - "localhost:8882"
     - "host.docker.internal:8882"
+    - ${MONITOR_SERVICE_ENDPOINT}
 
 MailGun:
   Domain: 

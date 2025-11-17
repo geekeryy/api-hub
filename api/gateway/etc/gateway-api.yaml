@@ -24,6 +24,7 @@ AuthService:
     - "auth:8880"
     - "localhost:8880"
     - "host.docker.internal:8880"
+    - ${AUTH_SERVICE_ENDPOINT}
 
 UserService:
   Timeout: 10000
@@ -31,6 +32,7 @@ UserService:
     - "user:8881"
     - "localhost:8881"
     - "host.docker.internal:8881"
+    - ${USER_SERVICE_ENDPOINT}
 
 
 MonitorService:
@@ -39,6 +41,7 @@ MonitorService:
     - "monitor:8882"
     - "localhost:8882"
     - "host.docker.internal:8882"
+    - ${MONITOR_SERVICE_ENDPOINT}
 
 Monitor:
   ReportInterval: 60

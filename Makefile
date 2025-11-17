@@ -73,20 +73,17 @@ IMAGE_TAG=latest
 
 tag-amd64:
 	make build ARCH=amd64
-	upx build/*
+	upx build/* || true
 	docker buildx build --platform linux/amd64 -t $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-amd64 -f Dockerfile .
 	docker push $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-amd64
 
 tag-arm64:
 	make build ARCH=arm64
-	upx build/*
+	upx build/* || true
 	docker buildx build --platform linux/arm64 -t $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-arm64 -f Dockerfile .
 	docker push $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-arm64
 
-tag: 
-	docker manifest rm $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)
+tag: tag-amd64 tag-arm64
+	docker manifest rm $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG) || true
 	docker manifest create $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG) $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-amd64 $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG)-arm64; 
 	docker manifest push $(IMAGE_REPO)/$(IMAGE_NAME):$(IMAGE_TAG); 
-
-deploy:
-	docker compose -f deploy/prod/docker-compose.yml up -d --pull always
