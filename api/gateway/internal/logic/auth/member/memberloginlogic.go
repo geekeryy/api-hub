@@ -5,7 +5,7 @@ import (
 
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
-	"github.com/geekeryy/api-hub/rpc/auth/client/authservice"
+	"github.com/geekeryy/api-hub/rpc/user/client/authservice"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,7 +27,7 @@ func NewMemberLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Membe
 
 // TODO 多个账号绑定同一个第三方账号/手机号/邮箱，需要处理
 func (l *MemberLoginLogic) MemberLogin(req *types.MemberLoginReq) (resp *types.MemberLoginResp, err error) {
-	memberLoginResp, err := l.svcCtx.AuthService.MemberLogin(l.ctx, &authservice.MemberLoginReq{
+	memberLoginResp, err := l.svcCtx.MemberService.MemberLogin(l.ctx, &authservice.MemberLoginReq{
 		IdentityType: req.IdentityType,
 		Identifier:   req.Identifier,
 		Credential:   req.Credential,

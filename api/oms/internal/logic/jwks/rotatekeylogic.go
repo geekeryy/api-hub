@@ -7,7 +7,7 @@ import (
 	"github.com/geekeryy/api-hub/api/oms/internal/svc"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/core/xstrings"
-	"github.com/geekeryy/api-hub/rpc/model/authmodel"
+	usermodel "github.com/geekeryy/api-hub/rpc/user/model"
 	"github.com/google/uuid"
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -45,7 +45,7 @@ func (l *RotateKeyLogic) RotateKey() error {
 		l.Errorf("Failed to encrypt private key. Error: %s", err)
 		return err
 	}
-	if _, err := l.svcCtx.JwksModel.Insert(l.ctx, nil, &authmodel.Jwks{
+	if _, err := l.svcCtx.JwksModel.Insert(l.ctx, nil, &usermodel.Jwks{
 		Kid:        kid,
 		Service:    "",
 		PublicKey:  encryptPub,

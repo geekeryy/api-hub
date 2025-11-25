@@ -18,14 +18,6 @@ Redis:
   Db: ${REDIS_DB}
 
 
-AuthService:
-  Timeout: 10000
-  Endpoints:
-    - "auth:8880"
-    - "localhost:8880"
-    - "host.docker.internal:8880"
-    - ${AUTH_SERVICE_ENDPOINT}
-
 UserService:
   Timeout: 10000
   Endpoints:

@@ -1,6 +1,6 @@
 module github.com/geekeryy/api-hub
 
-go 1.25.0
+go 1.25.4
 
 replace github.com/MicahParks/jwkset => github.com/geekeryy/jwkset v0.0.0-20251030070313-6ac7c02ef2b0
 

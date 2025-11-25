@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.30.2
-// source: rpc/user/user.proto
+// source: user.proto
 
 package user
 
@@ -19,13 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AdminService_GetAdminInfo_FullMethodName = "/user.AdminService/GetAdminInfo"
+	AdminService_AdminLogin_FullMethodName    = "/user.AdminService/AdminLogin"
+	AdminService_AdminRegister_FullMethodName = "/user.AdminService/AdminRegister"
+	AdminService_GetAdminInfo_FullMethodName  = "/user.AdminService/GetAdminInfo"
 )
 
 // AdminServiceClient is the client API for AdminService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdminServiceClient interface {
+	AdminLogin(ctx context.Context, in *AdminLoginReq, opts ...grpc.CallOption) (*AdminLoginResp, error)
+	AdminRegister(ctx context.Context, in *AdminRegisterReq, opts ...grpc.CallOption) (*AdminRegisterResp, error)
 	GetAdminInfo(ctx context.Context, in *GetAdminInfoReq, opts ...grpc.CallOption) (*GetAdminInfoResp, error)
 }
 
@@ -35,6 +39,26 @@ type adminServiceClient struct {
 
 func NewAdminServiceClient(cc grpc.ClientConnInterface) AdminServiceClient {
 	return &adminServiceClient{cc}
+}
+
+func (c *adminServiceClient) AdminLogin(ctx context.Context, in *AdminLoginReq, opts ...grpc.CallOption) (*AdminLoginResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminLoginResp)
+	err := c.cc.Invoke(ctx, AdminService_AdminLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) AdminRegister(ctx context.Context, in *AdminRegisterReq, opts ...grpc.CallOption) (*AdminRegisterResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminRegisterResp)
+	err := c.cc.Invoke(ctx, AdminService_AdminRegister_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *adminServiceClient) GetAdminInfo(ctx context.Context, in *GetAdminInfoReq, opts ...grpc.CallOption) (*GetAdminInfoResp, error) {
@@ -51,6 +75,8 @@ func (c *adminServiceClient) GetAdminInfo(ctx context.Context, in *GetAdminInfoR
 // All implementations must embed UnimplementedAdminServiceServer
 // for forward compatibility.
 type AdminServiceServer interface {
+	AdminLogin(context.Context, *AdminLoginReq) (*AdminLoginResp, error)
+	AdminRegister(context.Context, *AdminRegisterReq) (*AdminRegisterResp, error)
 	GetAdminInfo(context.Context, *GetAdminInfoReq) (*GetAdminInfoResp, error)
 	mustEmbedUnimplementedAdminServiceServer()
 }
@@ -62,6 +88,12 @@ type AdminServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAdminServiceServer struct{}
 
+func (UnimplementedAdminServiceServer) AdminLogin(context.Context, *AdminLoginReq) (*AdminLoginResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminLogin not implemented")
+}
+func (UnimplementedAdminServiceServer) AdminRegister(context.Context, *AdminRegisterReq) (*AdminRegisterResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminRegister not implemented")
+}
 func (UnimplementedAdminServiceServer) GetAdminInfo(context.Context, *GetAdminInfoReq) (*GetAdminInfoResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAdminInfo not implemented")
 }
@@ -84,6 +116,42 @@ func RegisterAdminServiceServer(s grpc.ServiceRegistrar, srv AdminServiceServer)
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&AdminService_ServiceDesc, srv)
+}
+
+func _AdminService_AdminLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminLoginReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).AdminLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_AdminLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).AdminLogin(ctx, req.(*AdminLoginReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_AdminRegister_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminRegisterReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).AdminRegister(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_AdminRegister_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).AdminRegister(ctx, req.(*AdminRegisterReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _AdminService_GetAdminInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -112,22 +180,40 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AdminServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "AdminLogin",
+			Handler:    _AdminService_AdminLogin_Handler,
+		},
+		{
+			MethodName: "AdminRegister",
+			Handler:    _AdminService_AdminRegister_Handler,
+		},
+		{
 			MethodName: "GetAdminInfo",
 			Handler:    _AdminService_GetAdminInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "rpc/user/user.proto",
+	Metadata: "user.proto",
 }
 
 const (
-	MemberService_GetMemberInfo_FullMethodName = "/user.MemberService/GetMemberInfo"
+	MemberService_MemberLogin_FullMethodName          = "/user.MemberService/MemberLogin"
+	MemberService_MemberRegister_FullMethodName       = "/user.MemberService/MemberRegister"
+	MemberService_MemberRefreshToken_FullMethodName   = "/user.MemberService/MemberRefreshToken"
+	MemberService_MemberActivateEmail_FullMethodName  = "/user.MemberService/MemberActivateEmail"
+	MemberService_MemberForgetPassword_FullMethodName = "/user.MemberService/MemberForgetPassword"
+	MemberService_GetMemberInfo_FullMethodName        = "/user.MemberService/GetMemberInfo"
 )
 
 // MemberServiceClient is the client API for MemberService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MemberServiceClient interface {
+	MemberLogin(ctx context.Context, in *MemberLoginReq, opts ...grpc.CallOption) (*MemberLoginResp, error)
+	MemberRegister(ctx context.Context, in *MemberRegisterReq, opts ...grpc.CallOption) (*MemberRegisterResp, error)
+	MemberRefreshToken(ctx context.Context, in *MemberRefreshTokenReq, opts ...grpc.CallOption) (*MemberRefreshTokenResp, error)
+	MemberActivateEmail(ctx context.Context, in *MemberActivateEmailReq, opts ...grpc.CallOption) (*Empty, error)
+	MemberForgetPassword(ctx context.Context, in *MemberForgetPasswordReq, opts ...grpc.CallOption) (*Empty, error)
 	GetMemberInfo(ctx context.Context, in *GetMemberInfoReq, opts ...grpc.CallOption) (*GetMemberInfoResp, error)
 }
 
@@ -137,6 +223,56 @@ type memberServiceClient struct {
 
 func NewMemberServiceClient(cc grpc.ClientConnInterface) MemberServiceClient {
 	return &memberServiceClient{cc}
+}
+
+func (c *memberServiceClient) MemberLogin(ctx context.Context, in *MemberLoginReq, opts ...grpc.CallOption) (*MemberLoginResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MemberLoginResp)
+	err := c.cc.Invoke(ctx, MemberService_MemberLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memberServiceClient) MemberRegister(ctx context.Context, in *MemberRegisterReq, opts ...grpc.CallOption) (*MemberRegisterResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MemberRegisterResp)
+	err := c.cc.Invoke(ctx, MemberService_MemberRegister_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memberServiceClient) MemberRefreshToken(ctx context.Context, in *MemberRefreshTokenReq, opts ...grpc.CallOption) (*MemberRefreshTokenResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MemberRefreshTokenResp)
+	err := c.cc.Invoke(ctx, MemberService_MemberRefreshToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memberServiceClient) MemberActivateEmail(ctx context.Context, in *MemberActivateEmailReq, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, MemberService_MemberActivateEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memberServiceClient) MemberForgetPassword(ctx context.Context, in *MemberForgetPasswordReq, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, MemberService_MemberForgetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *memberServiceClient) GetMemberInfo(ctx context.Context, in *GetMemberInfoReq, opts ...grpc.CallOption) (*GetMemberInfoResp, error) {
@@ -153,6 +289,11 @@ func (c *memberServiceClient) GetMemberInfo(ctx context.Context, in *GetMemberIn
 // All implementations must embed UnimplementedMemberServiceServer
 // for forward compatibility.
 type MemberServiceServer interface {
+	MemberLogin(context.Context, *MemberLoginReq) (*MemberLoginResp, error)
+	MemberRegister(context.Context, *MemberRegisterReq) (*MemberRegisterResp, error)
+	MemberRefreshToken(context.Context, *MemberRefreshTokenReq) (*MemberRefreshTokenResp, error)
+	MemberActivateEmail(context.Context, *MemberActivateEmailReq) (*Empty, error)
+	MemberForgetPassword(context.Context, *MemberForgetPasswordReq) (*Empty, error)
 	GetMemberInfo(context.Context, *GetMemberInfoReq) (*GetMemberInfoResp, error)
 	mustEmbedUnimplementedMemberServiceServer()
 }
@@ -164,6 +305,21 @@ type MemberServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMemberServiceServer struct{}
 
+func (UnimplementedMemberServiceServer) MemberLogin(context.Context, *MemberLoginReq) (*MemberLoginResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MemberLogin not implemented")
+}
+func (UnimplementedMemberServiceServer) MemberRegister(context.Context, *MemberRegisterReq) (*MemberRegisterResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MemberRegister not implemented")
+}
+func (UnimplementedMemberServiceServer) MemberRefreshToken(context.Context, *MemberRefreshTokenReq) (*MemberRefreshTokenResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MemberRefreshToken not implemented")
+}
+func (UnimplementedMemberServiceServer) MemberActivateEmail(context.Context, *MemberActivateEmailReq) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MemberActivateEmail not implemented")
+}
+func (UnimplementedMemberServiceServer) MemberForgetPassword(context.Context, *MemberForgetPasswordReq) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MemberForgetPassword not implemented")
+}
 func (UnimplementedMemberServiceServer) GetMemberInfo(context.Context, *GetMemberInfoReq) (*GetMemberInfoResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMemberInfo not implemented")
 }
@@ -186,6 +342,96 @@ func RegisterMemberServiceServer(s grpc.ServiceRegistrar, srv MemberServiceServe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&MemberService_ServiceDesc, srv)
+}
+
+func _MemberService_MemberLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MemberLoginReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemberServiceServer).MemberLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemberService_MemberLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemberServiceServer).MemberLogin(ctx, req.(*MemberLoginReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemberService_MemberRegister_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MemberRegisterReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemberServiceServer).MemberRegister(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemberService_MemberRegister_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemberServiceServer).MemberRegister(ctx, req.(*MemberRegisterReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemberService_MemberRefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MemberRefreshTokenReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemberServiceServer).MemberRefreshToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemberService_MemberRefreshToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemberServiceServer).MemberRefreshToken(ctx, req.(*MemberRefreshTokenReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemberService_MemberActivateEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MemberActivateEmailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemberServiceServer).MemberActivateEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemberService_MemberActivateEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemberServiceServer).MemberActivateEmail(ctx, req.(*MemberActivateEmailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemberService_MemberForgetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MemberForgetPasswordReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemberServiceServer).MemberForgetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemberService_MemberForgetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemberServiceServer).MemberForgetPassword(ctx, req.(*MemberForgetPasswordReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _MemberService_GetMemberInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -214,10 +460,134 @@ var MemberService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*MemberServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "MemberLogin",
+			Handler:    _MemberService_MemberLogin_Handler,
+		},
+		{
+			MethodName: "MemberRegister",
+			Handler:    _MemberService_MemberRegister_Handler,
+		},
+		{
+			MethodName: "MemberRefreshToken",
+			Handler:    _MemberService_MemberRefreshToken_Handler,
+		},
+		{
+			MethodName: "MemberActivateEmail",
+			Handler:    _MemberService_MemberActivateEmail_Handler,
+		},
+		{
+			MethodName: "MemberForgetPassword",
+			Handler:    _MemberService_MemberForgetPassword_Handler,
+		},
+		{
 			MethodName: "GetMemberInfo",
 			Handler:    _MemberService_GetMemberInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "rpc/user/user.proto",
+	Metadata: "user.proto",
+}
+
+const (
+	AuthService_GetJwks_FullMethodName = "/user.AuthService/GetJwks"
+)
+
+// AuthServiceClient is the client API for AuthService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type AuthServiceClient interface {
+	// 公钥服务
+	GetJwks(ctx context.Context, in *GetJwksReq, opts ...grpc.CallOption) (*GetJwksResp, error)
+}
+
+type authServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
+	return &authServiceClient{cc}
+}
+
+func (c *authServiceClient) GetJwks(ctx context.Context, in *GetJwksReq, opts ...grpc.CallOption) (*GetJwksResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetJwksResp)
+	err := c.cc.Invoke(ctx, AuthService_GetJwks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AuthServiceServer is the server API for AuthService service.
+// All implementations must embed UnimplementedAuthServiceServer
+// for forward compatibility.
+type AuthServiceServer interface {
+	// 公钥服务
+	GetJwks(context.Context, *GetJwksReq) (*GetJwksResp, error)
+	mustEmbedUnimplementedAuthServiceServer()
+}
+
+// UnimplementedAuthServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedAuthServiceServer struct{}
+
+func (UnimplementedAuthServiceServer) GetJwks(context.Context, *GetJwksReq) (*GetJwksResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetJwks not implemented")
+}
+func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
+func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
+
+// UnsafeAuthServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AuthServiceServer will
+// result in compilation errors.
+type UnsafeAuthServiceServer interface {
+	mustEmbedUnimplementedAuthServiceServer()
+}
+
+func RegisterAuthServiceServer(s grpc.ServiceRegistrar, srv AuthServiceServer) {
+	// If the following call pancis, it indicates UnimplementedAuthServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&AuthService_ServiceDesc, srv)
+}
+
+func _AuthService_GetJwks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetJwksReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetJwks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetJwks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetJwks(ctx, req.(*GetJwksReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var AuthService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "user.AuthService",
+	HandlerType: (*AuthServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetJwks",
+			Handler:    _AuthService_GetJwks_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "user.proto",
 }

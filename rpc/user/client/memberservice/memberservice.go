@@ -14,12 +14,32 @@ import (
 )
 
 type (
-	GetAdminInfoReq   = user.GetAdminInfoReq
-	GetAdminInfoResp  = user.GetAdminInfoResp
-	GetMemberInfoReq  = user.GetMemberInfoReq
-	GetMemberInfoResp = user.GetMemberInfoResp
+	AdminLoginReq           = user.AdminLoginReq
+	AdminLoginResp          = user.AdminLoginResp
+	AdminRegisterReq        = user.AdminRegisterReq
+	AdminRegisterResp       = user.AdminRegisterResp
+	Empty                   = user.Empty
+	GetAdminInfoReq         = user.GetAdminInfoReq
+	GetAdminInfoResp        = user.GetAdminInfoResp
+	GetJwksReq              = user.GetJwksReq
+	GetJwksResp             = user.GetJwksResp
+	GetMemberInfoReq        = user.GetMemberInfoReq
+	GetMemberInfoResp       = user.GetMemberInfoResp
+	MemberActivateEmailReq  = user.MemberActivateEmailReq
+	MemberForgetPasswordReq = user.MemberForgetPasswordReq
+	MemberLoginReq          = user.MemberLoginReq
+	MemberLoginResp         = user.MemberLoginResp
+	MemberRefreshTokenReq   = user.MemberRefreshTokenReq
+	MemberRefreshTokenResp  = user.MemberRefreshTokenResp
+	MemberRegisterReq       = user.MemberRegisterReq
+	MemberRegisterResp      = user.MemberRegisterResp
 
 	MemberService interface {
+		MemberLogin(ctx context.Context, in *MemberLoginReq, opts ...grpc.CallOption) (*MemberLoginResp, error)
+		MemberRegister(ctx context.Context, in *MemberRegisterReq, opts ...grpc.CallOption) (*MemberRegisterResp, error)
+		MemberRefreshToken(ctx context.Context, in *MemberRefreshTokenReq, opts ...grpc.CallOption) (*MemberRefreshTokenResp, error)
+		MemberActivateEmail(ctx context.Context, in *MemberActivateEmailReq, opts ...grpc.CallOption) (*Empty, error)
+		MemberForgetPassword(ctx context.Context, in *MemberForgetPasswordReq, opts ...grpc.CallOption) (*Empty, error)
 		GetMemberInfo(ctx context.Context, in *GetMemberInfoReq, opts ...grpc.CallOption) (*GetMemberInfoResp, error)
 	}
 
@@ -32,6 +52,31 @@ func NewMemberService(cli zrpc.Client) MemberService {
 	return &defaultMemberService{
 		cli: cli,
 	}
+}
+
+func (m *defaultMemberService) MemberLogin(ctx context.Context, in *MemberLoginReq, opts ...grpc.CallOption) (*MemberLoginResp, error) {
+	client := user.NewMemberServiceClient(m.cli.Conn())
+	return client.MemberLogin(ctx, in, opts...)
+}
+
+func (m *defaultMemberService) MemberRegister(ctx context.Context, in *MemberRegisterReq, opts ...grpc.CallOption) (*MemberRegisterResp, error) {
+	client := user.NewMemberServiceClient(m.cli.Conn())
+	return client.MemberRegister(ctx, in, opts...)
+}
+
+func (m *defaultMemberService) MemberRefreshToken(ctx context.Context, in *MemberRefreshTokenReq, opts ...grpc.CallOption) (*MemberRefreshTokenResp, error) {
+	client := user.NewMemberServiceClient(m.cli.Conn())
+	return client.MemberRefreshToken(ctx, in, opts...)
+}
+
+func (m *defaultMemberService) MemberActivateEmail(ctx context.Context, in *MemberActivateEmailReq, opts ...grpc.CallOption) (*Empty, error) {
+	client := user.NewMemberServiceClient(m.cli.Conn())
+	return client.MemberActivateEmail(ctx, in, opts...)
+}
+
+func (m *defaultMemberService) MemberForgetPassword(ctx context.Context, in *MemberForgetPasswordReq, opts ...grpc.CallOption) (*Empty, error) {
+	client := user.NewMemberServiceClient(m.cli.Conn())
+	return client.MemberForgetPassword(ctx, in, opts...)
 }
 
 func (m *defaultMemberService) GetMemberInfo(ctx context.Context, in *GetMemberInfoReq, opts ...grpc.CallOption) (*GetMemberInfoResp, error) {

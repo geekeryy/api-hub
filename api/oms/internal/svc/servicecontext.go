@@ -9,9 +9,8 @@ import (
 	"github.com/geekeryy/api-hub/api/oms/internal/config"
 	"github.com/geekeryy/api-hub/api/oms/internal/middleware"
 	"github.com/geekeryy/api-hub/library/validator"
-	"github.com/geekeryy/api-hub/rpc/model/authmodel"
-	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 	"github.com/geekeryy/api-hub/rpc/user/client/memberservice"
+	usermodel "github.com/geekeryy/api-hub/rpc/user/model"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -31,10 +30,10 @@ type ServiceContext struct {
 	OmsOtpMiddleware        rest.Middleware
 	OmsJwtMiddleware        rest.Middleware
 	Validator               *validate.Validate
-	JwksModel               authmodel.JwksModel
-	TokenRefreshRecordModel authmodel.TokenRefreshRecordModel
-	MemberInfoModel         membermodel.MemberInfoModel
-	RefreshTokenModel       authmodel.RefreshTokenModel
+	JwksModel               usermodel.JwksModel
+	TokenRefreshRecordModel usermodel.TokenRefreshRecordModel
+	MemberInfoModel         usermodel.MemberInfoModel
+	RefreshTokenModel       usermodel.RefreshTokenModel
 	MemberService           memberservice.MemberService
 	DB                      sqlx.SqlConn
 	RedisClient             *redis.Client
@@ -91,10 +90,10 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		RedisClient: redisClient,
 		CodeLimiter: codeLimiter,
 
-		JwksModel:               authmodel.NewJwksModel(mysqlClient),
-		TokenRefreshRecordModel: authmodel.NewTokenRefreshRecordModel(mysqlClient),
-		MemberInfoModel:         membermodel.NewMemberInfoModel(mysqlClient),
-		RefreshTokenModel:       authmodel.NewRefreshTokenModel(mysqlClient),
+		JwksModel:               usermodel.NewJwksModel(mysqlClient),
+		TokenRefreshRecordModel: usermodel.NewTokenRefreshRecordModel(mysqlClient),
+		MemberInfoModel:         usermodel.NewMemberInfoModel(mysqlClient),
+		RefreshTokenModel:       usermodel.NewRefreshTokenModel(mysqlClient),
 
 		MemberService: memberservice.NewMemberService(client),
 		Logger:        logger,

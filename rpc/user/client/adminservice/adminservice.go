@@ -14,12 +14,29 @@ import (
 )
 
 type (
-	GetAdminInfoReq   = user.GetAdminInfoReq
-	GetAdminInfoResp  = user.GetAdminInfoResp
-	GetMemberInfoReq  = user.GetMemberInfoReq
-	GetMemberInfoResp = user.GetMemberInfoResp
+	AdminLoginReq           = user.AdminLoginReq
+	AdminLoginResp          = user.AdminLoginResp
+	AdminRegisterReq        = user.AdminRegisterReq
+	AdminRegisterResp       = user.AdminRegisterResp
+	Empty                   = user.Empty
+	GetAdminInfoReq         = user.GetAdminInfoReq
+	GetAdminInfoResp        = user.GetAdminInfoResp
+	GetJwksReq              = user.GetJwksReq
+	GetJwksResp             = user.GetJwksResp
+	GetMemberInfoReq        = user.GetMemberInfoReq
+	GetMemberInfoResp       = user.GetMemberInfoResp
+	MemberActivateEmailReq  = user.MemberActivateEmailReq
+	MemberForgetPasswordReq = user.MemberForgetPasswordReq
+	MemberLoginReq          = user.MemberLoginReq
+	MemberLoginResp         = user.MemberLoginResp
+	MemberRefreshTokenReq   = user.MemberRefreshTokenReq
+	MemberRefreshTokenResp  = user.MemberRefreshTokenResp
+	MemberRegisterReq       = user.MemberRegisterReq
+	MemberRegisterResp      = user.MemberRegisterResp
 
 	AdminService interface {
+		AdminLogin(ctx context.Context, in *AdminLoginReq, opts ...grpc.CallOption) (*AdminLoginResp, error)
+		AdminRegister(ctx context.Context, in *AdminRegisterReq, opts ...grpc.CallOption) (*AdminRegisterResp, error)
 		GetAdminInfo(ctx context.Context, in *GetAdminInfoReq, opts ...grpc.CallOption) (*GetAdminInfoResp, error)
 	}
 
@@ -32,6 +49,16 @@ func NewAdminService(cli zrpc.Client) AdminService {
 	return &defaultAdminService{
 		cli: cli,
 	}
+}
+
+func (m *defaultAdminService) AdminLogin(ctx context.Context, in *AdminLoginReq, opts ...grpc.CallOption) (*AdminLoginResp, error) {
+	client := user.NewAdminServiceClient(m.cli.Conn())
+	return client.AdminLogin(ctx, in, opts...)
+}
+
+func (m *defaultAdminService) AdminRegister(ctx context.Context, in *AdminRegisterReq, opts ...grpc.CallOption) (*AdminRegisterResp, error) {
+	client := user.NewAdminServiceClient(m.cli.Conn())
+	return client.AdminRegister(ctx, in, opts...)
 }
 
 func (m *defaultAdminService) GetAdminInfo(ctx context.Context, in *GetAdminInfoReq, opts ...grpc.CallOption) (*GetAdminInfoResp, error) {

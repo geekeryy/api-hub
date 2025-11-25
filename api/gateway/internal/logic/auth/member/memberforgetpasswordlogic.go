@@ -5,7 +5,7 @@ import (
 
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
-	"github.com/geekeryy/api-hub/rpc/auth/client/authservice"
+	"github.com/geekeryy/api-hub/rpc/user/client/authservice"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -26,7 +26,7 @@ func NewMemberForgetPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 func (l *MemberForgetPasswordLogic) MemberForgetPassword(req *types.MemberForgetPasswordReq) error {
-	_, err := l.svcCtx.AuthService.MemberForgetPassword(l.ctx, &authservice.MemberForgetPasswordReq{
+	_, err := l.svcCtx.MemberService.MemberForgetPassword(l.ctx, &authservice.MemberForgetPasswordReq{
 		IdentityType: req.IdentityType,
 		Identifier:   req.Identifier,
 		Code:         req.Code,

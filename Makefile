@@ -10,13 +10,12 @@ gen-api:
 # Generate rpc go files
 # Example: make gen-rpc s=backendrpc
 gen-rpc:
-	goctl rpc --home tpl protoc rpc/${s}/${s}.proto --go_out=rpc/${s} --go-grpc_out=rpc/${s} --zrpc_out=rpc/${s} -m
+	goctl rpc --home tpl protoc --proto_path=thirdpart --proto_path=rpc/${s} rpc/${s}/${s}.proto --go_out=rpc/${s} --go-grpc_out=rpc/${s} --zrpc_out=rpc/${s} -m
 
 # Generate model
 # Example: make model s=auth
 model:
-	goctl model mysql ddl --home tpl -s doc/sql/$(s).sql -d rpc/model/$(s)model
-
+	goctl model mysql ddl --home tpl -s doc/sql/$(s).sql -d rpc/$(s)/model
 
 # Sync api doc to apifox
 # ENV: export APIFOX_TOKEN=APS-xxxxxxxxxxxxxxxxxxx
@@ -57,7 +56,6 @@ apifox:
 build:
 	GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/gateway api/gateway/gateway.go
 	GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/oms api/oms/oms.go
-	GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/auth rpc/auth/auth.go
 	GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/user rpc/user/user.go
 	GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/monitor rpc/monitor/monitor.go
 

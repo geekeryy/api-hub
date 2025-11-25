@@ -15,11 +15,11 @@ import (
 	"github.com/geekeryy/api-hub/core/validate"
 	"github.com/geekeryy/api-hub/core/xgrpc"
 	"github.com/geekeryy/api-hub/library/validator"
-	"github.com/geekeryy/api-hub/rpc/auth/client/authservice"
-	"github.com/geekeryy/api-hub/rpc/model/authmodel"
-	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 	"github.com/geekeryy/api-hub/rpc/monitor/client/monitorservice"
+	"github.com/geekeryy/api-hub/rpc/user/client/authservice"
 	"github.com/geekeryy/api-hub/rpc/user/client/memberservice"
+	usermodel "github.com/geekeryy/api-hub/rpc/user/model"
+	"github.com/geekeryy/api-hub/rpc/user/user"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -37,11 +37,11 @@ type ServiceContext struct {
 	OmsOtpMiddleware        rest.Middleware
 	OmsJwtMiddleware        rest.Middleware
 	Validator               *validate.Validate
-	JwksModel               authmodel.JwksModel
-	TokenRefreshRecordModel authmodel.TokenRefreshRecordModel
-	MemberIdentityModel     membermodel.MemberIdentityModel
-	MemberInfoModel         membermodel.MemberInfoModel
-	RefreshTokenModel       authmodel.RefreshTokenModel
+	JwksModel               usermodel.JwksModel
+	TokenRefreshRecordModel usermodel.TokenRefreshRecordModel
+	MemberIdentityModel     usermodel.MemberIdentityModel
+	MemberInfoModel         usermodel.MemberInfoModel
+	RefreshTokenModel       usermodel.RefreshTokenModel
 	MemberService           memberservice.MemberService
 	AuthService             authservice.AuthService
 	DB                      sqlx.SqlConn
@@ -80,10 +80,9 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 
 	userClient := zrpc.MustNewClient(c.UserService)
-	authClient := zrpc.MustNewClient(c.AuthService)
 	monitorLazyClient := xgrpc.NewLazyClient(c.MonitorService, 60)
 
-	kfunc, err := jwks.NewDefaultOverrideCtx(context.Background(), requestJWKSetFromGrpc(authClient), keyfunc.Override{
+	kfunc, err := jwks.NewDefaultOverrideCtx(context.Background(), requestJWKSetFromGrpc(userClient), keyfunc.Override{
 		RefreshInterval:   time.Duration(c.Jwks.RefreshInterval) * time.Second,
 		RateLimitWaitMax:  3 * time.Second,
 		RefreshUnknownKID: rate.NewLimiter(rate.Every(1*time.Minute), 2),
@@ -103,11 +102,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		JwtMiddleware:           middleware.NewJwtMiddleware(kfunc).Handle,
 		AdminJwtMiddleware:      middleware.NewAdminJwtMiddleware(kfunc).Handle,
 		Kfunc:                   kfunc,
-		JwksModel:               authmodel.NewJwksModel(mysqlClient),
-		TokenRefreshRecordModel: authmodel.NewTokenRefreshRecordModel(mysqlClient),
-		MemberIdentityModel:     membermodel.NewMemberIdentityModel(mysqlClient),
-		MemberInfoModel:         membermodel.NewMemberInfoModel(mysqlClient),
-		RefreshTokenModel:       authmodel.NewRefreshTokenModel(mysqlClient),
+		JwksModel:               usermodel.NewJwksModel(mysqlClient),
+		TokenRefreshRecordModel: usermodel.NewTokenRefreshRecordModel(mysqlClient),
+		MemberIdentityModel:     usermodel.NewMemberIdentityModel(mysqlClient),
+		MemberInfoModel:         usermodel.NewMemberInfoModel(mysqlClient),
+		RefreshTokenModel:       usermodel.NewRefreshTokenModel(mysqlClient),
 		Validator: validate.New([]validate.ValidatorFn{
 			validator.ChineseNameValidator,
 		}, []string{"zh", "en"}),
@@ -115,7 +114,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		RedisClient:    redisClient,
 		CodeLimiter:    codeLimiter,
 		MemberService:  memberservice.NewMemberService(userClient),
-		AuthService:    authservice.NewAuthService(authClient),
+		AuthService:    authservice.NewAuthService(userClient),
 		MonitorService: monitorservice.NewMonitorService(monitorLazyClient),
 		Logger:         logger,
 	}
@@ -128,7 +127,7 @@ func (s *ServiceContext) Close() {
 
 func requestJWKSetFromGrpc(conn zrpc.Client) func(ctx context.Context) (jwkset.JWKSMarshal, error) {
 	return func(ctx context.Context) (jwkset.JWKSMarshal, error) {
-		response, err := authservice.NewAuthService(conn).GetJwks(ctx, &authservice.GetJwksReq{})
+		response, err := authservice.NewAuthService(conn).GetJwks(ctx, &user.GetJwksReq{})
 		if err != nil {
 			return jwkset.JWKSMarshal{}, err
 		}

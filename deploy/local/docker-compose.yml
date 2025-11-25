@@ -11,7 +11,6 @@ services:
       - ../../api/gateway/etc/gateway-api.yaml:/app/etc/gateway-api.yaml
       - ../../build/gateway:/app/gateway
     depends_on:
-      - auth
       - user
   oms:
     image: alpine:latest
@@ -25,18 +24,7 @@ services:
       - ../../api/oms/etc/oms-api.yaml:/app/etc/oms-api.yaml
       - ../../build/oms:/app/oms
     depends_on:
-      - auth
       - user
-  auth:
-    image: alpine:latest
-    ports:
-      - 8880:8880
-    env_file:
-      - ../../.env
-    command: ["/app/auth", "-f", "/app/etc/auth.yaml"]
-    volumes:
-      - ../../rpc/auth/etc/auth.yaml:/app/etc/auth.yaml
-      - ../../build/auth:/app/auth
   user:
     image: alpine:latest
     ports:
@@ -47,8 +35,6 @@ services:
     volumes:
       - ../../rpc/user/etc/user.yaml:/app/etc/user.yaml
       - ../../build/user:/app/user
-    depends_on:
-      - auth
   monitor:
     image: alpine:latest
     restart: always

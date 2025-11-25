@@ -7,7 +7,7 @@ import (
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/library/xerror"
-	"github.com/geekeryy/api-hub/rpc/auth/client/authservice"
+	"github.com/geekeryy/api-hub/rpc/user/client/authservice"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -41,7 +41,7 @@ func (l *MemberActivateEmailLogic) MemberActivateEmail(req *types.MemberActivate
 		return xerror.New(err, xerror.InvalidParameterErr)
 	}
 
-	_, err = l.svcCtx.AuthService.MemberActivateEmail(l.ctx, &authservice.MemberActivateEmailReq{
+	_, err = l.svcCtx.MemberService.MemberActivateEmail(l.ctx, &authservice.MemberActivateEmailReq{
 		MemberUuid: memberUUID,
 		Email:      email,
 	})

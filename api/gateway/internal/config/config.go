@@ -13,7 +13,6 @@ type Config struct {
 	MailGun        MailGun
 	Secret         Secret
 	UserService    zrpc.RpcClientConf
-	AuthService    zrpc.RpcClientConf
 	MonitorService zrpc.RpcClientConf
 	Deepseek       Deepseek
 }

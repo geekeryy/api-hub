@@ -5,7 +5,7 @@ import (
 
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
-	"github.com/geekeryy/api-hub/rpc/auth/client/authservice"
+	"github.com/geekeryy/api-hub/rpc/user/client/authservice"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,7 +27,7 @@ func NewMemberRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Me
 
 // TODO: 高并发情况下，会导致重复注册，需要优化
 func (l *MemberRegisterLogic) MemberRegister(req *types.MemberRegisterReq) error {
-	_, err := l.svcCtx.AuthService.MemberRegister(l.ctx, &authservice.MemberRegisterReq{
+	_, err := l.svcCtx.MemberService.MemberRegister(l.ctx, &authservice.MemberRegisterReq{
 		IdentityType: req.IdentityType,
 		Identifier:   req.Identifier,
 		Credential:   req.Credential,

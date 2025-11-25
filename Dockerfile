@@ -9,6 +9,5 @@ WORKDIR /app
 COPY /build /app
 COPY api/gateway/etc /app/etc
 COPY api/oms/etc /app/etc
-COPY rpc/auth/etc /app/etc
 COPY rpc/user/etc /app/etc
 COPY rpc/monitor/etc /app/etc

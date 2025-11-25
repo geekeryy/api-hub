@@ -23,6 +23,31 @@ func NewMemberServiceServer(svcCtx *svc.ServiceContext) *MemberServiceServer {
 	}
 }
 
+func (s *MemberServiceServer) MemberLogin(ctx context.Context, in *user.MemberLoginReq) (*user.MemberLoginResp, error) {
+	l := memberservicelogic.NewMemberLoginLogic(ctx, s.svcCtx)
+	return l.MemberLogin(in)
+}
+
+func (s *MemberServiceServer) MemberRegister(ctx context.Context, in *user.MemberRegisterReq) (*user.MemberRegisterResp, error) {
+	l := memberservicelogic.NewMemberRegisterLogic(ctx, s.svcCtx)
+	return l.MemberRegister(in)
+}
+
+func (s *MemberServiceServer) MemberRefreshToken(ctx context.Context, in *user.MemberRefreshTokenReq) (*user.MemberRefreshTokenResp, error) {
+	l := memberservicelogic.NewMemberRefreshTokenLogic(ctx, s.svcCtx)
+	return l.MemberRefreshToken(in)
+}
+
+func (s *MemberServiceServer) MemberActivateEmail(ctx context.Context, in *user.MemberActivateEmailReq) (*user.Empty, error) {
+	l := memberservicelogic.NewMemberActivateEmailLogic(ctx, s.svcCtx)
+	return l.MemberActivateEmail(in)
+}
+
+func (s *MemberServiceServer) MemberForgetPassword(ctx context.Context, in *user.MemberForgetPasswordReq) (*user.Empty, error) {
+	l := memberservicelogic.NewMemberForgetPasswordLogic(ctx, s.svcCtx)
+	return l.MemberForgetPassword(in)
+}
+
 func (s *MemberServiceServer) GetMemberInfo(ctx context.Context, in *user.GetMemberInfoReq) (*user.GetMemberInfoResp, error) {
 	l := memberservicelogic.NewGetMemberInfoLogic(ctx, s.svcCtx)
 	return l.GetMemberInfo(in)

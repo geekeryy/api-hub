@@ -6,7 +6,7 @@ import (
 
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
-	"github.com/geekeryy/api-hub/rpc/auth/client/authservice"
+	"github.com/geekeryy/api-hub/rpc/user/client/authservice"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

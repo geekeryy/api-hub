@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/geekeryy/api-hub/library/xerror"
-	"github.com/geekeryy/api-hub/rpc/model/membermodel"
 	"github.com/geekeryy/api-hub/rpc/user/internal/svc"
+	"github.com/geekeryy/api-hub/rpc/user/model"
 	"github.com/geekeryy/api-hub/rpc/user/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -31,7 +31,7 @@ func (l *GetMemberInfoLogic) GetMemberInfo(in *user.GetMemberInfoReq) (*user.Get
 	memberInfo, err := l.svcCtx.MemberInfoModel.FindOneByMemberUuid(l.ctx, in.MemberUuid)
 	if err != nil {
 		l.Errorf("Failed to find member info. Error: %s, member_uuid: %s", err, in.MemberUuid)
-		if errors.Is(err, membermodel.ErrNotFound) {
+		if errors.Is(err, model.ErrNotFound) {
 			return nil, xerror.NotFoundErr.WithMetadata("member_uuid", in.MemberUuid)
 		}
 		return nil, xerror.DBErr.WithSlacks()

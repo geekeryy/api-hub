@@ -23,6 +23,16 @@ func NewAdminServiceServer(svcCtx *svc.ServiceContext) *AdminServiceServer {
 	}
 }
 
+func (s *AdminServiceServer) AdminLogin(ctx context.Context, in *user.AdminLoginReq) (*user.AdminLoginResp, error) {
+	l := adminservicelogic.NewAdminLoginLogic(ctx, s.svcCtx)
+	return l.AdminLogin(in)
+}
+
+func (s *AdminServiceServer) AdminRegister(ctx context.Context, in *user.AdminRegisterReq) (*user.AdminRegisterResp, error) {
+	l := adminservicelogic.NewAdminRegisterLogic(ctx, s.svcCtx)
+	return l.AdminRegister(in)
+}
+
 func (s *AdminServiceServer) GetAdminInfo(ctx context.Context, in *user.GetAdminInfoReq) (*user.GetAdminInfoResp, error) {
 	l := adminservicelogic.NewGetAdminInfoLogic(ctx, s.svcCtx)
 	return l.GetAdminInfo(in)

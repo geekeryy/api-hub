@@ -11,6 +11,7 @@ import (
 // 官方文档
 // https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
 // https://docs.github.com/zh/rest/users/users
+
 type Token struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"` // 这个字段下面没用到

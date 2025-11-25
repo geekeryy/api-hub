@@ -7,7 +7,7 @@ import (
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/geekeryy/api-hub/core/jwks"
 	"github.com/geekeryy/api-hub/library/xerror"
-	"github.com/geekeryy/api-hub/rpc/auth/client/authservice"
+	"github.com/geekeryy/api-hub/rpc/user/client/authservice"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -40,7 +40,7 @@ func (l *MemberRefreshTokenLogic) MemberRefreshToken(req *types.MemberRefreshTok
 		return nil, xerror.UnauthorizedErr
 	}
 
-	_, err = l.svcCtx.AuthService.MemberRefreshToken(l.ctx, &authservice.MemberRefreshTokenReq{
+	_, err = l.svcCtx.MemberService.MemberRefreshToken(l.ctx, &authservice.MemberRefreshTokenReq{
 		RefreshToken: req.RefreshToken,
 		MemberUuid:   memberId,
 	})
