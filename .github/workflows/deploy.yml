@@ -35,11 +35,12 @@ jobs:
           cache-dependency-path: "**/*.sum"
 
       - name: Golang CI Lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v9
         with:
           version: v2.0
 
   build-deploy:
+    environment: prod
     name: Build Docker Image And Deploy to Server
     runs-on: ubuntu-latest
 
