@@ -226,7 +226,7 @@ func (l *MemberRegisterLogic) registerEmail(in *user.MemberRegisterReq, memberUU
 		return err
 	}
 	if in.Code != cacheValue {
-		return fmt.Errorf("邮箱验证码不正确")
+		return xerror.VerificationCodeErr
 	}
 
 	memberIdentities, err := l.svcCtx.MemberIdentityModel.FindByIdentity(l.ctx, consts.IdentityTypeEmail, in.Identifier)
@@ -234,7 +234,7 @@ func (l *MemberRegisterLogic) registerEmail(in *user.MemberRegisterReq, memberUU
 		return err
 	}
 	if len(memberIdentities) > 0 {
-		return fmt.Errorf("邮箱已注册")
+		return xerror.EmailHasRegisteredErr
 	}
 
 	insertIdentities := []model.MemberIdentity{{
@@ -283,7 +283,7 @@ func (l *MemberRegisterLogic) registerEmail(in *user.MemberRegisterReq, memberUU
 		return nil
 	})
 	if err != nil {
-		return err
+		return xerror.DBErr.WithDetails(err.Error())
 	}
 	return nil
 }

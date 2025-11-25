@@ -43,6 +43,8 @@ type ServiceContext struct {
 	logx.Logger
 }
 
+// NewServiceContext
+// oms每次重启使用一个新的jwks密钥（TODO 分布式场景）
 func NewServiceContext(c config.Config) *ServiceContext {
 	mysqlClient, err := sqlx.NewConn(sqlx.SqlConf{
 		DataSource: fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", c.Mysql.Username, c.Mysql.Password, c.Mysql.Host, c.Mysql.Dbname),
@@ -72,7 +74,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		log.Fatalf("Failed to init code limiter. Error: %s", err)
 	}
 
-	client := zrpc.MustNewClient(c.MemberService)
+	client := zrpc.MustNewClient(c.UserService)
 
 	logger := logx.WithContext(context.Background())
 

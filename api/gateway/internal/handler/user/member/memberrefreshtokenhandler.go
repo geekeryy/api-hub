@@ -1,19 +1,22 @@
+// Code scaffolded by goctl. Safe to edit.
+// goctl 1.9.2
+
 package member
 
 import (
 	"net/http"
 
-	"github.com/geekeryy/api-hub/api/gateway/internal/logic/auth/member"
+	"github.com/geekeryy/api-hub/api/gateway/internal/logic/user/member"
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/geekeryy/api-hub/library/xerror"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 忘记密码
-func MemberForgetPasswordHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 刷新Token
+func MemberRefreshTokenHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.MemberForgetPasswordReq
+		var req types.MemberRefreshTokenReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, xerror.InvalidParameterErr)
 			return
@@ -23,12 +26,12 @@ func MemberForgetPasswordHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := member.NewMemberForgetPasswordLogic(r.Context(), svcCtx)
-		err := l.MemberForgetPassword(&req)
+		l := member.NewMemberRefreshTokenLogic(r.Context(), svcCtx)
+		resp, err := l.MemberRefreshToken(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
-			httpx.Ok(w)
+			httpx.OkJsonCtx(r.Context(), w, resp)
 		}
 	}
 }

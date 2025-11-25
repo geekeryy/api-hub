@@ -18,7 +18,7 @@ type Config struct {
 	MailGun        MailGun
 	Secret         Secret
 	Oms            Oms
-	MemberService  zrpc.RpcClientConf
+	UserService    zrpc.RpcClientConf
 	MonitorService zrpc.RpcClientConf
 }
 

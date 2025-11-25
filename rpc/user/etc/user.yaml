@@ -21,7 +21,6 @@ Secret:
   PrivateKey: ${SECRET_PRIVATE_KEY}
   PublicKey: ${SECRET_PUBLIC_KEY}
 
-
 Jwt:
   AccessExpire: ${AUTH_ACCESS_EXPIRE}
   RefreshExpire: ${AUTH_REFRESH_EXPIRE}

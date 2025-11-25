@@ -43,9 +43,9 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	svc := &ServiceContext{
 		Config:                  c,
-		MemberInfoModel:         model.NewMemberInfoModel(mysqlClient),
 		DB:                      mysqlClient,
 		JwksModel:               model.NewJwksModel(mysqlClient),
+		MemberInfoModel:         model.NewMemberInfoModel(mysqlClient),
 		TokenRefreshRecordModel: model.NewTokenRefreshRecordModel(mysqlClient),
 		RefreshTokenModel:       model.NewRefreshTokenModel(mysqlClient),
 		MemberIdentityModel:     model.NewMemberIdentityModel(mysqlClient),

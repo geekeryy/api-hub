@@ -13,28 +13,6 @@ type AdminInfoResp struct {
 	Birthday string `json:"birthday"` // 生日
 }
 
-type AdminLoginReq struct {
-	IdentityType int64  `json:"identity_type,options=1|2|3|4|5|6|7"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
-	Identifier   string `json:"identifier,optional"`                 // 标识符 账号/手机号/邮箱
-	Credential   string `json:"credential"`                          // 凭证 密码/验证码/access_token
-}
-
-type AdminLoginResp struct {
-	Token        string `json:"token"`         // 新token
-	RefreshToken string `json:"refresh_token"` // 刷新token
-}
-
-type AdminRegisterReq struct {
-	IdentityType int64  `json:"identity_type,options=1|2|3|4|5|6|7"` // 身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github
-	Identifier   string `json:"identifier,optional"`                 // 标识符 账号/手机号/邮箱
-	Credential   string `json:"credential"`                          // 凭证 密码/验证码/access_token
-}
-
-type AdminRegisterResp struct {
-	Token        string `json:"token"`         // 新token
-	RefreshToken string `json:"refresh_token"` // 刷新token
-}
-
 type DailySentenceReq struct {
 	Lang string `form:"lang" validate:"omitempty,oneof=zh en ja ko" comment:"LANGUAGE"` // 语言
 	Use  string `form:"use,optional"`                                                   // 用途 将会传递给Prompt模板，为空时模板不包含用途
@@ -42,10 +20,6 @@ type DailySentenceReq struct {
 
 type DailySentenceResp struct {
 	Sentence string `json:"sentence"` // 句子
-}
-
-type JWKSReq struct {
-	Service string `form:"service,optional"` // 服务名称
 }
 
 type MemberActivateEmailReq struct {

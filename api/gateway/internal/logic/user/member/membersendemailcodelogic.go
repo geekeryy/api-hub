@@ -1,3 +1,6 @@
+// Code scaffolded by goctl. Safe to edit.
+// goctl 1.9.2
+
 package member
 
 import (
@@ -10,6 +13,7 @@ import (
 	"github.com/geekeryy/api-hub/core/email"
 	"github.com/geekeryy/api-hub/core/limiter"
 	"github.com/geekeryy/api-hub/core/xstrings"
+	"github.com/geekeryy/api-hub/library/xerror"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -36,7 +40,7 @@ func (l *MemberSendEmailCodeLogic) MemberSendEmailCode(req *types.MemberSendEmai
 		l.svcCtx.CodeLimiter.Add(req.Email, limit)
 	}
 	if !limit.Validate() {
-		return fmt.Errorf("发送频率过高")
+		return xerror.RequestRateLimitError
 	}
 	code := xstrings.GenerateRandomNumber(6)
 	l.Infof("send email code to %s code: %s", req.Email, code)

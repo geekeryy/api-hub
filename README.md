@@ -22,24 +22,28 @@
 ```plain
 .
 ├── api
-│   └── gateway // 网关（BFF层）
+│   ├── gateway              网关服务（BFF层）
+│   │   ├── doc
+│   │   └── internal
+│   │       ├── ...
+│   │       ├── logic
+│   │       │   ├── healthz   健康检查
+│   │       │   ├── ai        AI服务
+│   │       │   ├── explorer  其他业务服务  
+│   │       │   └── user      用户服务
+│   │       │       ├── admin B端用户管理
+│   │       │       └── member C端用户管理
+│   │       ├── ...
+│   │       └── types
+│   └── oms                  运维管理服务（BFF层）
 │       ├── doc
 │       └── internal
-│           ├── config
-│           ├── handler
+│           ├── ...
 │           ├── logic
-│           │   ├── auth                    // 认证中心（授权域）
-│           │   │   ├── admin B端授权
-│           │   │   ├── jwks  jwt密钥开放接口
-│           │   │   └── member C端授权
-│           │   ├── healthz 健康检查
-│           │   ├── oms                     // 运维管理服务（运维域）
-│           │   │   └── jwks jwt密钥管理
-│           │   └── user                    // 业务服务（用户域）
-│           │       ├── admin B端用户管理
-│           │       └── member C端用户管理
-│           ├── middleware
-│           ├── svc
+│           │   ├── healthz  健康检查
+│           │   ├── jwks     jwt密钥管理
+│           │   └── auth     oms认证
+│           ├── ...
 │           └── types
 ├── core          核心库
 │   ├── consts    常量
@@ -59,8 +63,7 @@
 │   ├── xgorm     sql日志
 │   └── xstrings  字符串处理
 ├── deploy        部署
-│   ├── local
-│   └── prod
+│   └── local
 ├── doc           文档
 │   ├── assets    静态资源
 │   ├── sql       sql
@@ -72,8 +75,8 @@
 │   ├── validator  自定义参数校验
 │   └── xerror     自定义错误码
 ├── rpc
-│   ├── model     gorm
-│   └── user      用户服务（业务）
+│   ├── monitor   监控告警服务
+│   └── user      用户服务
 ├── test          测试
 └── tpl           项目模板
 ```
@@ -155,10 +158,7 @@ EMAIL_FORMAT_ERRO = "Email format error"
 ## 🤔 QA
 
 * 使用模板生成代码出现`<no value>`，如何解决？
-  * 由于目前go-zero官方还未合并我的pr，暂时不支持projectPkg模板变量，可以选择使用我fork的goctl版本，或者等待官方合并。
-
-* 为什么配置项的类型不能使用`int64`？
-  * 因为go-zero使用环境变量覆盖配置项时，使用类型为int64的配置项会被误认为time.Duration，我已经提交pr修复，等待官方合并 [#4979](https://github.com/zeromicro/go-zero/pull/4979)
+  * 目前go-zero官方已经合并我的pr，使用goctl 1.9.2以上版本即可。
 
 ## 项目管理
 
@@ -183,10 +183,10 @@ EMAIL_FORMAT_ERRO = "Email format error"
 ### Git分支管理
 
 * master：稳定分支
-* hotfix：紧急修复分支 线上紧急bug修复，修改后需合入dev
-* release：发布分支 用于提测 格式：release/20250630（下个迭代开始后，release不再合并dev分支，而是直接在分支上修复问题，修改后需合入dev）
 * dev：开发分支
-* feature：功能分支
+* hotfix/xx：紧急修复分支 线上紧急bug修复，修改后需合入dev
+* release/xx：发布分支 用于提测 格式：release/20250630（下个迭代开始后，release不再合并dev分支，而是直接在分支上修复问题，修改后需合入dev）
+* feature/xx：功能分支
 
 ### 版本管理
 

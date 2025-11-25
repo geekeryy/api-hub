@@ -8,7 +8,6 @@ info (
 	basePath:     ""
 )
 
-import "auth.api"
 import "user.api"
 import "ai.api"
 import "explorer.api"

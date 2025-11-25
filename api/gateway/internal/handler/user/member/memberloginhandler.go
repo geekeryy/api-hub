@@ -1,19 +1,22 @@
+// Code scaffolded by goctl. Safe to edit.
+// goctl 1.9.2
+
 package member
 
 import (
 	"net/http"
 
-	"github.com/geekeryy/api-hub/api/gateway/internal/logic/auth/member"
+	"github.com/geekeryy/api-hub/api/gateway/internal/logic/user/member"
 	"github.com/geekeryy/api-hub/api/gateway/internal/svc"
 	"github.com/geekeryy/api-hub/api/gateway/internal/types"
 	"github.com/geekeryy/api-hub/library/xerror"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-// 注册
-func MemberRegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+// 登录
+func MemberLoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.MemberRegisterReq
+		var req types.MemberLoginReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, xerror.InvalidParameterErr)
 			return
@@ -23,12 +26,12 @@ func MemberRegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := member.NewMemberRegisterLogic(r.Context(), svcCtx)
-		err := l.MemberRegister(&req)
+		l := member.NewMemberLoginLogic(r.Context(), svcCtx)
+		resp, err := l.MemberLogin(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
-			httpx.Ok(w)
+			httpx.OkJsonCtx(r.Context(), w, resp)
 		}
 	}
 }

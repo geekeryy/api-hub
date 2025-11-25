@@ -69,559 +69,6 @@
         }
       }
     },
-    "/api/v1/gateway/auth/admin/login": {
-      "post": {
-        "description": "登录",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - B端用户授权"
-        ],
-        "summary": "登录",
-        "operationId": "auth/AdminAdminLoginHandler",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "identity_type",
-                "credential"
-              ],
-              "properties": {
-                "credential": {
-                  "description": "凭证 密码/验证码/access_token",
-                  "type": "string"
-                },
-                "identifier": {
-                  "description": "标识符 账号/手机号/邮箱",
-                  "type": "string"
-                },
-                "identity_type": {
-                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
-                  "type": "integer",
-                  "enum": [
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5",
-                    "6",
-                    "7"
-                  ]
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "refresh_token": {
-                  "description": "刷新token",
-                  "type": "string"
-                },
-                "token": {
-                  "description": "新token",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/admin/register": {
-      "post": {
-        "description": "注册",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - B端用户授权"
-        ],
-        "summary": "注册",
-        "operationId": "auth/AdminAdminRegisterHandler",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "identity_type",
-                "credential"
-              ],
-              "properties": {
-                "credential": {
-                  "description": "凭证 密码/验证码/access_token",
-                  "type": "string"
-                },
-                "identifier": {
-                  "description": "标识符 账号/手机号/邮箱",
-                  "type": "string"
-                },
-                "identity_type": {
-                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
-                  "type": "integer",
-                  "enum": [
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5",
-                    "6",
-                    "7"
-                  ]
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "refresh_token": {
-                  "description": "刷新token",
-                  "type": "string"
-                },
-                "token": {
-                  "description": "新token",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/jwks/get": {
-      "get": {
-        "description": "获取公钥",
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - jwks"
-        ],
-        "summary": "获取公钥",
-        "operationId": "auth/JwksGetJWKSHandler",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "服务名称",
-            "name": "service",
-            "in": "query",
-            "allowEmptyValue": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {}
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/member/activate-email": {
-      "get": {
-        "description": "用户点击邮箱激活链接，前端页面调用激活邮箱接口，激活邮箱",
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - C端用户授权"
-        ],
-        "summary": "激活邮箱",
-        "operationId": "auth/MemberMemberActivateEmailHandler",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "激活token",
-            "name": "token",
-            "in": "query",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {}
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/member/forget-password": {
-      "post": {
-        "description": "忘记密码",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - C端用户授权"
-        ],
-        "summary": "忘记密码",
-        "operationId": "auth/MemberMemberForgetPasswordHandler",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "identity_type",
-                "identifier",
-                "code",
-                "password"
-              ],
-              "properties": {
-                "code": {
-                  "description": "验证码",
-                  "type": "string"
-                },
-                "identifier": {
-                  "description": "标识符 手机号/邮箱",
-                  "type": "string"
-                },
-                "identity_type": {
-                  "description": "身份类型 1: 手机号 2: 邮箱",
-                  "type": "integer",
-                  "enum": [
-                    "1",
-                    "2"
-                  ]
-                },
-                "password": {
-                  "description": "新密码",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {}
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/member/login": {
-      "post": {
-        "description": "手机号+验证码登录、邮箱+验证码登录、用户名/手机号/邮箱+密码登录、第三方登录",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - C端用户授权"
-        ],
-        "summary": "登录",
-        "operationId": "auth/MemberMemberLoginHandler",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "identity_type",
-                "credential"
-              ],
-              "properties": {
-                "credential": {
-                  "description": "凭证 密码/验证码/access_token/code",
-                  "type": "string"
-                },
-                "identifier": {
-                  "description": "标识符 账号/手机号/邮箱",
-                  "type": "string"
-                },
-                "identity_type": {
-                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
-                  "type": "integer",
-                  "enum": [
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5",
-                    "6",
-                    "7"
-                  ]
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "refresh_token": {
-                  "description": "刷新token",
-                  "type": "string"
-                },
-                "token": {
-                  "description": "新token",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/member/refresh": {
-      "post": {
-        "description": "资源请求返回401时，自动调用刷新Token接口，并重放资源请求；如果刷新Token返回401，则需要重新登录",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - C端用户授权"
-        ],
-        "summary": "刷新Token",
-        "operationId": "auth/MemberMemberRefreshTokenHandler",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "refresh_token"
-              ],
-              "properties": {
-                "refresh_token": {
-                  "description": "刷新token",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "token": {
-                  "description": "新token",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/member/register": {
-      "post": {
-        "description": "账号密码注册、手机号验证码注册、手机号验证码+密码注册、邮箱验证码注册、邮箱验证码+密码注册、邮箱激活+密码注册",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - C端用户授权"
-        ],
-        "summary": "注册",
-        "operationId": "auth/MemberMemberRegisterHandler",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "identity_type",
-                "credential"
-              ],
-              "properties": {
-                "code": {
-                  "description": "验证码",
-                  "type": "string"
-                },
-                "credential": {
-                  "description": "凭证 密码/access_token",
-                  "type": "string"
-                },
-                "identifier": {
-                  "description": "标识符 账号/手机号/邮箱",
-                  "type": "string"
-                },
-                "identity_type": {
-                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
-                  "type": "integer",
-                  "enum": [
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5",
-                    "6",
-                    "7"
-                  ]
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {}
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/member/send-email-code": {
-      "post": {
-        "description": "发送邮箱验证码",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - C端用户授权"
-        ],
-        "summary": "发送邮箱验证码",
-        "operationId": "auth/MemberMemberSendEmailCodeHandler",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "email"
-              ],
-              "properties": {
-                "email": {
-                  "description": "邮箱",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {}
-          }
-        }
-      }
-    },
-    "/api/v1/gateway/auth/member/send-phone-code": {
-      "post": {
-        "description": "发送手机验证码",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "https"
-        ],
-        "tags": [
-          "Auth - C端用户授权"
-        ],
-        "summary": "发送手机验证码",
-        "operationId": "auth/MemberMemberSendPhoneCodeHandler",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "required": [
-                "phone"
-              ],
-              "properties": {
-                "phone": {
-                  "description": "手机号",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {}
-          }
-        }
-      }
-    },
     "/api/v1/gateway/explorer/rss-proxy": {
       "get": {
         "produces": [
@@ -731,6 +178,37 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/activate-email": {
+      "get": {
+        "description": "用户点击邮箱激活链接，前端页面调用激活邮箱接口，激活邮箱",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户授权"
+        ],
+        "summary": "激活邮箱",
+        "operationId": "user/MemberMemberActivateEmailHandler",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "激活token",
+            "name": "token",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
           }
         }
       }
@@ -882,6 +360,69 @@
         }
       }
     },
+    "/api/v1/gateway/user/member/forget-password": {
+      "post": {
+        "description": "忘记密码",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户授权"
+        ],
+        "summary": "忘记密码",
+        "operationId": "user/MemberMemberForgetPasswordHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "identity_type",
+                "identifier",
+                "code",
+                "password"
+              ],
+              "properties": {
+                "code": {
+                  "description": "验证码",
+                  "type": "string"
+                },
+                "identifier": {
+                  "description": "标识符 手机号/邮箱",
+                  "type": "string"
+                },
+                "identity_type": {
+                  "description": "身份类型 1: 手机号 2: 邮箱",
+                  "type": "integer",
+                  "enum": [
+                    "1",
+                    "2"
+                  ]
+                },
+                "password": {
+                  "description": "新密码",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
     "/api/v1/gateway/user/member/info": {
       "get": {
         "description": "获取用户信息",
@@ -928,6 +469,286 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/login": {
+      "post": {
+        "description": "手机号+验证码登录、邮箱+验证码登录、用户名/手机号/邮箱+密码登录、第三方登录",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户授权"
+        ],
+        "summary": "登录",
+        "operationId": "user/MemberMemberLoginHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "identity_type",
+                "credential"
+              ],
+              "properties": {
+                "credential": {
+                  "description": "凭证 密码/验证码/access_token/code",
+                  "type": "string"
+                },
+                "identifier": {
+                  "description": "标识符 账号/手机号/邮箱",
+                  "type": "string"
+                },
+                "identity_type": {
+                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
+                  "type": "integer",
+                  "enum": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refresh_token": {
+                  "description": "刷新token",
+                  "type": "string"
+                },
+                "token": {
+                  "description": "新token",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/refresh": {
+      "post": {
+        "description": "资源请求返回401时，自动调用刷新Token接口，并重放资源请求；如果刷新Token返回401，则需要重新登录",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户授权"
+        ],
+        "summary": "刷新Token",
+        "operationId": "user/MemberMemberRefreshTokenHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "refresh_token"
+              ],
+              "properties": {
+                "refresh_token": {
+                  "description": "刷新token",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "description": "新token",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/register": {
+      "post": {
+        "description": "账号密码注册、手机号验证码注册、手机号验证码+密码注册、邮箱验证码注册、邮箱验证码+密码注册、邮箱激活+密码注册",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户授权"
+        ],
+        "summary": "注册",
+        "operationId": "user/MemberMemberRegisterHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "identity_type",
+                "credential"
+              ],
+              "properties": {
+                "code": {
+                  "description": "验证码",
+                  "type": "string"
+                },
+                "credential": {
+                  "description": "凭证 密码/access_token",
+                  "type": "string"
+                },
+                "identifier": {
+                  "description": "标识符 账号/手机号/邮箱",
+                  "type": "string"
+                },
+                "identity_type": {
+                  "description": "身份类型 1: 手机号 2: 邮箱 3: 用户名 4: wechat 5: google 6: facebook 7: github",
+                  "type": "integer",
+                  "enum": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/send-email-code": {
+      "post": {
+        "description": "发送邮箱验证码",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户授权"
+        ],
+        "summary": "发送邮箱验证码",
+        "operationId": "user/MemberMemberSendEmailCodeHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "email"
+              ],
+              "properties": {
+                "email": {
+                  "description": "邮箱",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/api/v1/gateway/user/member/send-phone-code": {
+      "post": {
+        "description": "发送手机验证码",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "https"
+        ],
+        "tags": [
+          "User - C端用户授权"
+        ],
+        "summary": "发送手机验证码",
+        "operationId": "user/MemberMemberSendPhoneCodeHandler",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "phone"
+              ],
+              "properties": {
+                "phone": {
+                  "description": "手机号",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {}
           }
         }
       }
@@ -1074,7 +895,7 @@
       }
     }
   },
-  "x-date": "2025-11-11 00:01:01",
+  "x-date": "2025-11-25 22:32:18",
   "x-description": "This is a goctl generated swagger file.",
   "x-github": "https://github.com/zeromicro/go-zero",
   "x-go-zero-doc": "https://go-zero.dev/",

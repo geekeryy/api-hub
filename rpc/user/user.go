@@ -6,6 +6,7 @@ import (
 
 	"github.com/geekeryy/api-hub/rpc/user/internal/config"
 	adminserviceServer "github.com/geekeryy/api-hub/rpc/user/internal/server/adminservice"
+	authserviceServer "github.com/geekeryy/api-hub/rpc/user/internal/server/authservice"
 	memberserviceServer "github.com/geekeryy/api-hub/rpc/user/internal/server/memberservice"
 	"github.com/geekeryy/api-hub/rpc/user/internal/svc"
 	"github.com/geekeryy/api-hub/rpc/user/user"
@@ -31,6 +32,7 @@ func main() {
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		user.RegisterAdminServiceServer(grpcServer, adminserviceServer.NewAdminServiceServer(ctx))
 		user.RegisterMemberServiceServer(grpcServer, memberserviceServer.NewMemberServiceServer(ctx))
+		user.RegisterAuthServiceServer(grpcServer, authserviceServer.NewAuthServiceServer(ctx))
 
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)

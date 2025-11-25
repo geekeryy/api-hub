@@ -7,9 +7,6 @@ import (
 	"net/http"
 
 	ai "github.com/geekeryy/api-hub/api/gateway/internal/handler/ai"
-	authadmin "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/admin"
-	authjwks "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/jwks"
-	authmember "github.com/geekeryy/api-hub/api/gateway/internal/handler/auth/member"
 	explorer "github.com/geekeryy/api-hub/api/gateway/internal/handler/explorer"
 	healthz "github.com/geekeryy/api-hub/api/gateway/internal/handler/healthz"
 	useradmin "github.com/geekeryy/api-hub/api/gateway/internal/handler/user/admin"
@@ -33,90 +30,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			}...,
 		),
 		rest.WithPrefix("/api/v1/gateway/ai"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.ContextMiddleware},
-			[]rest.Route{
-				{
-					// 登录
-					Method:  http.MethodPost,
-					Path:    "/login",
-					Handler: authadmin.AdminLoginHandler(serverCtx),
-				},
-				{
-					// 注册
-					Method:  http.MethodPost,
-					Path:    "/register",
-					Handler: authadmin.AdminRegisterHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithPrefix("/api/v1/gateway/auth/admin"),
-	)
-
-	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 获取公钥
-				Method:  http.MethodGet,
-				Path:    "/get",
-				Handler: authjwks.GetJWKSHandler(serverCtx),
-			},
-		},
-		rest.WithPrefix("/api/v1/gateway/auth/jwks"),
-	)
-
-	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.ContextMiddleware},
-			[]rest.Route{
-				{
-					// 激活邮箱
-					Method:  http.MethodGet,
-					Path:    "/activate-email",
-					Handler: authmember.MemberActivateEmailHandler(serverCtx),
-				},
-				{
-					// 忘记密码
-					Method:  http.MethodPost,
-					Path:    "/forget-password",
-					Handler: authmember.MemberForgetPasswordHandler(serverCtx),
-				},
-				{
-					// 登录
-					Method:  http.MethodPost,
-					Path:    "/login",
-					Handler: authmember.MemberLoginHandler(serverCtx),
-				},
-				{
-					// 刷新Token
-					Method:  http.MethodPost,
-					Path:    "/refresh",
-					Handler: authmember.MemberRefreshTokenHandler(serverCtx),
-				},
-				{
-					// 注册
-					Method:  http.MethodPost,
-					Path:    "/register",
-					Handler: authmember.MemberRegisterHandler(serverCtx),
-				},
-				{
-					// 发送邮箱验证码
-					Method:  http.MethodPost,
-					Path:    "/send-email-code",
-					Handler: authmember.MemberSendEmailCodeHandler(serverCtx),
-				},
-				{
-					// 发送手机验证码
-					Method:  http.MethodPost,
-					Path:    "/send-phone-code",
-					Handler: authmember.MemberSendPhoneCodeHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithPrefix("/api/v1/gateway/auth/member"),
 	)
 
 	server.AddRoutes(
@@ -206,6 +119,57 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPut,
 					Path:    "/update-info",
 					Handler: usermember.MemberUpdateInfoHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/api/v1/gateway/user/member"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ContextMiddleware},
+			[]rest.Route{
+				{
+					// 激活邮箱
+					Method:  http.MethodGet,
+					Path:    "/activate-email",
+					Handler: usermember.MemberActivateEmailHandler(serverCtx),
+				},
+				{
+					// 忘记密码
+					Method:  http.MethodPost,
+					Path:    "/forget-password",
+					Handler: usermember.MemberForgetPasswordHandler(serverCtx),
+				},
+				{
+					// 登录
+					Method:  http.MethodPost,
+					Path:    "/login",
+					Handler: usermember.MemberLoginHandler(serverCtx),
+				},
+				{
+					// 刷新Token
+					Method:  http.MethodPost,
+					Path:    "/refresh",
+					Handler: usermember.MemberRefreshTokenHandler(serverCtx),
+				},
+				{
+					// 注册
+					Method:  http.MethodPost,
+					Path:    "/register",
+					Handler: usermember.MemberRegisterHandler(serverCtx),
+				},
+				{
+					// 发送邮箱验证码
+					Method:  http.MethodPost,
+					Path:    "/send-email-code",
+					Handler: usermember.MemberSendEmailCodeHandler(serverCtx),
+				},
+				{
+					// 发送手机验证码
+					Method:  http.MethodPost,
+					Path:    "/send-phone-code",
+					Handler: usermember.MemberSendPhoneCodeHandler(serverCtx),
 				},
 			}...,
 		),

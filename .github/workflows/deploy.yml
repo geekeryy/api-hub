@@ -1,0 +1,86 @@
+name: Build Docker Image And Deploy to Server
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "是否部署"
+        required: false
+        type: boolean
+        default: false
+
+
+env:
+  REGISTRY: "ccr.ccs.tencentyun.com"
+  DEPLOY: ${{ inputs.deploy }}
+
+jobs:
+  lint:
+    name: Golang CI Lint
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache-dependency-path: "**/*.sum"
+
+      - name: Golang CI Lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.0
+
+  build-deploy:
+    name: Build Docker Image And Deploy to Server
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache-dependency-path: "**/*.sum"
+
+      - name: Login to Tencent Image Repository
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.TENCENT_IMAGE_REPO_USERNAME }}
+          password: ${{ secrets.TENCENT_IMAGE_REPO_PASSWORD }}
+
+      - name: Install UPX
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          install-only: true
+
+      - name: Build, tag, and push Tencent Image Repository
+        id: build
+        run: |-
+          make tag
+
+      - name: Deploy to server
+        if: env.DEPLOY == 'true'
+        uses: appleboy/ssh-action@v1
+        with:
+          # host: ${{ secrets.HOST }}
+          # username: ${{ secrets.USERNAME }}
+          # key: ${{ secrets.KEY }}
+          # port: ${{ secrets.PORT }}
+          script: |
+            # TODO
