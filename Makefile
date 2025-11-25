@@ -54,10 +54,10 @@ apifox:
 ############################################ Docker本地调试 #############################################
 
 build:
-	GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/gateway api/gateway/gateway.go
-	GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/oms api/oms/oms.go
-	GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/user rpc/user/user.go
-	GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/monitor rpc/monitor/monitor.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/gateway api/gateway/gateway.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/oms api/oms/oms.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/user rpc/user/user.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(ARCH) go build -ldflags="-s -w" -o build/monitor rpc/monitor/monitor.go
 
 restart: build
 	docker compose -f deploy/local/docker-compose.yml up -d

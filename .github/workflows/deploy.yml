@@ -11,7 +11,6 @@ on:
         type: boolean
         default: false
 
-
 env:
   REGISTRY: "ccr.ccs.tencentyun.com"
   DEPLOY: ${{ inputs.deploy }}
@@ -22,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: 'read'
+      contents: "read"
 
     steps:
       - name: Checkout
@@ -31,13 +30,13 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache-dependency-path: "**/*.sum"
 
       - name: Golang CI Lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.0
+          version: v2.4.0
 
   build-deploy:
     environment: prod
